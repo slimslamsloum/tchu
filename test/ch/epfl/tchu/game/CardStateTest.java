@@ -74,4 +74,5 @@ class CardStateTest {
         assertEquals(5, arbitrary_CS.faceDownCards().size());
         assertEquals(Card.ALL.subList(0,5), arbitrary_CS.faceDownCards().topCards(5).toList());
     }
+
 }
