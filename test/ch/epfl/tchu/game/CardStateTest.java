@@ -58,7 +58,7 @@ class CardStateTest {
     void newDiscardCardsAreAdded(){
         SortedBag<Card> discards = SortedBag.of(Card.ALL.subList(0,5));
         CardState arbitrary_CS = test_cardState.withMoreDiscardedCards(discards);
-        assertEquals(git5, arbitrary_CS.discardsSize());
+        assertEquals(5, arbitrary_CS.discardsSize());
         assertEquals(Card.ALL.subList(0,5), arbitrary_CS.discardCards().toList());
     }
 
