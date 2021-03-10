@@ -3,11 +3,8 @@ package ch.epfl.tchu.gui;
 import ch.epfl.tchu.Preconditions;
 import ch.epfl.tchu.SortedBag;
 import ch.epfl.tchu.game.Card;
-import ch.epfl.tchu.game.ChMap;
 import ch.epfl.tchu.game.Route;
 import ch.epfl.tchu.game.Trail;
-
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -163,8 +160,8 @@ public class Info {
             return s;
         }
         else {
-           s+=String.format(StringsFr.SOME_ADDITIONAL_COST,additionalCost,StringsFr.plural(additionalCost));
-           return s;
+            s+=String.format(StringsFr.SOME_ADDITIONAL_COST,additionalCost,StringsFr.plural(additionalCost));
+            return s;
         }
     }
 
@@ -236,38 +233,5 @@ public class Info {
             cmp+=1;
         }
         return setContent;
-    }
-
-    public static void main(String[] args){
-        SortedBag.Builder<Card> s= new SortedBag.Builder<>();
-        s.add(Card.WHITE).add(Card.GREEN).add(Card.BLACK).add(Card.WHITE);
-        SortedBag<Card> cards =s.build();
-
-        List<String> players1= new ArrayList<>();
-        players1.add("Michelle");
-        players1.add("Marin");
-        players1.add("Gabonga");
-
-        List<String> players2= new ArrayList<>();
-        players2.add("Michelle");
-        Info info = new Info("Michelle");
-        Route route = ChMap.routes().get(2);
-        //Trail trail = Trail.longest(ChMap.ALL_ROUTES);
-
-        //System.out.println(cardName(Card.LOCOMOTIVE,4));
-        //System.out.println(draw(players2,0));
-        //System.out.println(info.drewBlindCard());
-        //System.out.println(roadName(route));
-        //System.out.println(setContent(cards));
-        //System.out.println(info.drewAdditionalCards(cards,2));
-        //System.out.println(info.drewAdditionalCards(cards,0));
-        //System.out.println(info.attemptsTunnelClaim(route,cards));
-        //System.out.println(info.claimedRoute(route,cards));
-        //System.out.println(info.didNotClaimRoute(route));
-        //System.out.println(info.drewVisibleCard(Card.BLUE));
-        //System.out.println(info.drewTickets(4));
-        //System.out.println(info.keptTickets(4));
-        //System.out.println(info.won(4,7));
-        //System.out.println(info.getsLongestTrailBonus(trail));
     }
 }
