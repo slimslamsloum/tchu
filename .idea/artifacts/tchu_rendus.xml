@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact name="tchu.rendus">
+    <output-path>$PROJECT_DIR$/out/artifacts/tchu_rendus</output-path>
+    <root id="root">
+      <element id="archive" name="projet-cs108.zip">
+        <element id="directory" name="rendus-tchu">
+          <element id="directory" name="src">
+            <element id="dir-copy" path="$PROJECT_DIR$/src" />
+          </element>
+        </element>
+      </element>
+    </root>
+  </artifact>
+</component>
