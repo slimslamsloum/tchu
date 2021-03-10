@@ -29,7 +29,7 @@ class CardStateTest {
     }
 
    CardState generate(List<Card> Cards){
-       return CardState.of(Deck.of(SortedBag.of(Cards), new Random(1)));
+       return CardState.of(Deck.of(SortedBag.of(Cards), DeckTest.NON_RANDOM));
    }
 
     CardState test_cardState =
@@ -37,18 +37,18 @@ class CardStateTest {
     //all;
 
    @Test
-    void topDeckCard(){
+    void topDeckCardWorks(){
        assertEquals(Card.ALL.get(5), test_cardState.topDeckCard());
     }
 
     @Test
-    void firstCardIsGoneAndOtherCardIsReplaced(){
+    void CardIsReplaced(){
        CardState arbitrary_CS = test_cardState.withDrawnFaceUpCard(3);
        assertEquals(Card.ALL.get(5), arbitrary_CS.faceUpCard(3));
     }
 
     @Test
-    void withoutTopDeckCard(){
+    void withoutTopDeckCardWorks(){
        CardState arbitrary_CS = test_cardState.withoutTopDeckCard();
        assertNotEquals(Card.ALL.get(5), arbitrary_CS.faceDownCards().topCard());
        assertEquals(Card.ALL.get(6), arbitrary_CS.faceDownCards().topCard());
