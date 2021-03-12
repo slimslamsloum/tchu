@@ -51,7 +51,7 @@ public final class Deck <C extends Comparable<C>> {
      *
      * @return true if the deck is empty, false otherwise
      */
-    boolean isEmpty(){
+    public boolean isEmpty(){
         if (this.size()==0){ return true; }
         else { return false; }
     }

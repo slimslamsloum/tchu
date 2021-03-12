@@ -54,7 +54,7 @@ public class PublicCardState {
 
     /**
      *
-     * @return true if deck is empty, else returns fals3e
+     * @return true if deck is empty, else returns false
      */
     public boolean isDeckEmpty(){
         if(deckSize==0){
