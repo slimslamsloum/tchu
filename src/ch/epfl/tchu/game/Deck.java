@@ -85,7 +85,7 @@ public final class Deck <C extends Comparable<C>> {
      * @throws IllegalArgumentException if deck is empty, or count is smaller than 0, or bigger than the deck size
      */
     public SortedBag<C> topCards(int count){
-        Preconditions.checkArgument(!isEmpty() && count <= this.size() && count >=0);
+        Preconditions.checkArgument(count <= this.size() && count >=0);
         List<C> TopCards_List = new ArrayList<>(this.cardsInDeck);
         TopCards_List = TopCards_List.subList(0,count);
         SortedBag.Builder<C> TopCards_SB = new SortedBag.Builder<>();
@@ -102,7 +102,7 @@ public final class Deck <C extends Comparable<C>> {
      * @throws IllegalArgumentException if deck is empty, or count is smaller than 0, or bigger than the deck size
      */
     public Deck<C> withoutTopCards(int count){
-        Preconditions.checkArgument(!isEmpty() && count <= this.size() && count >=0);
+        Preconditions.checkArgument(count <= this.size() && count >=0);
         List<C> WithoutTopCards = new ArrayList<>(this.cardsInDeck);
         WithoutTopCards = WithoutTopCards.subList(count, WithoutTopCards.size());
         return new Deck<>(WithoutTopCards);

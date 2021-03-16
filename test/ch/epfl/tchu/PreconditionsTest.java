@@ -2,6 +2,7 @@
 
 package ch.epfl.tchu;
 
+import ch.epfl.tchu.Preconditions;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;

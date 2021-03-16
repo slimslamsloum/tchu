@@ -104,7 +104,15 @@ public final class CardState extends PublicCardState {
      * @return cardstate with the additional cards added to the discard pile
      */
     public CardState withMoreDiscardedCards(SortedBag<Card> additionalDiscards){
-        return new CardState(faceUpCards(), deckSize(), additionalDiscards.size(), faceDownCards(), additionalDiscards);
+        List<Card> new_discard = discardCards.toList();
+        for (Card card : additionalDiscards){
+            new_discard.add(card);
+        }
+        SortedBag.Builder<Card> discard_SB = new SortedBag.Builder<>();
+        for (Card card : new_discard){
+            discard_SB.add(card);
+        }
+        return new CardState(faceUpCards(), deckSize(), discardsSize()+additionalDiscards.size(), faceDownCards(), discard_SB.build());
     }
 
     //getters: return face down cards and discard cards
