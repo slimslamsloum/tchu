@@ -4,10 +4,10 @@ import ch.epfl.tchu.Preconditions;
 
 public final class StationPartition implements StationConnectivity{
 
-    private int[] partition;
+    private final int[] partition;
 
     private StationPartition(int[] station_partition){
-        this.partition = partition;
+        this.partition = station_partition;
     }
 
     @Override
@@ -27,24 +27,24 @@ public final class StationPartition implements StationConnectivity{
     }
 
     public final static class Builder {
-        private int[] flat_partition;
+        private final int[] deep_partition;
 
         Builder(int stationCount){
             Preconditions.checkArgument(stationCount >= 0);
-            flat_partition = new int[stationCount];
+            deep_partition = new int[stationCount];
         }
 
         public Builder connect (Station s1, Station s2){
-            flat_partition[s2.id()] = representative(s1.id());
+            deep_partition[s2.id()] = representative(s1.id());
             return this;
         }
 
         public StationPartition build(){
-            return new StationPartition(flat_partition);
+            return new StationPartition(deep_partition);
         }
 
         private int representative (int id){
-            return flat_partition[id];
+            return deep_partition[id];
         }
     }
 }

@@ -30,6 +30,6 @@ public class PublicPlayerState {
     public int ticketCount(){ return ticketCount; }
     public int cardCount(){ return cardCount; }
     public List<Route> routes(){ return routes; }
-    public int carCount(){ return cardCount; }
+    public int carCount(){ return carCount; }
     public int claimPoints(){ return claimPoints; }
 }
