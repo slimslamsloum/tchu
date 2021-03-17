@@ -5,17 +5,40 @@ import ch.epfl.tchu.SortedBag;
 
 import java.util.*;
 
+/**
+ * Private state of a player
+ *
+ * @author Alexandre Kambiz Gunter (324268)
+ * @author Selim Jerad (327529)
+ */
+
 public final class PlayerState extends PublicPlayerState {
+    //private attributes of a player: his tickets, cards, and routes
     private final SortedBag<Ticket> tickets;
     private final SortedBag<Card> cards;
     private final List<Route> routes;
 
+    /**
+     * Player State constructor
+     * @param tickets
+     * @param cards
+     * @param routes
+     */
     public PlayerState(SortedBag<Ticket> tickets, SortedBag<Card> cards, List<Route> routes) {
         super(tickets.size(), cards.size(), routes);
         this.tickets = tickets;
         this.cards = cards;
         this.routes = routes;
     }
+
+
+    /**
+     *
+     * @param initialCards
+     * @return initial state of a player, where he doesn't have any tickets, routes, and has the cards given in
+     * argument
+     * @throws IllegalArgumentException if size of initial cards isn't 4
+     */
     public PlayerState initial(SortedBag<Card> initialCards){
         Preconditions.checkArgument( initialCards.size()==4);
         SortedBag.Builder <Ticket> tickets = new SortedBag.Builder<>();
@@ -23,10 +46,20 @@ public final class PlayerState extends PublicPlayerState {
         return new PlayerState(tickets.build(), initialCards, routes);
     }
 
+    //getters: returns player's tickets and player's cards
     public SortedBag<Ticket> tickets(){
         return tickets;
     }
+    public SortedBag<Card> cards(){
+        return cards;
+    }
 
+    /**
+     *
+     * @param newTickets tickets to be added to player state
+     * @return identical player state, except that the tickets given as argument have been added to the previous list
+     * of tickets
+     */
     public PlayerState withAddedTickets(SortedBag<Ticket> newTickets) {
         List<Ticket> listWithTickets = tickets.toList();
         for (Ticket ticket : newTickets) {
@@ -39,10 +72,12 @@ public final class PlayerState extends PublicPlayerState {
         return new PlayerState(new_Builder.build(), cards, routes);
     }
 
-    public SortedBag<Card> cards(){
-        return cards;
-    }
-
+    /**
+     *
+     * @param card to be added to the list of cards
+     * @return identical player state, except that the card that has been given as argument has been added to the
+     * previous list of cards
+     */
     public PlayerState withAddedCard(Card card){
         List<Card> listWithCard = cards.toList();
         listWithCard.add(card);
@@ -53,6 +88,12 @@ public final class PlayerState extends PublicPlayerState {
         return new PlayerState(tickets, new_Builder.build(), routes);
     }
 
+    /**
+     *
+     * @param additionalCards to be added to the list of cards
+     * @return identical player state, except that the cards that have been given as argument have been added to the
+     * previous list of cards
+     */
     public PlayerState withAddedCards(SortedBag<Card> additionalCards){
         List<Card> listWithCard = cards.toList();
         for (Card card: additionalCards){
@@ -65,6 +106,12 @@ public final class PlayerState extends PublicPlayerState {
         return new PlayerState(tickets, new_Builder.build(), routes);
     }
 
+    /**
+     *
+     * @param route
+     * @return true if the route can be claimed, false if it can't. A route can be claimed if the player has the necessary cars
+     * and cards.
+     */
     public boolean canClaimRoute(Route route){
         boolean canClaim = false;
         if (this.carCount() >= route.length() ){
@@ -77,6 +124,12 @@ public final class PlayerState extends PublicPlayerState {
         return canClaim;
     }
 
+    /**
+     *
+     * @param route that wants to be claimed by the player
+     * @return all the possible combinations of cards a player can use to claim a route
+     * @throws IllegalArgumentException the car count is smaller than the route length
+     */
     public List<SortedBag<Card>> possibleClaimCards(Route route){
         Preconditions.checkArgument(this.carCount() >= route.length());
         List<SortedBag<Card>> possibleClaimCards = new ArrayList<>();
@@ -88,6 +141,13 @@ public final class PlayerState extends PublicPlayerState {
         return possibleClaimCards;
     }
 
+    /**
+     *
+     * @param additionalCardsCount
+     * @param initialCards
+     * @param drawnCards
+     * @return
+     */
     public List<SortedBag<Card>> possibleAdditionalCards(int additionalCardsCount, SortedBag<Card> initialCards, SortedBag<Card> drawnCards){
         Preconditions.checkArgument(additionalCardsCount>=1 && additionalCardsCount<=3 && drawnCards.size()==3
                 && initialCards != null);
@@ -112,6 +172,12 @@ public final class PlayerState extends PublicPlayerState {
         return possibleAdditionalCards;
     }
 
+    /**
+     *
+     * @param deck
+     * @param drawnCards
+     * @return
+     */
     private static SortedBag<Card> allUsableCards(SortedBag<Card> deck,SortedBag<Card> drawnCards){
         SortedBag.Builder<Card> temp = new SortedBag.Builder<>();
         for (Card my_card : deck) {
@@ -125,6 +191,13 @@ public final class PlayerState extends PublicPlayerState {
         return temp.build();
     }
 
+    /**
+     *
+     * @param route that has been claimed by the player
+     * @param claimCards cards used to claim the route
+     * @return new player state without the cards used to claim the route, but with the new route added to the list of
+     * routes
+     */
     PlayerState withClaimedRoute(Route route, SortedBag<Card> claimCards){
         List<Route> routesWithoutClaimedRoute =new ArrayList<>(routes) ;
         routesWithoutClaimedRoute.add(route);
@@ -159,6 +232,10 @@ public final class PlayerState extends PublicPlayerState {
         return totalPoints;
     }
 
+    /**
+     *
+     * @return the final number of points the player has obtained
+     */
     public int finalPoints(){
         return ticketPoints()+claimPoints();
     }

@@ -2,105 +2,70 @@ package ch.epfl.tchu.game;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import ch.epfl.tchu.SortedBag;
-import ch.epfl.test.TestRandomizer;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 class arbitraryTest {
-    private Deck<Card> testedDeck;
-    private CardState testedCardState;
-    private int originalDeckSize;
-    private CardState cardStateWithEmptyDeck;
+
+    private Station s2;
+    private Station s1;
+    private Station s3;
+    private Station s4;
+    private Station s5;
+    private List<Station> allStations;
 
     @BeforeEach
     void setUp() {
-        testedDeck = Deck.of(SortedBag.of(Card.ALL), TestRandomizer.newRandom());
-        testedCardState = CardState.of(testedDeck);
-        cardStateWithEmptyDeck =
-                CardState.of(Deck.of(SortedBag.of(5, Card.BLUE), TestRandomizer.newRandom()));
-        originalDeckSize = testedCardState.deckSize();
+        this.s1 = new Station(0, "Station1");
+        this.s2 = new Station(1, "Station2");
+        this.s3 = new Station(2, "Station3");
+        this.s4 = new Station(3, "Station4");
+        this.s5 = new Station(3, "Station5");
+
+        this.allStations = List.of(s1, s2, s3, s4, s5);
     }
 
     @Test
-    void ofFailWhenTooSmallDeck() { // et non pas dick xD
-        Deck<Card> tooSmallDeck = Deck.of(SortedBag.of(Card.BLUE), TestRandomizer.newRandom());
-        assertThrows(IllegalArgumentException.class, () -> CardState.of(tooSmallDeck));
+    void connectedWithStationsOfTheSameSubset() {
+        StationPartition partition = new StationPartition.Builder(2).connect(s1, s2).build();
+        assertTrue(partition.connected(s1, s2));
+        assertTrue(partition.connected(s1, s1));
+
+        StationPartition.Builder builder = new StationPartition.Builder(5);
+        builder.connect(s1, s2);
+        builder.connect(s1, s3);
+        assertTrue(builder.build().connected(s1, s2));
+        assertTrue(builder.build().connected(s2, s1));
+        assertTrue(builder.build().connected(s3, s1));
+        assertTrue(builder.build().connected(s3, s2));
+
+        // Tries to add the same station to the builder
+        builder.connect(s3, s1);
+        assertTrue(builder.build().connected(s1, s3));
+
+        // Add a new disjoint set of two station and connect them to the bug one.
+        builder.connect(s4, s5);
+        StationPartition partition2 = builder.build();
+        for (Station s : allStations) {
+            for (Station sPrime : allStations) {
+                assertTrue(partition2.connected(s, sPrime));
+            }
+        }
     }
 
     @Test
-    void withDrawnFaceUpCard() {
-        CardState c = testedCardState.withDrawnFaceUpCard(4);
-        assertEquals(Card.RED, c.faceUpCard(4));
-        assertEquals(Card.YELLOW, c.topDeckCard());
-        assertEquals(testedCardState.deckSize() - 1, c.deckSize());
+    void connectedWithDifferentSubset() {
+        StationPartition.Builder builder = new StationPartition.Builder(4);
+        builder.connect(s1, s2);
+        StationPartition partition = builder.build();
+        assertFalse(partition.connected(s1, s3));
     }
 
     @Test
-    void withDrawnFaceUpCardFailsWhenWrongIndex() {
-        assertThrows(IndexOutOfBoundsException.class, () -> testedCardState.withDrawnFaceUpCard(5));
-        assertThrows(
-                IndexOutOfBoundsException.class, () -> testedCardState.withDrawnFaceUpCard(-1));
-        assertDoesNotThrow(() -> testedCardState.withDrawnFaceUpCard(0));
-    }
-
-    @Test
-    void withDrawnFaceUpCardFailsWhenNoDeck() {
-        assertThrows(
-                IllegalArgumentException.class,
-                () -> cardStateWithEmptyDeck.withDrawnFaceUpCard(1));
-    }
-
-    @Test
-    void topDeckCard() {
-        assertEquals(Card.RED, testedCardState.topDeckCard());
-        // c's deck is empty.
-        assertThrows(IllegalArgumentException.class, cardStateWithEmptyDeck::topDeckCard);
-        assertEquals(Card.RED, testedCardState.topDeckCard());
-    }
-
-    @Test
-    void topDeckCardFailsWhenThereIsNoDeck() {
-        assertThrows(IllegalArgumentException.class, cardStateWithEmptyDeck::topDeckCard);
-    }
-
-    @Test
-    void withoutTopDeckCard() {
-        assertThrows(IllegalArgumentException.class, cardStateWithEmptyDeck::withoutTopDeckCard);
-        assertEquals(Card.YELLOW, testedCardState.withoutTopDeckCard().topDeckCard());
-        assertEquals(originalDeckSize - 1, testedCardState.withoutTopDeckCard().deckSize());
-    }
-
-    @Test
-    void withoutTopDeckCardKeepsSameSetOfCards() {
-        CardState c = testedCardState.withoutTopDeckCard();
-        assertEquals(testedCardState.discardsSize(), c.discardsSize());
-        assertEquals(testedCardState.faceUpCards(), c.faceUpCards());
-    }
-
-    @Test
-    void withMoreDiscardedCards() {
-        CardState addedDiscard = testedCardState.withMoreDiscardedCards(SortedBag.of(Card.BLUE));
-        assertEquals(1, addedDiscard.discardsSize());
-        assertEquals(testedCardState.deckSize(), addedDiscard.deckSize());
-        assertEquals(testedCardState.faceUpCards(), addedDiscard.faceUpCards());
-    }
-
-    @Test
-    void withDeckRecreatedFromDiscards() {
-
-        CardState newState = cardStateWithEmptyDeck.withMoreDiscardedCards(SortedBag.of(Card.BLUE));
-        newState = newState.withDeckRecreatedFromDiscards(TestRandomizer.newRandom());
-        assertEquals(0, newState.discardsSize());
-        assertEquals(1, newState.deckSize());
-        assertEquals(cardStateWithEmptyDeck.faceUpCards(), newState.faceUpCards());
-    }
-
-    @Test
-    void withDeckRecreatedFromDiscardsFailsWhenDeckIsNotEmpty() {
-        assertThrows(
-                IllegalArgumentException.class,
-                () -> testedCardState.withDeckRecreatedFromDiscards(TestRandomizer.newRandom()));
+    void builderFails() {
+        assertThrows(IllegalArgumentException.class, () -> new StationPartition.Builder(-1));
+        assertDoesNotThrow(() -> new StationPartition.Builder(0));
     }
 }
