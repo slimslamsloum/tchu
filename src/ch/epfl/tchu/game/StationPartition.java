@@ -40,6 +40,15 @@ public final class StationPartition implements StationConnectivity{
         }
 
         public StationPartition build(){
+            for(int i=0; i< deep_partition.length; i++){
+                if(representative(i)!=i){
+                    int j=i;
+                    while(representative(j)!=j){
+                        j=representative(j);
+                    }
+                    deep_partition[i]=deep_partition[j];
+                }
+            }
             return new StationPartition(deep_partition);
         }
 

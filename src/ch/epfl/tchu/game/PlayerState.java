@@ -6,7 +6,6 @@ import ch.epfl.tchu.SortedBag;
 import java.util.*;
 
 public final class PlayerState extends PublicPlayerState {
-
     private final SortedBag<Ticket> tickets;
     private final SortedBag<Card> cards;
     private final List<Route> routes;
@@ -17,7 +16,6 @@ public final class PlayerState extends PublicPlayerState {
         this.cards = cards;
         this.routes = routes;
     }
-
     public PlayerState initial(SortedBag<Card> initialCards){
         Preconditions.checkArgument( initialCards.size()==4);
         SortedBag.Builder <Ticket> tickets = new SortedBag.Builder<>();
@@ -34,7 +32,7 @@ public final class PlayerState extends PublicPlayerState {
         for (Ticket ticket : newTickets) {
             listWithTickets.add(ticket);
         }
-        SortedBag.Builder<Ticket> new_Builder = new SortedBag.Builder<Ticket>();
+        SortedBag.Builder<Ticket> new_Builder = new SortedBag.Builder<>();
         for (Ticket ticket : listWithTickets){
             new_Builder.add(ticket);
         }
@@ -48,7 +46,7 @@ public final class PlayerState extends PublicPlayerState {
     public PlayerState withAddedCard(Card card){
         List<Card> listWithCard = cards.toList();
         listWithCard.add(card);
-        SortedBag.Builder<Card> new_Builder = new SortedBag.Builder<Card>();
+        SortedBag.Builder<Card> new_Builder = new SortedBag.Builder<>();
         for (Card single_card : listWithCard){
             new_Builder.add(single_card);
         }
@@ -60,7 +58,7 @@ public final class PlayerState extends PublicPlayerState {
         for (Card card: additionalCards){
             listWithCard.add(card);
         }
-        SortedBag.Builder<Card> new_Builder = new SortedBag.Builder<Card>();
+        SortedBag.Builder<Card> new_Builder = new SortedBag.Builder<>();
         for (Card single_card : listWithCard){
             new_Builder.add(single_card);
         }
@@ -81,7 +79,7 @@ public final class PlayerState extends PublicPlayerState {
 
     public List<SortedBag<Card>> possibleClaimCards(Route route){
         Preconditions.checkArgument(this.carCount() >= route.length());
-        List<SortedBag<Card>> possibleClaimCards = new ArrayList<SortedBag<Card>>();
+        List<SortedBag<Card>> possibleClaimCards = new ArrayList<>();
         for (SortedBag<Card> SB : route.possibleClaimCards()){
             if (cards.contains(SB)){
                 possibleClaimCards.add(SB);
@@ -93,15 +91,7 @@ public final class PlayerState extends PublicPlayerState {
     public List<SortedBag<Card>> possibleAdditionalCards(int additionalCardsCount, SortedBag<Card> initialCards, SortedBag<Card> drawnCards){
         Preconditions.checkArgument(additionalCardsCount>=1 && additionalCardsCount<=3 && drawnCards.size()==3
                 && initialCards != null);
-        Card firstCard = initialCards.get(0);
-        for ( Card card : initialCards){
-            if (firstCard.equals(Card.LOCOMOTIVE)){
-                firstCard = card;
-            }
-            else{
-                Preconditions.checkArgument(card.equals(firstCard) || card.equals(Card.LOCOMOTIVE));
-            } // NE PAS OUBLIER PRECONDITIONS COULEURS
-        }
+        Preconditions.checkArgument(initialCards.toSet().size()<=2);
 
         SortedBag<Card> newCards = cards.difference(initialCards);
         for(Card card : drawnCards){
@@ -142,8 +132,31 @@ public final class PlayerState extends PublicPlayerState {
     }
 
     public int ticketPoints(){
+        int stationCount=0;
+        for(Route route : routes){
+            int station1Id = route.station1().id();
+            int station2Id = route.station2().id();
+            if (station2Id > station1Id && station2Id > stationCount){
+                stationCount = station2Id;
+            }
+            else if (station1Id > stationCount) {
+                stationCount = station2Id;
+            }
+        }
 
-        return 0;
+        StationPartition.Builder partition = new StationPartition.Builder(stationCount+1);
+
+        for (Route route : routes) {
+            Station departure = route.station1();
+            Station arrival = route.station2();
+            partition.connect(departure,arrival);
+        }
+        StationConnectivity connectivity = partition.build();
+        int totalPoints=0;
+        for (Ticket ticket : tickets) {
+            totalPoints+=ticket.points(connectivity);
+        }
+        return totalPoints;
     }
 
     public int finalPoints(){
