@@ -143,10 +143,10 @@ public final class PlayerState extends PublicPlayerState {
 
     /**
      *
-     * @param additionalCardsCount
-     * @param initialCards
-     * @param drawnCards
-     * @return
+     * @param additionalCardsCount the number of cards the player has to add
+     * @param initialCards the initial cards used to take the tunnel
+     * @param drawnCards the cards drawn from the stock
+     * @return all possible additional cards that the player has to add
      */
     public List<SortedBag<Card>> possibleAdditionalCards(int additionalCardsCount, SortedBag<Card> initialCards, SortedBag<Card> drawnCards){
         Preconditions.checkArgument(additionalCardsCount>=1 && additionalCardsCount<=3 && drawnCards.size()==3
@@ -174,9 +174,9 @@ public final class PlayerState extends PublicPlayerState {
 
     /**
      *
-     * @param deck
-     * @param drawnCards
-     * @return
+     * @param deck the cards in possession of the payer
+     * @param drawnCards the cards randomly drawn from the stock
+     * @return all the cards that can be used by the player from his own deck of cards
      */
     private static SortedBag<Card> allUsableCards(SortedBag<Card> deck,SortedBag<Card> drawnCards){
         SortedBag.Builder<Card> temp = new SortedBag.Builder<>();
@@ -204,6 +204,10 @@ public final class PlayerState extends PublicPlayerState {
         return new PlayerState(tickets, cards.difference(claimCards), routesWithoutClaimedRoute);
     }
 
+    /**
+     *
+     * @return the number of total points won / lost with the players tickets
+     */
     public int ticketPoints(){
         int stationCount=0;
         for(Route route : routes){
