@@ -61,6 +61,9 @@ public final class StationPartition implements StationConnectivity{
         Builder(int stationCount){
             Preconditions.checkArgument(stationCount >= 0);
             deep_partition = new int[stationCount];
+            for (int i=0; i<stationCount; i++){
+                deep_partition[i]=i;
+            }
         }
 
         /**

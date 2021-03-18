@@ -31,7 +31,6 @@ public final class PlayerState extends PublicPlayerState {
         this.routes = routes;
     }
 
-
     /**
      *
      * @param initialCards
@@ -199,7 +198,7 @@ public final class PlayerState extends PublicPlayerState {
      * routes
      */
     PlayerState withClaimedRoute(Route route, SortedBag<Card> claimCards){
-        List<Route> routesWithoutClaimedRoute =new ArrayList<>(routes) ;
+        List<Route> routesWithoutClaimedRoute =new ArrayList(routes);
         routesWithoutClaimedRoute.add(route);
         return new PlayerState(tickets, cards.difference(claimCards), routesWithoutClaimedRoute);
     }
