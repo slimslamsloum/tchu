@@ -20,9 +20,9 @@ public final class PlayerState extends PublicPlayerState {
 
     /**
      * Player State constructor
-     * @param tickets
-     * @param cards
-     * @param routes
+     * @param tickets the players tickets
+     * @param cards the players cards
+     * @param routes the players routes
      */
     public PlayerState(SortedBag<Ticket> tickets, SortedBag<Card> cards, List<Route> routes) {
         super(tickets.size(), cards.size(), routes);
@@ -31,14 +31,15 @@ public final class PlayerState extends PublicPlayerState {
         this.routes = routes;
     }
 
+
     /**
      *
-     * @param initialCards
+     * @param initialCards the players cards at the beginning of the game
      * @return initial state of a player, where he doesn't have any tickets, routes, and has the cards given in
      * argument
      * @throws IllegalArgumentException if size of initial cards isn't 4
      */
-    public PlayerState initial(SortedBag<Card> initialCards){
+    public static PlayerState initial(SortedBag<Card> initialCards){
         Preconditions.checkArgument( initialCards.size()==4);
         SortedBag.Builder <Ticket> tickets = new SortedBag.Builder<>();
         List<Route> routes = new ArrayList<>();
@@ -107,7 +108,7 @@ public final class PlayerState extends PublicPlayerState {
 
     /**
      *
-     * @param route
+     * @param route road claimed by the player
      * @return true if the route can be claimed, false if it can't. A route can be claimed if the player has the necessary cars
      * and cards.
      */
@@ -153,22 +154,28 @@ public final class PlayerState extends PublicPlayerState {
         Preconditions.checkArgument(initialCards.toSet().size()<=2);
 
         SortedBag<Card> newCards = cards.difference(initialCards);
+
         for(Card card : drawnCards){
-            SortedBag.Builder<Card> dC = new SortedBag.Builder<>();
             for(Card initial_card : initialCards){
+                SortedBag.Builder<Card> dC = new SortedBag.Builder<>();
                 if (card.equals(initial_card) || card.equals(Card.LOCOMOTIVE)){
                     break;
                 }
+                dC.add(card);
+                SortedBag<Card> uselessCard = dC.build();
+                drawnCards = drawnCards.difference(uselessCard);
             }
-            dC.add(card);
-            SortedBag<Card> uselessCard = dC.build();
-            drawnCards.difference(uselessCard);
         }
         SortedBag<Card> allUsableCards = allUsableCards(newCards,drawnCards);
-        List<SortedBag<Card>> possibleAdditionalCards = new ArrayList<>(allUsableCards.subsetsOfSize(additionalCardsCount));
-        possibleAdditionalCards.sort(
-                Comparator.comparingInt(cs -> cs.countOf(Card.LOCOMOTIVE)));
-        return possibleAdditionalCards;
+        if(allUsableCards.size() >= additionalCardsCount){
+            List<SortedBag<Card>> possibleAdditionalCards = new ArrayList<>(allUsableCards.subsetsOfSize(additionalCardsCount));
+            possibleAdditionalCards.sort(
+                    Comparator.comparingInt(cs -> cs.countOf(Card.LOCOMOTIVE)));
+            return possibleAdditionalCards;
+        }
+        else {
+            return new ArrayList<>();
+        }
     }
 
     /**
@@ -197,8 +204,8 @@ public final class PlayerState extends PublicPlayerState {
      * @return new player state without the cards used to claim the route, but with the new route added to the list of
      * routes
      */
-    PlayerState withClaimedRoute(Route route, SortedBag<Card> claimCards){
-        List<Route> routesWithoutClaimedRoute =new ArrayList(routes);
+    public PlayerState withClaimedRoute(Route route, SortedBag<Card> claimCards){
+        List<Route> routesWithoutClaimedRoute =new ArrayList<>(routes) ;
         routesWithoutClaimedRoute.add(route);
         return new PlayerState(tickets, cards.difference(claimCards), routesWithoutClaimedRoute);
     }

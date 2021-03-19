@@ -97,7 +97,4 @@ public class PlayerStateTest {
         assert(PS.possibleClaimCards(ChMap.routes().get(1)).contains(SortedBag.of(Card.RED)));
     }
 
-
-
-
 }

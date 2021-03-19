@@ -58,7 +58,7 @@ public final class StationPartition implements StationConnectivity{
          * @param stationCount number of stations in Builder
          * @throws IllegalArgumentException if station count is negative
          */
-        Builder(int stationCount){
+        public Builder(int stationCount){
             Preconditions.checkArgument(stationCount >= 0);
             deep_partition = new int[stationCount];
             for (int i=0; i<stationCount; i++){
@@ -73,7 +73,7 @@ public final class StationPartition implements StationConnectivity{
          * @return a partition where both stations given as argument now have same representant
          */
         public Builder connect (Station s1, Station s2){
-            deep_partition[s2.id()] = representative(s1.id());
+            deep_partition[representative(s2.id())] = representative(s1.id());
             return this;
         }
 
@@ -83,10 +83,10 @@ public final class StationPartition implements StationConnectivity{
          */
         public StationPartition build(){
             for(int i=0; i< deep_partition.length; i++){
-                if(representative(i)!=i){
+                if(deep_partition[i]!=i){
                     int j=i;
-                    while(representative(j)!=j){
-                        j=representative(j);
+                    while(deep_partition[j]!=j){
+                        j=deep_partition[j];
                     }
                     deep_partition[i]=deep_partition[j];
                 }
@@ -100,7 +100,10 @@ public final class StationPartition implements StationConnectivity{
          * @return representative station of the station that has the id given as argument
          */
         private int representative (int id){
-            return deep_partition[id];
+            while (deep_partition[id]!=id){
+                id = deep_partition[id];
+            }
+            return id;
         }
     }
 }
