@@ -14,12 +14,18 @@ public enum PlayerId {
     //different constants for enum PlayerId: player 1 and player 2
     PLAYER_1, PLAYER_2;
 
-    //getters: methods that return list of constants and size of list
+    /**
+     * List of different players
+     */
     public final static List<PlayerId> ALL = List.of(values());
+
+    /**
+     * Number of different players
+     */
     public final static int COUNT= ALL.size();
 
     /**
-     *
+     * Method that returns the next player's id
      * @return the player different to the one on which this method was called
      */
     public PlayerId next(){

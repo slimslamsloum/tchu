@@ -95,7 +95,7 @@ public final class StationPartition implements StationConnectivity{
         }
 
         /**
-         *
+         * Computes the station the represents the station at index id
          * @param id id of the desired station
          * @return representative station of the station that has the id given as argument
          */

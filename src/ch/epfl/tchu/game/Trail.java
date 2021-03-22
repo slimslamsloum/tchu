@@ -90,6 +90,7 @@ public final class Trail {
     }
 
     /**
+     * Computes a trail's length
      * @return a trails length, defined by the sum of the lengths of each of its routes
      */
     public int length(){
@@ -101,6 +102,7 @@ public final class Trail {
     }
 
     /**
+     * Station 1 getter
      * @return null if length of trail is 0, else returns starting station
      */
     public Station station1(){
@@ -109,6 +111,7 @@ public final class Trail {
     }
 
     /**
+     * Station 2 getter
      * @return null if length of trail is 0, else returns ending station
      */
     public Station station2(){

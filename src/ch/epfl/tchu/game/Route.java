@@ -51,13 +51,16 @@ public final class Route {
         this.station2=station2;
     }
 
-    //returns a list composed of a route's starting and ending station
+    /**
+     * Stations getter
+     * @return station 1 and 2
+     */
     public List<Station> stations(){
         return List.of(station1, station2);
     }
 
     /**
-     *
+     * Computes opposite station to the one given in argument
      * @param station
      * @return station opposite to station given as an argument i.e returns ending station if starting station
      * is given as argument and vice-versa
@@ -170,18 +173,46 @@ public final class Route {
     }
 
     /**
-     *
+     * Returns claim points of route
      * @return a certain number of points that depends on the length of the route taken
      */
     public int claimPoints(){
         return Constants.ROUTE_CLAIM_POINTS.get(length);
     }
 
-    //getters
+    /**
+     * Id getter
+     * @return id of Station
+     */
     public String id(){ return id;}
+
+    /**
+     * Station 1 getter
+     * @return Station 1
+     */
     public Station station1(){return station1;}
+
+    /**
+     * Station 2 getter
+     * @return Station 2
+     */
     public Station station2(){return station2;}
+
+    /**
+     * Length getter
+     * @return route length
+     */
     public int length(){return length;}
+
+    /**
+     * Level getter
+     * @return level (underground or overground)
+     */
     public Level level(){return level;}
+
+    /**
+     * Color getter
+     * @return color of route
+     */
     public Color color(){return color;}
 }

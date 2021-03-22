@@ -28,13 +28,26 @@ public final class Station {
         this.name = name;
     }
 
-    //getters
+    /**
+     * Station id getter
+     * @return Station id
+     */
     public int id(){
         return this.id;
     }
+
+    /**
+     * Name getter
+     * @return station name
+     */
     public String name(){
         return this.name;
     }
+
+    /**
+     * Textual representation of station getter
+     * @return textual representation of station
+     */
     @Override
     public String toString(){
         return this.name;

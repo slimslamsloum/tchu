@@ -44,11 +44,33 @@ public class PublicPlayerState {
         carCount = 40 - routes_size;
     }
 
-    //getters: return the ticket count, the card count, the list of routes, the car count and the number of
-    //claim points
+    /**
+     * Ticket count getter
+     * @return ticket count
+     */
     public int ticketCount(){ return ticketCount; }
+
+    /**
+     * Card count getter
+     * @return card count
+     */
     public int cardCount(){ return cardCount; }
+
+    /**
+     * Routes getter
+     * @return routes
+     */
     public List<Route> routes(){ return routes; }
+
+    /**
+     * Car count getter
+     * @return car count
+     */
     public int carCount(){ return carCount; }
+
+    /**
+     * Claim points getter
+     * @return claim points
+     */
     public int claimPoints(){ return claimPoints; }
 }

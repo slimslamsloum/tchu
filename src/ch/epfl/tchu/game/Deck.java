@@ -42,7 +42,7 @@ public final class Deck <C extends Comparable<C>> {
     }
 
     /**
-     *
+     * Methods that returns the size of the deck
      * @return the size of a deck
      */
     public int size(){return cardsInDeck.size();}
@@ -57,7 +57,7 @@ public final class Deck <C extends Comparable<C>> {
     }
 
     /**
-     *
+     * Method that returns the card at the top of the deck
      * @return the card at the top of a deck
      * @throws IllegalArgumentException if deck is empty
      */
@@ -67,7 +67,7 @@ public final class Deck <C extends Comparable<C>> {
     }
 
     /**
-     *
+     * Method that returns a deck without its top card
      * @return the deck without its top card
      * @throws IllegalArgumentException if deck is empty
      */

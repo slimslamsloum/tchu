@@ -33,7 +33,7 @@ public final class PlayerState extends PublicPlayerState {
 
 
     /**
-     *
+     * Initiates a player state given some initial cards
      * @param initialCards the players cards at the beginning of the game
      * @return initial state of a player, where he doesn't have any tickets, routes, and has the cards given in
      * argument
@@ -46,16 +46,24 @@ public final class PlayerState extends PublicPlayerState {
         return new PlayerState(tickets.build(), initialCards, routes);
     }
 
-    //getters: returns player's tickets and player's cards
+    /**
+     * Tickets getter
+     * @return a player's tickets
+     */
     public SortedBag<Ticket> tickets(){
         return tickets;
     }
+
+    /**
+     * Cards getter
+     * @return a player's cards
+     */
     public SortedBag<Card> cards(){
         return cards;
     }
 
     /**
-     *
+     * Method that adds tickets to a player state
      * @param newTickets tickets to be added to player state
      * @return identical player state, except that the tickets given as argument have been added to the previous list
      * of tickets
@@ -73,7 +81,7 @@ public final class PlayerState extends PublicPlayerState {
     }
 
     /**
-     *
+     * Adds a card to a player state
      * @param card to be added to the list of cards
      * @return identical player state, except that the card that has been given as argument has been added to the
      * previous list of cards
@@ -89,7 +97,7 @@ public final class PlayerState extends PublicPlayerState {
     }
 
     /**
-     *
+     * Adds several cards to a player state
      * @param additionalCards to be added to the list of cards
      * @return identical player state, except that the cards that have been given as argument have been added to the
      * previous list of cards
@@ -107,7 +115,7 @@ public final class PlayerState extends PublicPlayerState {
     }
 
     /**
-     *
+     * Method that verifies if a player can claim a given route or not
      * @param route road claimed by the player
      * @return true if the route can be claimed, false if it can't. A route can be claimed if the player has the necessary cars
      * and cards.
@@ -125,7 +133,7 @@ public final class PlayerState extends PublicPlayerState {
     }
 
     /**
-     *
+     * Returns all the possible combinations of cards a player can use to claim a route
      * @param route that wants to be claimed by the player
      * @return all the possible combinations of cards a player can use to claim a route
      * @throws IllegalArgumentException the car count is smaller than the route length
@@ -142,7 +150,7 @@ public final class PlayerState extends PublicPlayerState {
     }
 
     /**
-     *
+     * Method that gives the cards a player has to burn when trying to claim a tunnel
      * @param additionalCardsCount the number of cards the player has to add
      * @param initialCards the initial cards used to take the tunnel
      * @param drawnCards the cards drawn from the stock
@@ -198,7 +206,7 @@ public final class PlayerState extends PublicPlayerState {
     }
 
     /**
-     *
+     * Adds a claimed route to a player's player state and burns the cards he used to claim that route
      * @param route that has been claimed by the player
      * @param claimCards cards used to claim the route
      * @return new player state without the cards used to claim the route, but with the new route added to the list of
@@ -211,7 +219,7 @@ public final class PlayerState extends PublicPlayerState {
     }
 
     /**
-     *
+     * Method that computes the points a player has won with his tickets
      * @return the number of total points won / lost with the players tickets
      */
     public int ticketPoints(){
@@ -243,7 +251,7 @@ public final class PlayerState extends PublicPlayerState {
     }
 
     /**
-     *
+     * Method that gives the final number of points a player has
      * @return the final number of points the player has obtained
      */
     public int finalPoints(){

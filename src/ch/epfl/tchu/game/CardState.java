@@ -65,7 +65,7 @@ public final class CardState extends PublicCardState {
     }
 
     /**
-     *
+     * Method returning top card in the deck
      * @return card at the top of the deck
      * @throws IllegalArgumentException if deck is empty
      */
@@ -75,7 +75,7 @@ public final class CardState extends PublicCardState {
     }
 
     /**
-     *
+     * Method returning cardstate without top deck card
      * @return cardstate where the card at the top of the deck has been removed
      * @throws IllegalArgumentException if deck is empty
      */
@@ -86,7 +86,7 @@ public final class CardState extends PublicCardState {
     }
 
     /**
-     *
+     * Method that creates a new deck from the discard cards
      * @param rng
      * @return new cardstate where discard cards were used to form a new deck
      * @throws IllegalArgumentException if deck isn't empty
@@ -99,7 +99,7 @@ public final class CardState extends PublicCardState {
     }
 
     /**
-     *
+     * Method that adds new discard cards to discard pile
      * @param additionalDiscards cards to be added to discard pile
      * @return cardstate with the additional cards added to the discard pile
      */
@@ -115,7 +115,15 @@ public final class CardState extends PublicCardState {
         return new CardState(faceUpCards(), deckSize(), discardsSize()+additionalDiscards.size(), faceDownCards(), discard_SB.build());
     }
 
-    //getters: return face down cards and discard cards
+    /**
+     * Face down cards getter
+     * @return deck of face down cards
+     */
     public Deck<Card> faceDownCards(){ return faceDownCards; }
+
+    /**
+     * Discard cards getter
+     * @return the discard cards
+     */
     public SortedBag<Card> discardCards(){ return discardCards; }
 }

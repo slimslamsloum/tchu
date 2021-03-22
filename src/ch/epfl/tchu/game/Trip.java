@@ -57,11 +57,24 @@ public final class Trip {
         return allTrips;
     }
 
-    //getters
+    /**
+     * Starting station getter
+     * @return starting station
+     */
     public Station from(){ return from; }
-    public  Station to(){ return to;}
+    /**
+     * Ending station getter
+     * @return ending station
+     */
+    public Station to(){ return to;}
+
+    /**
+     * Trip's points getter
+     * @return number of points for the trip
+     */
     public int points(){ return points;
     }
+
     /**
      * method that increases or decreases number of points depending on if 2 stations were connected or not
      * @param connectivity

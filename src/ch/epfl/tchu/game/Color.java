@@ -10,12 +10,17 @@ import java.util.List;
  */
 
 public enum Color {
+
     //the different constants for the enum Color
     BLACK, VIOLET, BLUE , GREEN, YELLOW, ORANGE, RED, WHITE;
 
-    //List of these different constants
+    /**
+     * List of different colors
+     */
     public final static List<Color> ALL = List.of(values());
 
-    //number of constants in Color
+    /**
+     * number of different colors
+     */
     public final static int COUNT= ALL.size();
 }

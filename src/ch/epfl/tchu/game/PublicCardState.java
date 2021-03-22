@@ -11,7 +11,7 @@ import java.util.List;
  * @author Selim Jerad (327529)
  */
 
-public class PublicCardState {
+public class PublicCardState{
 
     //attributes: the list of face up cards, size of deck, and size of discard deck
     private final List<Card> faceUpCards;
@@ -34,13 +34,13 @@ public class PublicCardState {
     }
 
     /**
-     *
+     * Methods that computes total number of cards (face up, deck and discard)
      * @return the sum of the sizes of the face up cards, the deck size, and the discard pile size
      */
     public int totalSize(){ return faceUpCards.size()+deckSize+discardsSize; };
 
     /**
-     *
+     * Methods that returns face up card at a certain index
      * @param slot of the desired card
      * @return the card at index slot
      * @throws IndexOutOfBoundsException if slot isn't between 0 (included) and 5 (excluded)
@@ -53,7 +53,7 @@ public class PublicCardState {
     };
 
     /**
-     *
+     * Asks if deck is empty or not
      * @return true if deck is empty, else returns false
      */
     public boolean isDeckEmpty(){
@@ -63,10 +63,21 @@ public class PublicCardState {
         else return false;
         };
 
-    //getter that returns size of discard pile
+    /**
+     * Discard size getter
+     * @return discard size
+     */
     public int discardsSize(){ return discardsSize; };
-    //getter that returns a list of the visible cards
+
+    /**
+     * Face up cards getter
+     * @return face up cards
+     */
     public List<Card>faceUpCards(){ return faceUpCards; };
-    //getter that returns size of deck
+
+    /**
+     * Deck size getter
+     * @return deck size
+     */
     public int deckSize(){ return deckSize; };
 }

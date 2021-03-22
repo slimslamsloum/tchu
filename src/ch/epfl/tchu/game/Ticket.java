@@ -47,6 +47,7 @@ public final class Ticket implements Comparable<Ticket> {
 
 
     /**
+     * Compares 2 tickets
      * @param that ticket that is being compared to
      * @return positive, negative or null integer depending on the comparison between the two tickets
      */
@@ -82,7 +83,7 @@ public final class Ticket implements Comparable<Ticket> {
     }
 
     /**
-     *
+     * Computes number of points of a ticket depending on if its was completed or not
      * @param connectivity connectivity is a parameter to verify if two stations were connected or not
      * @return
      * if at least a trip was completed: returns the number of points from the most rewarding trip
@@ -109,7 +110,10 @@ public final class Ticket implements Comparable<Ticket> {
         return ticket_points;
     }
 
-    //getter
+    /**
+     * Textual representation getter
+     * @return ticket textual representation
+     */
     public String text(){
         return text;
     }
