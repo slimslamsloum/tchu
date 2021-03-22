@@ -23,7 +23,6 @@ public class PublicGameState {
         this.currentPlayerId=currentPlayerId;
         this.playerState=playerState;
         this.lastPlayer=lastPlayer;
-
     }
 
     public int ticketsCount(){
