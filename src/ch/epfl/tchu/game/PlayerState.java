@@ -158,7 +158,7 @@ public final class PlayerState extends PublicPlayerState {
      */
     public List<SortedBag<Card>> possibleAdditionalCards(int additionalCardsCount, SortedBag<Card> initialCards, SortedBag<Card> drawnCards){
         Preconditions.checkArgument(additionalCardsCount>=1 && additionalCardsCount<=3 && drawnCards.size()==3
-                && initialCards != null);
+                && initialCards != null && initialCards.size() != 0);
         Preconditions.checkArgument(initialCards.toSet().size()<=2);
 
         SortedBag<Card> newCards = cards.difference(initialCards);
@@ -185,6 +185,7 @@ public final class PlayerState extends PublicPlayerState {
             return new ArrayList<>();
         }
     }
+
 
     /**
      *
@@ -231,7 +232,7 @@ public final class PlayerState extends PublicPlayerState {
                 stationCount = station2Id;
             }
             else if (station1Id > stationCount) {
-                stationCount = station2Id;
+                stationCount = station1Id;
             }
         }
 
