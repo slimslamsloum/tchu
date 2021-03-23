@@ -7,10 +7,20 @@ import java.util.*;
 
 public final class GameState extends PublicGameState {
 
+    //private attributes for GameState: map of private player states, tickets, and private elements of card state
     private final Map<PlayerId, PlayerState> privatePlayerState;
     private final Deck<Ticket> ticketDeck;
     private final CardState privateCardState;
 
+    /**
+     * Game State constructor
+     * @param ticketsCount ticket count
+     * @param ticketDeck tickets in deck
+     * @param privateCardState private card state
+     * @param currentPlayerId current player id
+     * @param playerState map of player states
+     * @param lastPlayer last player id
+     */
     private GameState(int ticketsCount, Deck<Ticket> ticketDeck, CardState privateCardState, PlayerId currentPlayerId,
                       Map<PlayerId, PlayerState> playerState, PlayerId lastPlayer) {
         super(ticketsCount, privateCardState, currentPlayerId, Map.copyOf(playerState), lastPlayer);
@@ -76,6 +86,13 @@ public final class GameState extends PublicGameState {
         return new GameState(ticketsCount(), ticketDeck, privateCardState,currentPlayerId(), privatePlayerState,lastPlayer());
     }
 
+    /**
+     * returns game state where a given player has taken the tickets given in argument
+     * @param playerId player that takes tickets
+     * @param chosenTickets tickets he chose
+     * @return game state where the player takes the tickets he chose at the beginning
+     * @throws IllegalArgumentException if tickets in player state is not empty
+     */
     public GameState withInitiallyChosenTickets(PlayerId playerId, SortedBag<Ticket> chosenTickets){
         Preconditions.checkArgument(privatePlayerState.get(playerId).tickets().isEmpty());
         PlayerState withTickets = privatePlayerState.get(currentPlayerId()).withAddedTickets(chosenTickets);
@@ -84,6 +101,13 @@ public final class GameState extends PublicGameState {
         return new GameState(ticketsCount(), ticketDeck, privateCardState, currentPlayerId(), MapWithTickets, lastPlayer());
     }
 
+    /**
+     *  returns game state where amongst the drawn tickets, player has taken the chosen tickets
+     * @param drawnTickets drawn tickets from deck
+     * @param chosenTickets tickets the player chose
+     * @return game state where amongst the drawn tickets, player has taken the chosen tickets
+     * @throws IllegalArgumentException if drawn tickets don't contain chosen tickets
+     */
     public GameState withChosenAdditionalTickets(SortedBag<Ticket> drawnTickets, SortedBag<Ticket> chosenTickets){
         Preconditions.checkArgument(drawnTickets.contains(chosenTickets));
         PlayerState withTickets = privatePlayerState.get(currentPlayerId()).withAddedTickets(chosenTickets);
@@ -93,6 +117,12 @@ public final class GameState extends PublicGameState {
                 currentPlayerId(), MapWithTickets, lastPlayer());
     }
 
+    /**
+     * returns game state where current player has drawn face up card at index slot
+     * @param slot
+     * @return game state where current player has drawn face up card at index slot
+     * @throws IllegalArgumentException if player can draw cards
+     */
     public GameState withDrawnFaceUpCard(int slot){
         Preconditions.checkArgument(canDrawCards()==true);
         PlayerState withCard = privatePlayerState.get(currentPlayerId()).withAddedCard(cardState().faceUpCard(slot));
@@ -102,6 +132,11 @@ public final class GameState extends PublicGameState {
         return new GameState(ticketsCount(), ticketDeck, withoutCard, currentPlayerId(), MapWithCard, lastPlayer());
     }
 
+    /**
+     * Method that returns game state where player has drawn top card of the deck
+     * @return game state where player has drawn top card of the deck
+     * @throws IllegalArgumentException if player can't draw cards
+     */
     public GameState withBlindlyDrawnCard(){
         Preconditions.checkArgument(canDrawCards()==true);
         PlayerState withCard = privatePlayerState.get(currentPlayerId()).withAddedCard(privateCardState.topDeckCard());
@@ -111,6 +146,12 @@ public final class GameState extends PublicGameState {
         return new GameState(ticketsCount(), ticketDeck, withoutCard, currentPlayerId(), MapWithCard, lastPlayer());
     }
 
+    /**
+     * Method the returns game state where current player has claimed route with a certain combination of cards
+     * @param route route claimed by player
+     * @param cards cards used to claim route
+     * @return game state where current player has claimed route with a certain combination of cards
+     */
     public GameState withClaimedRoute(Route route, SortedBag<Card> cards){
         PlayerState withCard = privatePlayerState.get(currentPlayerId()).withClaimedRoute(route,cards);
         Map<PlayerId, PlayerState> MapWithRoute = Map.copyOf(privatePlayerState);
@@ -118,11 +159,19 @@ public final class GameState extends PublicGameState {
         return new GameState(ticketsCount(), ticketDeck, privateCardState, currentPlayerId(), MapWithRoute, lastPlayer());
     }
 
+    /**
+     * Method that tells if last turn is starting or not
+     * @return true if last turn is starting (i.e current player has 2 cars or less), else returns false
+     */
     public boolean lastTurnBegins(){
         if (privatePlayerState.get(currentPlayerId()).carCount() <= 2){ return true; }
         else return false;
     }
 
+    /**
+     * Method that returns game state depending on if last turn is starting or not
+     * @return game state where last player id = current player id if last turn begins, else return previous game state
+     */
     public GameState forNextTurn(){
         if (lastTurnBegins()){
             return  new GameState( ticketsCount(), ticketDeck, privateCardState,
