@@ -29,6 +29,12 @@ public final class GameState extends PublicGameState {
         this.privateCardState=privateCardState;
     }
 
+    /**
+     *
+     * @param tickets all the tickets available in the game
+     * @param rng a random value
+     * @return the beginning of the game
+     */
     public static GameState initial(SortedBag<Ticket> tickets, Random rng) {
         PlayerId currentPlayerId=PlayerId.PLAYER_2;
         if ( rng.nextInt(2)<1 ){currentPlayerId=PlayerId.PLAYER_1; }
@@ -44,38 +50,75 @@ public final class GameState extends PublicGameState {
         return new GameState(ticketsDeck.size(), ticketsDeck,CardState.of(cardDeck),currentPlayerId,playerStateMap,currentPlayerId.next());
     }
 
+    /**
+     *
+     * @param playerId the identity of a player
+     * @return the private state of (= all the intel about) this player
+     */
     public PlayerState playerState(PlayerId playerId){
         return privatePlayerState.get(playerId);
     }
 
+    /**
+     *
+     * @return the private state of the player playing currently
+     */
     public PlayerState currentPlayerState(){
         return privatePlayerState.get(currentPlayerId());
     }
 
+    /**
+     *
+     * @param count A number between 0 and the size of the deck
+     * @return the "count" first tickets at the top of the ticket Deck
+     */
     public SortedBag<Ticket> topTickets(int count){
         Preconditions.checkArgument(count>=0 || count<=ticketDeck.size());
         return ticketDeck.topCards(count);
     }
 
+    /**
+     *
+     * @param count A number between 0 and the size of the deck
+     * @return the ticket deck without the "count" top Cards
+     */
     public GameState withoutTopTickets(int count){
         Preconditions.checkArgument(count>=0 || count<=ticketDeck.size());
         return new GameState(ticketsCount(), ticketDeck.withoutTopCards(count), privateCardState,currentPlayerId(), privatePlayerState,lastPlayer());
     }
 
+    /**
+     *
+     * @return the top card of the deck of cards
+     */
     public Card topCard(){
         Preconditions.checkArgument(!privateCardState.isDeckEmpty());
         return privateCardState.topDeckCard();
     }
 
+    /**
+     *
+     * @return the deck of cards without its top card
+     */
     public GameState withoutTopCard(){
         Preconditions.checkArgument(!privateCardState.isDeckEmpty());
         return new GameState(ticketsCount(), ticketDeck, privateCardState.withoutTopDeckCard(),currentPlayerId(), privatePlayerState,lastPlayer());
     }
 
+    /**
+     *
+     * @param discardedCards the card that are to be put in the discard
+     * @return the discard with the additional discarded cards
+     */
     public GameState withMoreDiscardedCards(SortedBag<Card> discardedCards){
         return new GameState(ticketsCount(), ticketDeck, privateCardState.withMoreDiscardedCards(discardedCards),currentPlayerId(), privatePlayerState,lastPlayer());
     }
 
+    /**
+     *
+     * @param rng A random number
+     * @return return a new deck from the discard id the deck of cards is empty
+     */
     public GameState withCardsDeckRecreatedIfNeeded(Random rng){
         if(privateCardState.isDeckEmpty()){
             return new GameState(ticketsCount(), ticketDeck, privateCardState.withDeckRecreatedFromDiscards(rng),currentPlayerId(), privatePlayerState,lastPlayer());
