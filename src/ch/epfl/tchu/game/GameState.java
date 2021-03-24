@@ -29,7 +29,7 @@ public final class GameState extends PublicGameState {
         this.privateCardState=privateCardState;
     }
 
-    public GameState initial(SortedBag<Ticket> tickets, Random rng) {
+    public static GameState initial(SortedBag<Ticket> tickets, Random rng) {
         PlayerId currentPlayerId=PlayerId.PLAYER_2;
         if ( rng.nextInt(2)<1 ){currentPlayerId=PlayerId.PLAYER_1; }
         Deck<Ticket> ticketsDeck = Deck.of(tickets,rng);
@@ -179,5 +179,29 @@ public final class GameState extends PublicGameState {
         }
         return new GameState( ticketsCount(), ticketDeck, privateCardState,
                 currentPlayerId().next(), privatePlayerState, lastPlayer());
+    }
+
+    /**
+     * Ticket deck getter
+     * @return ticket deck
+     */
+    public Deck<Ticket> ticketDeck(){
+        return ticketDeck;
+    }
+
+    /**
+     * Map of player states getter
+     * @return map of player states
+     */
+    public Map<PlayerId, PlayerState> privatePlayerState () {
+        return privatePlayerState;
+    }
+
+    /**
+     * Card State getter
+     * @return card state
+     */
+    public CardState privateCardState(){
+        return privateCardState;
     }
 }

@@ -194,12 +194,19 @@ public final class CardStateTest {
         assertEquals(expectedDeck, actualDeck.build());
     }
 
-    private SortedBag<Card> allCards() {
+    private static SortedBag<Card> allCards() {
         var cardsBuilder = new SortedBag.Builder<Card>();
         cardsBuilder.add(14, Card.LOCOMOTIVE);
         for (Card card : Card.CARS)
             cardsBuilder.add(12, card);
         var cards = cardsBuilder.build();
         return cards;
+    }
+
+    public static CardState generator() {
+        var cards = allCards();
+        var deck = Deck.of(cards, new Random(1));
+        var cardState = CardState.of(deck);
+        return cardState;
     }
 }

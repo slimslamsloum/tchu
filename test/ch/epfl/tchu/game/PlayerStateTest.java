@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class PlayerStateTest {
 
-    PlayerState PS_generator(int ticketcount, int routecount){
+    public static PlayerState PS_generator(int ticketcount, int routecount){
         SortedBag.Builder ticketSB = new SortedBag.Builder();
         for (int i = 0; i < ticketcount; i++){
             ticketSB.add(ChMap.tickets().get(i));
