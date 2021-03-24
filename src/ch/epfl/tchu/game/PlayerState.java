@@ -13,10 +13,13 @@ import java.util.*;
  */
 
 public final class PlayerState extends PublicPlayerState {
-    //private attributes of a player: his tickets, cards, and routes
+    //private attributes of a player: his tickets, cards, and routes, and we added carCount and claimPoints so that
+    //these attributes are computed when constructing a Player State
     private final SortedBag<Ticket> tickets;
     private final SortedBag<Card> cards;
     private final List<Route> routes;
+    private final int carCount;
+    private final int claimPoints;
 
     /**
      * Player State constructor
@@ -29,8 +32,15 @@ public final class PlayerState extends PublicPlayerState {
         this.tickets = tickets;
         this.cards = cards;
         this.routes = routes;
+        int routes_size=0;
+        int temp =0;
+        for (Route route: routes){
+            routes_size += route.length();
+            temp += route.claimPoints();
+        }
+        claimPoints = temp;
+        carCount = 40 - routes_size;
     }
-
 
     /**
      * Initiates a player state given some initial cards
@@ -214,9 +224,9 @@ public final class PlayerState extends PublicPlayerState {
      * routes
      */
     public PlayerState withClaimedRoute(Route route, SortedBag<Card> claimCards){
-        List<Route> routesWithoutClaimedRoute =new ArrayList<>(routes) ;
-        routesWithoutClaimedRoute.add(route);
-        return new PlayerState(tickets, cards.difference(claimCards), routesWithoutClaimedRoute);
+        List<Route> routesWithClaimedRoute =new ArrayList<>(routes) ;
+        routesWithClaimedRoute.add(route);
+        return new PlayerState(tickets, cards.difference(claimCards), routesWithClaimedRoute);
     }
 
     /**

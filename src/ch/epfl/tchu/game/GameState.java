@@ -37,14 +37,11 @@ public final class GameState extends PublicGameState {
         Map<PlayerId, PlayerState> playerStateMap = new EnumMap<>(PlayerId.class);
 
         for(PlayerId playerId : PlayerId.ALL ){
-            SortedBag<Ticket> playerTickets = ticketsDeck.topCards(Constants.INITIAL_TICKETS_COUNT);
-            ticketsDeck = ticketsDeck.withoutTopCards(Constants.INITIAL_TICKETS_COUNT);
             SortedBag<Card> playerCards = cardDeck.topCards(Constants.INITIAL_CARDS_COUNT);
-            cardDeck = cardDeck.withoutTopCards(Constants.INITIAL_TICKETS_COUNT);
-            PlayerState playerState= new PlayerState(playerTickets,playerCards,new ArrayList<>());
-            playerStateMap.put(playerId, playerState);
+            cardDeck = cardDeck.withoutTopCards(Constants.INITIAL_CARDS_COUNT);
+            playerStateMap.put(playerId, PlayerState.initial(playerCards));
         }
-        return new GameState(ticketsDeck.size(),ticketsDeck,CardState.of(cardDeck),currentPlayerId,playerStateMap,currentPlayerId.next());
+        return new GameState(ticketsDeck.size(), ticketsDeck,CardState.of(cardDeck),currentPlayerId,playerStateMap,currentPlayerId.next());
     }
 
     public PlayerState playerState(PlayerId playerId){
@@ -96,8 +93,7 @@ public final class GameState extends PublicGameState {
     public GameState withInitiallyChosenTickets(PlayerId playerId, SortedBag<Ticket> chosenTickets){
         Preconditions.checkArgument(privatePlayerState.get(playerId).tickets().isEmpty());
         PlayerState withTickets = privatePlayerState.get(currentPlayerId()).withAddedTickets(chosenTickets);
-        Map<PlayerId, PlayerState> MapWithTickets = Map.copyOf(privatePlayerState);
-        MapWithTickets.replace(currentPlayerId(), withTickets);
+        Map<PlayerId, PlayerState> MapWithTickets= Map.of(currentPlayerId(), withTickets, lastPlayer(), playerState(lastPlayer()));
         return new GameState(ticketsCount(), ticketDeck, privateCardState, currentPlayerId(), MapWithTickets, lastPlayer());
     }
 
@@ -111,8 +107,7 @@ public final class GameState extends PublicGameState {
     public GameState withChosenAdditionalTickets(SortedBag<Ticket> drawnTickets, SortedBag<Ticket> chosenTickets){
         Preconditions.checkArgument(drawnTickets.contains(chosenTickets));
         PlayerState withTickets = privatePlayerState.get(currentPlayerId()).withAddedTickets(chosenTickets);
-        Map<PlayerId, PlayerState> MapWithTickets = Map.copyOf(privatePlayerState);
-        MapWithTickets.replace(currentPlayerId(), withTickets);
+        Map<PlayerId, PlayerState> MapWithTickets= Map.of(currentPlayerId(), withTickets, lastPlayer(), playerState(lastPlayer()));
         return new GameState(ticketsCount()-drawnTickets.size(), ticketDeck.withoutTopCards(drawnTickets.size()), privateCardState,
                 currentPlayerId(), MapWithTickets, lastPlayer());
     }
@@ -126,8 +121,7 @@ public final class GameState extends PublicGameState {
     public GameState withDrawnFaceUpCard(int slot){
         Preconditions.checkArgument(canDrawCards()==true);
         PlayerState withCard = privatePlayerState.get(currentPlayerId()).withAddedCard(cardState().faceUpCard(slot));
-        Map<PlayerId, PlayerState> MapWithCard = Map.copyOf(privatePlayerState);
-        MapWithCard.replace(currentPlayerId(),withCard);
+        Map<PlayerId, PlayerState> MapWithCard= Map.of(currentPlayerId(), withCard, lastPlayer(), playerState(lastPlayer()));
         CardState withoutCard = privateCardState.withDrawnFaceUpCard(slot);
         return new GameState(ticketsCount(), ticketDeck, withoutCard, currentPlayerId(), MapWithCard, lastPlayer());
     }
@@ -141,8 +135,7 @@ public final class GameState extends PublicGameState {
         Preconditions.checkArgument(canDrawCards()==true);
         PlayerState withCard = privatePlayerState.get(currentPlayerId()).withAddedCard(privateCardState.topDeckCard());
         CardState withoutCard = privateCardState.withoutTopDeckCard();
-        Map<PlayerId, PlayerState> MapWithCard = Map.copyOf(privatePlayerState);
-        MapWithCard.replace(currentPlayerId(),withCard);
+        Map<PlayerId, PlayerState> MapWithCard= Map.of(currentPlayerId(), withCard, lastPlayer(), playerState(lastPlayer()));
         return new GameState(ticketsCount(), ticketDeck, withoutCard, currentPlayerId(), MapWithCard, lastPlayer());
     }
 
@@ -153,9 +146,8 @@ public final class GameState extends PublicGameState {
      * @return game state where current player has claimed route with a certain combination of cards
      */
     public GameState withClaimedRoute(Route route, SortedBag<Card> cards){
-        PlayerState withCard = privatePlayerState.get(currentPlayerId()).withClaimedRoute(route,cards);
-        Map<PlayerId, PlayerState> MapWithRoute = Map.copyOf(privatePlayerState);
-        MapWithRoute.replace(currentPlayerId(), withCard);
+        PlayerState withRoute = privatePlayerState.get(currentPlayerId()).withClaimedRoute(route,cards);
+        Map<PlayerId, PlayerState> MapWithRoute= Map.of(currentPlayerId(), withRoute, lastPlayer(), playerState(lastPlayer()));
         return new GameState(ticketsCount(), ticketDeck, privateCardState, currentPlayerId(), MapWithRoute, lastPlayer());
     }
 

@@ -92,10 +92,11 @@ public class GameStateTest {
     void withDrawnFaceUpCardFails(){
         GameState GS = generator();
         while (!GS.cardState().isDeckEmpty()){
-            GS.withoutTopCard();
+            GS=GS.withoutTopCard();
         }
+        GameState finalGS = GS;
         assertThrows(IllegalArgumentException.class, () -> {
-            GS.withDrawnFaceUpCard(3);
+            finalGS.withDrawnFaceUpCard(3);
         });
     }
 
@@ -113,10 +114,11 @@ public class GameStateTest {
     void withBlindlyDrawnCardFails(){
         GameState GS = generator();
         while (!GS.cardState().isDeckEmpty()){
-            GS.withoutTopCard();
+            GS=GS.withoutTopCard();
         }
+        GameState finalGS = GS;
         assertThrows(IllegalArgumentException.class, () -> {
-            GS.withBlindlyDrawnCard();
+            finalGS.withBlindlyDrawnCard();
         });
     }
 
@@ -151,10 +153,8 @@ public class GameStateTest {
         List<Route> routes = new ArrayList<>(new ChMaps().ALL_ROUTES.subList(0, 17));
         int i = 0;
         for (Route route : routes){
-            GS.withClaimedRoute(route, null);
+            GS=GS.withClaimedRoute(route, SortedBag.of(Card.RED));
             assertTrue(GS.currentPlayerState().routes().contains(route));
-            assertTrue(GS.currentPlayerState().routes().contains(new ChMaps().ALL_ROUTES.get(i)));
-            i++;
         }
     }
 
@@ -174,8 +174,10 @@ public class GameStateTest {
     void withChosenAdditionalTicketsWorks(){
         GameState GS = generator();
         GS = GS.withChosenAdditionalTickets(SortedBag.of(new ChMaps().ALL_TICKETS.subList(0,3)), SortedBag.of(new ChMaps().ALL_TICKETS.subList(0,2)));
-        assertEquals(SortedBag.of(new ChMaps().ALL_TICKETS.subList(0,2)), GS.currentPlayerState().tickets());
-        assertTrue(GS.ticketDeck().size() == new ChMaps().ALL_TICKETS.size()-2);
+        assertTrue(SortedBag.of(new ChMaps().ALL_TICKETS.subList(0,2)).equals(GS.currentPlayerState().tickets()));
+        System.out.println(GS.ticketDeck().size());
+        System.out.println(new ChMaps().ALL_TICKETS.size()-2);
+        assertTrue(GS.ticketDeck().size() == new ChMaps().ALL_TICKETS.size()-3);
     }
 
     @Test
@@ -184,7 +186,7 @@ public class GameStateTest {
         List<Route> routes = new ArrayList<>(new ChMaps().ALL_ROUTES.subList(0, 17));
         routes.add(new ChMaps().ALL_ROUTES.get(18));
         for(Route route: routes) {
-            GS.currentPlayerState().withClaimedRoute(route, null);
+            GS=GS.withClaimedRoute(route, SortedBag.of(Card.RED));
         }
         assertTrue(GS.lastTurnBegins());
     }
@@ -195,7 +197,7 @@ public class GameStateTest {
         List<Route> routes = new ArrayList<>(new ChMaps().ALL_ROUTES.subList(0, 17));
         routes.add(new ChMaps().ALL_ROUTES.get(18));
         for(Route route: routes) {
-            GS.currentPlayerState().withClaimedRoute(route, null);
+            GS=GS.withClaimedRoute(route, SortedBag.of(Card.RED));
         }
         assertEquals(GS.currentPlayerId(), GS.forNextTurn().lastPlayer());
     }
