@@ -19,23 +19,6 @@ public class GameStateTest {
     };
 
     @Test
-    /*void InitialWorksForNonRandomDeck(){
-        var tickets = SortedBag.of(new ChMaps().ALL_TICKETS);
-        var gameState = GameState.initial(tickets,NON_RANDOM);
-        var ticketsDeck = Deck.of(tickets,NON_RANDOM);
-        var playerTickets = ticketsDeck.topCards(5);
-        ticketsDeck.withoutTopCards(5);
-        var cardDeck = Deck.of(Constants.ALL_CARDS, NON_RANDOM);
-        var playerCards = cardDeck.topCards(Constants.INITIAL_CARDS_COUNT);
-        cardDeck.withoutTopCards(4);
-        var currentPlayerId=PlayerId.PLAYER_2;
-        var finalPlayerID=PlayerId.PLAYER_1;
-        var playerStateMap = new EnumMap<>(PlayerId.class);
-        PlayerState playerState= new PlayerState(playerTickets,playerCards,new ArrayList<>());
-        playerStateMap.put(currentPlayerId,playerState);
-        playerStateMap.put(finalPlayerID,playerState);
-        assertEquals(gameState, new GameState(tickets.size(),ticketsDeck,CardState.of(cardDeck),currentPlayerId,playerStateMap,finalPlayerID ));
-    }*/
     void InitialWorksForNonRandomDeck(){
         var tickets = SortedBag.of(new ChMaps().ALL_TICKETS);
         var gameState1 = GameState.initial(tickets,NON_RANDOM);
@@ -64,10 +47,8 @@ public class GameStateTest {
         SortedBag.Builder<Ticket> reducedBag= new SortedBag.Builder<>();
         int cmp=0;
         for(Ticket ticket : tickets){
-            if(cmp<10){
+            if(cmp<tickets.size()-10){
                 cmp+=1;
-            }
-            else {
                 reducedBag.add(ticket);
             }
         }
@@ -137,7 +118,7 @@ public class GameStateTest {
         GameState finalGS = GS;
         assertThrows(IllegalArgumentException.class, () -> {
             finalGS.withInitiallyChosenTickets(finalGS.currentPlayerId(), SortedBag.of(new ChMaps().ALL_TICKETS.subList(0,2)) );
-       });
+        });
     }
 
     @Test
