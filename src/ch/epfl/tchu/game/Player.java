@@ -26,6 +26,7 @@ public interface Player {
     TurnKind nextTurn();
     int drawSlot();
     Route claimedRoute();
+    SortedBag<Ticket> chooseTickets(SortedBag<Ticket> options);
     SortedBag<Card> initialClaimCards();
     SortedBag<Card> chooseAdditionalCards(List<SortedBag<Card>> options);
 }

@@ -51,9 +51,8 @@ public final class PlayerState extends PublicPlayerState {
      */
     public static PlayerState initial(SortedBag<Card> initialCards){
         Preconditions.checkArgument( initialCards.size()==4);
-        SortedBag.Builder <Ticket> tickets = new SortedBag.Builder<>();
         List<Route> routes = new ArrayList<>();
-        return new PlayerState(tickets.build(), initialCards, routes);
+        return new PlayerState(SortedBag.of(), initialCards, routes);
     }
 
     /**

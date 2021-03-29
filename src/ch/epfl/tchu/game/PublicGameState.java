@@ -2,6 +2,7 @@ package ch.epfl.tchu.game;
 
 import ch.epfl.tchu.Preconditions;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -50,7 +51,7 @@ public class PublicGameState {
      * @return true if deck isn't empty, else returns false
      */
     public boolean canDrawTickets(){
-        if (cardState.isDeckEmpty()){
+        if (ticketCount == 0){
             return false;
         }
         else return true;
@@ -94,9 +95,18 @@ public class PublicGameState {
 
     /**
      * claimed routes getter
-     * @return claimed routes of any player (in this case, the current player)
+     * @return all claimed routes of both players
      */
-    public List<Route> claimedRoutes(){ return playerState.get(currentPlayerId).routes(); }
+    public List<Route> claimedRoutes(){
+        List<Route> totalRoutes= new ArrayList<Route>();
+        for (Route route: playerState.get(currentPlayerId).routes()){
+            totalRoutes.add(route);
+        }
+        for (Route route: playerState.get(currentPlayerId.next()).routes()){
+            totalRoutes.add(route);
+        }
+        return totalRoutes;
+    }
 
     /**
      * Returns id of last player
