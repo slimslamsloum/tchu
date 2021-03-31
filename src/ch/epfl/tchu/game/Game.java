@@ -35,7 +35,7 @@ public final class Game {
         }
 
         while (!gameState.lastTurnBegins()) {
-            Player currentPlayer =  players.get(gameState.currentPlayerId());
+            Player currentPlayer = players.get(gameState.currentPlayerId());
             currentPlayer.updateState(gameState, gameState.currentPlayerState());
             Player.TurnKind playerChoice = currentPlayer.nextTurn();
 
@@ -43,52 +43,44 @@ public final class Game {
             if (playerChoice == Player.TurnKind.CLAIM_ROUTE) {
                 Route route = currentPlayer.claimedRoute();
                 SortedBag<Card> initialClaimCards = currentPlayer.initialClaimCards();
-                List<Card> drawnCards=  new ArrayList<>();
+                SortedBag.Builder<Card> drawnCardsSB = new SortedBag.Builder<>();
                 boolean canClaimRoute = gameState.currentPlayerState().canClaimRoute(route);
 
                 if (canClaimRoute) {
                     if (route.level() == Route.Level.UNDERGROUND) {
-                        for (int i = 0; i < Constants.ADDITIONAL_TUNNEL_CARDS; i++){
+                        for (int i = 0; i < Constants.ADDITIONAL_TUNNEL_CARDS; i++) {
                             gameState = gameState.withCardsDeckRecreatedIfNeeded(rng);
-                            drawnCards.add(gameState.topCard());
+                            drawnCardsSB.add(gameState.topCard());
                             gameState = gameState.withoutTopCard();
                         }
 
-                        //implement fact that locomotives can always be used
-                        SortedBag.Builder<Card> AdditionalCardsToPlayBuilder = new SortedBag.Builder<>();
-                        for (Card card: initialClaimCards){
-                            for (Card drawnCard: drawnCards){
-                                if (drawnCard.equals(card) && card != Card.LOCOMOTIVE){
-                                    AdditionalCardsToPlayBuilder.add(card);
-                                }
-                                if(drawnCard==Card.LOCOMOTIVE){
-                                    AdditionalCardsToPlayBuilder.add(Card.LOCOMOTIVE);
-                                }
-                            }
-                        }
-                        SortedBag<Card> AdditionalCardsToPlay = AdditionalCardsToPlayBuilder.build();
+                        int cardsToPlay = route.additionalClaimCardsCount(initialClaimCards, SortedBag.of(drawnCardsSB.build()));
+                        List<SortedBag<Card>> possibleAdditionalCards =
+                                gameState.currentPlayerState().possibleAdditionalCards(cardsToPlay, initialClaimCards,
+                                        drawnCardsSB.build());
+                        SortedBag<Card> chosenCards = currentPlayer.chooseAdditionalCards(possibleAdditionalCards);
 
+                        if (chosenCards.isEmpty()) {
 
-                        if(AdditionalCardsToPlay.isEmpty()){
-                            gameState=gameState.withMoreDiscardedCards(SortedBag.of(drawnCards));
-                        }
-                        else{
-                            int cardsToPlay = route.additionalClaimCardsCount(initialClaimCards, SortedBag.of(drawnCards));
-                            SortedBag<Card> cardsPlayedForTunnel = initialClaimCards.union(AdditionalCardsToPlay);
+                        } else {
+                            SortedBag<Card> cardsPlayedForTunnel = initialClaimCards.union(chosenCards);
                             gameState = gameState.withClaimedRoute(route, cardsPlayedForTunnel);
                         }
+                        gameState = gameState.withMoreDiscardedCards(SortedBag.of(drawnCardsSB.build()));
                     }
                     if (route.level() == Route.Level.OVERGROUND) {
                         gameState = gameState.withClaimedRoute(route, initialClaimCards);
                     }
-                    gameState=gameState.forNextTurn();
+                    gameState = gameState.forNextTurn();
                 }
             }
 
             if (playerChoice == Player.TurnKind.DRAW_CARDS) {
-                for(int i = 0; i<2; i++) {
-                    if (i==1) {currentPlayer.updateState(gameState, gameState.currentPlayerState());}
-                    if (gameState.canDrawCards()){
+                for (int i = 0; i < 2; i++) {
+                    if (i == 1) {
+                        currentPlayer.updateState(gameState, gameState.currentPlayerState());
+                    }
+                    if (gameState.canDrawCards()) {
                         int slot = currentPlayer.drawSlot();
                         if (slot == Constants.DECK_SLOT) {
                             gameState = gameState.withCardsDeckRecreatedIfNeeded(rng);
@@ -99,14 +91,15 @@ public final class Game {
                         }
                     }
                 }
-                gameState=gameState.forNextTurn();
+                gameState = gameState.forNextTurn();
             }
 
             if (playerChoice == Player.TurnKind.DRAW_TICKETS && gameState.canDrawTickets()) {
                 tickets = currentPlayer.chooseTickets(gameState.topTickets(3));
-                gameState=gameState.withChosenAdditionalTickets(gameState.topTickets(3),tickets);
+                gameState = gameState.withChosenAdditionalTickets(gameState.topTickets(3), tickets);
                 gameState = gameState.forNextTurn();
             }
+        }
 
             for(int i = 0; i<2; i++){
 
@@ -115,13 +108,12 @@ public final class Game {
             for(PlayerId playerId : PlayerId.ALL){
                 players.get(playerId).updateState(gameState, gameState.currentPlayerState());
             }
-            currentPlayer.updateState(gameState, gameState.currentPlayerState());
+
             int player1points = gameState.playerState(PlayerId.PLAYER_1).finalPoints();
             int player2points = gameState.playerState(PlayerId.PLAYER_2).finalPoints();
 
             if (player1points > player2points) {}
             if (player1points < player2points) {}
             if (player1points == player2points) {}
-        }
     }
 }
