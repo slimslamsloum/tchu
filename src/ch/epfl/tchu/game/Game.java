@@ -54,16 +54,26 @@ public final class Game {
                             gameState = gameState.withoutTopCard();
                         }
 
-                        SortedBag<Card> AdditiionalCardsToPlay =
-                                currentPlayer.chooseAdditionalCards(List.of(initialClaimCards));
+                        SortedBag.Builder<Card> AdditionalCardsToPlayBuilder = new SortedBag.Builder<>();
+                        for (Card card: initialClaimCards){
+                            for (Card drawnCard: drawnCards){
+                                if (drawnCard.equals(card) && card != Card.LOCOMOTIVE){
+                                    AdditionalCardsToPlayBuilder.add(card);
+                                }
+                                if(drawnCard==Card.LOCOMOTIVE){
+                                    AdditionalCardsToPlayBuilder.add(Card.LOCOMOTIVE);
+                                }
+                            }
+                        }
+                        SortedBag<Card> AdditionalCardsToPlay = AdditionalCardsToPlayBuilder.build();
 
-                        if(AdditiionalCardsToPlay.isEmpty()){
+
+                        if(AdditionalCardsToPlay.isEmpty()){
                             gameState=gameState.withMoreDiscardedCards(SortedBag.of(drawnCards));
                         }
-
                         else{
                             int cardsToPlay = route.additionalClaimCardsCount(initialClaimCards, SortedBag.of(drawnCards));
-                            SortedBag<Card> cardsPlayedForTunnel = initialClaimCards.union(AdditiionalCardsToPlay);
+                            SortedBag<Card> cardsPlayedForTunnel = initialClaimCards.union(AdditionalCardsToPlay);
                             gameState = gameState.withClaimedRoute(route, cardsPlayedForTunnel);
                         }
                     }
