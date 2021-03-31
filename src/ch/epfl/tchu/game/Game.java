@@ -4,6 +4,7 @@ import ch.epfl.tchu.Preconditions;
 import ch.epfl.tchu.SortedBag;
 import ch.epfl.tchu.gui.Info;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -19,13 +20,14 @@ public final class Game {
             playerEntry.getValue().initPlayers(playerEntry.getKey(),playerNames);
         }
 
-        GameState gameState =GameState.initial(tickets,rng);
+        GameState gameState = GameState.initial(tickets,rng);
         players.get(gameState.currentPlayerId()).receiveInfo(new Info(playerNames.get(gameState.currentPlayerId())).willPlayFirst());
 
         for(PlayerId playerId : PlayerId.ALL){
             players.get(playerId).setInitialTicketChoice(gameState.topTickets(5));
         }
         for(PlayerId playerId : PlayerId.ALL){
+            players.get(playerId).updateState(gameState, gameState.playerState(playerId));
             players.get(playerId).chooseInitialTickets();
         }
         for(PlayerId playerId : PlayerId.ALL){
@@ -33,74 +35,63 @@ public final class Game {
         }
 
         while (!gameState.lastTurnBegins()) {
-            boolean turnDone = false;
+            Player currentPlayer =  players.get(gameState.currentPlayerId());
+            currentPlayer.updateState(gameState, gameState.currentPlayerState());
+            Player.TurnKind playerChoice = currentPlayer.nextTurn();
 
-            while (turnDone = false) {
-                Player.TurnKind playerChoice = players.get(gameState.currentPlayerId()).nextTurn();
+            if (playerChoice == Player.TurnKind.CLAIM_ROUTE) {
+                Route route = currentPlayer.claimedRoute();
+                SortedBag<Card> initialClaimCards = currentPlayer.initialClaimCards();
+                List<Card> drawnCards=  new ArrayList<>();
+                boolean canClaimRoute = gameState.currentPlayerState().canClaimRoute(route);
 
-                if (playerChoice == Player.TurnKind.CLAIM_ROUTE) {
-                    players.get(gameState.currentPlayerId()).claimedRoute();
-                    players.get(gameState.currentPlayerId()).initialClaimCards();
-                    if (players.get(gameState.currentPlayerId()).claimedRoute().level() == Route.Level.UNDERGROUND) {
-                        players.get(gameState.currentPlayerId()).chooseAdditionalCards
-                                (gameState.currentPlayerState().possibleAdditionalCards());
+                if (canClaimRoute) {
+                    if (route.level() == Route.Level.UNDERGROUND) {
+                        SortedBag<Card> AdditiionalCardsToPlay =
+                                currentPlayer.chooseAdditionalCards(List.of(initialClaimCards));
+
+
                     }
-                //cette partie c'est un enorme bordel, a finir
-                }
-
-                if (playerChoice == Player.TurnKind.DRAW_CARDS) {
-                    gameState=gameState.withCardsDeckRecreatedIfNeeded(rng);
-                    int slot =  players.get(gameState.currentPlayerId()).drawSlot();
-                    if (slot == Constants.DECK_SLOT){
-                        gameState=gameState.withBlindlyDrawnCard();
+                    if (route.level() == Route.Level.OVERGROUND) {
+                        gameState = gameState.withClaimedRoute(route, initialClaimCards);
                     }
-                    if (slot >0 && slot <4){
-                        gameState=gameState.withDrawnFaceUpCard(slot);
-                    }
-                    turnDone = true;
                 }
 
-                if (playerChoice == Player.TurnKind.DRAW_TICKETS && gameState.canDrawTickets()) {
-                    tickets = players.get(gameState.currentPlayerId()).chooseTickets(gameState.topTickets(3));
-                    gameState=gameState.withChosenAdditionalTickets(gameState.topTickets(3),tickets);
-                    turnDone = true;
-                }
 
-                if(turnDone==true){
-                    gameState = gameState.forNextTurn();
-                }
+
             }
+
+            if (playerChoice == Player.TurnKind.DRAW_CARDS) {
+                for(int i = 0; i<2; i++) {
+                    if (i==1) {currentPlayer.updateState(gameState, gameState.currentPlayerState());}
+                    if (gameState.canDrawCards()){
+                        int slot = currentPlayer.drawSlot();
+                        if (slot == Constants.DECK_SLOT) {
+                            gameState = gameState.withCardsDeckRecreatedIfNeeded(rng);
+                            gameState = gameState.withBlindlyDrawnCard();
+                        }
+                        if (slot > 0 && slot < 4) {
+                            gameState = gameState.withDrawnFaceUpCard(slot);
+                        }
+                    }
+                }
+                gameState=gameState.forNextTurn();
+            }
+
+            if (playerChoice == Player.TurnKind.DRAW_TICKETS && gameState.canDrawTickets()) {
+                tickets = currentPlayer.chooseTickets(gameState.topTickets(3));
+                gameState=gameState.withChosenAdditionalTickets(gameState.topTickets(3),tickets);
+                gameState = gameState.forNextTurn();
+            }
+
             for(int i = 0; i<2; i++){
-                Player.TurnKind playerChoice = players.get(gameState.currentPlayerId()).nextTurn();
-                if (playerChoice == Player.TurnKind.CLAIM_ROUTE) {
-                    players.get(gameState.currentPlayerId()).claimedRoute();
-                    players.get(gameState.currentPlayerId()).initialClaimCards();
-                    if (players.get(gameState.currentPlayerId()).claimedRoute().level() == Route.Level.UNDERGROUND) {
-                        players.get(gameState.currentPlayerId()).chooseAdditionalCards
-                                (gameState.currentPlayerState().possibleAdditionalCards());
-                    }
-                }
-                if (playerChoice == Player.TurnKind.DRAW_CARDS) {
-                    gameState=gameState.withCardsDeckRecreatedIfNeeded(rng);
-                    int slot =  players.get(gameState.currentPlayerId()).drawSlot();
-                    if (slot == Constants.DECK_SLOT){
-                        gameState=gameState.withBlindlyDrawnCard();
-                    }
-                    if (slot >0 && slot <4){
-                        gameState=gameState.withDrawnFaceUpCard(slot);
-                    }
-                    turnDone = true;
-                }
-                if (playerChoice == Player.TurnKind.DRAW_TICKETS && gameState.canDrawTickets()) {
-                    tickets = players.get(gameState.currentPlayerId()).chooseTickets(gameState.topTickets(3));
-                    gameState=gameState.withChosenAdditionalTickets(gameState.topTickets(3),tickets);
-                    turnDone = true;
-                }
-                if(turnDone==true){
-                    gameState = gameState.forNextTurn();
-                }
+
             }
 
+            for(PlayerId playerId : PlayerId.ALL){
+                players.get(playerId).updateState(gameState, gameState.currentPlayerState());
+            }
+            currentPlayer.updateState(gameState, gameState.currentPlayerState());
             int player1points = gameState.playerState(PlayerId.PLAYER_1).finalPoints();
             int player2points = gameState.playerState(PlayerId.PLAYER_2).finalPoints();
 
