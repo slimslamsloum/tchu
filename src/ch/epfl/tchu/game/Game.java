@@ -39,6 +39,7 @@ public final class Game {
             currentPlayer.updateState(gameState, gameState.currentPlayerState());
             Player.TurnKind playerChoice = currentPlayer.nextTurn();
 
+            //pas sur de cette partie
             if (playerChoice == Player.TurnKind.CLAIM_ROUTE) {
                 Route route = currentPlayer.claimedRoute();
                 SortedBag<Card> initialClaimCards = currentPlayer.initialClaimCards();
@@ -47,18 +48,19 @@ public final class Game {
 
                 if (canClaimRoute) {
                     if (route.level() == Route.Level.UNDERGROUND) {
-                        SortedBag<Card> AdditiionalCardsToPlay =
-                                currentPlayer.chooseAdditionalCards(List.of(initialClaimCards));
-
                         for (int i = 0; i < Constants.ADDITIONAL_TUNNEL_CARDS; i++){
                             gameState = gameState.withCardsDeckRecreatedIfNeeded(rng);
                             drawnCards.add(gameState.topCard());
-                            gameState=gameState.withoutTopCard();
+                            gameState = gameState.withoutTopCard();
                         }
+
+                        SortedBag<Card> AdditiionalCardsToPlay =
+                                currentPlayer.chooseAdditionalCards(List.of(initialClaimCards));
 
                         if(AdditiionalCardsToPlay.isEmpty()){
                             gameState=gameState.withMoreDiscardedCards(SortedBag.of(drawnCards));
                         }
+
                         else{
                             int cardsToPlay = route.additionalClaimCardsCount(initialClaimCards, SortedBag.of(drawnCards));
                             SortedBag<Card> cardsPlayedForTunnel = initialClaimCards.union(AdditiionalCardsToPlay);
