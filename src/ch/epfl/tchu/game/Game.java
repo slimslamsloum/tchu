@@ -54,6 +54,7 @@ public final class Game {
                             gameState = gameState.withoutTopCard();
                         }
 
+                        //implement fact that locomotives can always be used
                         SortedBag.Builder<Card> AdditionalCardsToPlayBuilder = new SortedBag.Builder<>();
                         for (Card card: initialClaimCards){
                             for (Card drawnCard: drawnCards){
@@ -93,7 +94,7 @@ public final class Game {
                             gameState = gameState.withCardsDeckRecreatedIfNeeded(rng);
                             gameState = gameState.withBlindlyDrawnCard();
                         }
-                        if (slot > 0 && slot < 4) {
+                        if (slot >= 0 && slot <= 4) {
                             gameState = gameState.withDrawnFaceUpCard(slot);
                         }
                     }
