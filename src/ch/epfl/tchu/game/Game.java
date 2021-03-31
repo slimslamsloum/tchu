@@ -50,15 +50,26 @@ public final class Game {
                         SortedBag<Card> AdditiionalCardsToPlay =
                                 currentPlayer.chooseAdditionalCards(List.of(initialClaimCards));
 
+                        for (int i = 0; i < Constants.ADDITIONAL_TUNNEL_CARDS; i++){
+                            gameState = gameState.withCardsDeckRecreatedIfNeeded(rng);
+                            drawnCards.add(gameState.topCard());
+                            gameState=gameState.withoutTopCard();
+                        }
 
+                        if(AdditiionalCardsToPlay.isEmpty()){
+                            gameState=gameState.withMoreDiscardedCards(SortedBag.of(drawnCards));
+                        }
+                        else{
+                            int cardsToPlay = route.additionalClaimCardsCount(initialClaimCards, SortedBag.of(drawnCards));
+                            SortedBag<Card> cardsPlayedForTunnel = initialClaimCards.union(AdditiionalCardsToPlay);
+                            gameState = gameState.withClaimedRoute(route, cardsPlayedForTunnel);
+                        }
                     }
                     if (route.level() == Route.Level.OVERGROUND) {
                         gameState = gameState.withClaimedRoute(route, initialClaimCards);
                     }
+                    gameState=gameState.forNextTurn();
                 }
-
-
-
             }
 
             if (playerChoice == Player.TurnKind.DRAW_CARDS) {
