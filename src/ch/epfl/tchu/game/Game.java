@@ -34,12 +34,18 @@ public final class Game {
             players.get(playerId).receiveInfo(new Info(playerNames.get(playerId)).keptTickets(gameState.playerState(playerId).ticketCount()));
         }
 
-        while (!gameState.lastTurnBegins()) {
+        int lastTurns = 2;
+
+        while (!gameState.lastTurnBegins() || lastTurns != 0) {
+
+            if (gameState.lastTurnBegins()){
+                lastTurns -= 1;
+            }
+
             Player currentPlayer = players.get(gameState.currentPlayerId());
             currentPlayer.updateState(gameState, gameState.currentPlayerState());
             Player.TurnKind playerChoice = currentPlayer.nextTurn();
 
-            //pas sur de cette partie
             if (playerChoice == Player.TurnKind.CLAIM_ROUTE) {
                 Route route = currentPlayer.claimedRoute();
                 SortedBag<Card> initialClaimCards = currentPlayer.initialClaimCards();
@@ -100,10 +106,6 @@ public final class Game {
                 gameState = gameState.forNextTurn();
             }
         }
-
-            for(int i = 0; i<2; i++){
-
-            }
 
             for(PlayerId playerId : PlayerId.ALL){
                 players.get(playerId).updateState(gameState, gameState.currentPlayerState());
