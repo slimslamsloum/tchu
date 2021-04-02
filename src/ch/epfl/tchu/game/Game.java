@@ -64,11 +64,10 @@ public final class Game {
                         List<SortedBag<Card>> possibleAdditionalCards =
                                 gameState.currentPlayerState().possibleAdditionalCards(cardsToPlay, initialClaimCards,
                                         drawnCardsSB.build());
-                        SortedBag<Card> chosenCards = currentPlayer.chooseAdditionalCards(possibleAdditionalCards);
 
-                        if (chosenCards.isEmpty()) {
 
-                        } else {
+                        if (possibleAdditionalCards.size() != 0) {
+                            SortedBag<Card> chosenCards = currentPlayer.chooseAdditionalCards(possibleAdditionalCards);
                             SortedBag<Card> cardsPlayedForTunnel = initialClaimCards.union(chosenCards);
                             gameState = gameState.withClaimedRoute(route, cardsPlayedForTunnel);
                         }
@@ -107,15 +106,25 @@ public final class Game {
             }
         }
 
-            for(PlayerId playerId : PlayerId.ALL){
-                players.get(playerId).updateState(gameState, gameState.currentPlayerState());
-            }
+        for(PlayerId playerId : PlayerId.ALL){
+            players.get(playerId).updateState(gameState, gameState.currentPlayerState());
+        }
 
-            int player1points = gameState.playerState(PlayerId.PLAYER_1).finalPoints();
-            int player2points = gameState.playerState(PlayerId.PLAYER_2).finalPoints();
+        int player1points = gameState.playerState(PlayerId.PLAYER_1).finalPoints();
+        int player2points = gameState.playerState(PlayerId.PLAYER_2).finalPoints();
 
-            if (player1points > player2points) {}
-            if (player1points < player2points) {}
-            if (player1points == player2points) {}
+        Trail longestTrailP1 = Trail.longest(gameState.playerState(PlayerId.PLAYER_1).routes());
+        Trail longestTrailP2 = Trail.longest(gameState.playerState(PlayerId.PLAYER_1).routes());
+
+        if (longestTrailP1.length() > longestTrailP2.length()){
+              player1points += 10;
+        }
+        if (longestTrailP1.length() < longestTrailP2.length()){
+            player2points += 10;
+        }
+
+        if (player1points > player2points) {}
+        if (player1points < player2points) {}
+        if (player1points == player2points) {}
     }
 }
