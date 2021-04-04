@@ -39,12 +39,16 @@ public final class Game {
         while (!gameState.lastTurnBegins() || lastTurns != 0) {
 
             if (gameState.lastTurnBegins()){
+                if (lastTurns ==2){
+                    allInfo(new Info(playerNames.get(gameState.currentPlayerId())).lastTurnBegins(gameState.currentPlayerState().carCount()),players);
+                }
                 lastTurns -= 1;
             }
 
             Player currentPlayer = players.get(gameState.currentPlayerId());
             currentPlayer.updateState(gameState, gameState.currentPlayerState());
             Player.TurnKind playerChoice = currentPlayer.nextTurn();
+            Game.allInfo(new Info(playerNames.get(gameState.currentPlayerId())).canPlay(),players);
 
             if (playerChoice == Player.TurnKind.CLAIM_ROUTE) {
                 Route route = currentPlayer.claimedRoute();
@@ -54,6 +58,7 @@ public final class Game {
 
                 if (canClaimRoute) {
                     if (route.level() == Route.Level.UNDERGROUND) {
+                        Game.allInfo(new Info(playerNames.get(gameState.currentPlayerId())).attemptsTunnelClaim(route,initialClaimCards),players);
                         for (int i = 0; i < Constants.ADDITIONAL_TUNNEL_CARDS; i++) {
                             gameState = gameState.withCardsDeckRecreatedIfNeeded(rng);
                             drawnCardsSB.add(gameState.topCard());
@@ -61,6 +66,7 @@ public final class Game {
                         }
 
                         int cardsToPlay = route.additionalClaimCardsCount(initialClaimCards, SortedBag.of(drawnCardsSB.build()));
+                        Game.allInfo(new Info(playerNames.get(gameState.currentPlayerId())).drewAdditionalCards(drawnCardsSB.build(),cardsToPlay),players);
                         List<SortedBag<Card>> possibleAdditionalCards =
                                 gameState.currentPlayerState().possibleAdditionalCards(cardsToPlay, initialClaimCards,
                                         drawnCardsSB.build());
@@ -68,18 +74,29 @@ public final class Game {
                         //what if player can't claim route??
                         if (possibleAdditionalCards.size() != 0) {
                             SortedBag<Card> chosenCards = currentPlayer.chooseAdditionalCards(possibleAdditionalCards);
-                            SortedBag<Card> cardsPlayedForTunnel = initialClaimCards.union(chosenCards);
-                            gameState = gameState.withClaimedRoute(route, cardsPlayedForTunnel);
+                            if (chosenCards.size()== cardsToPlay){ // condition trop spécifique? -->condition pas assez specifique pr moi mdr
+                                SortedBag<Card> cardsPlayedForTunnel = initialClaimCards.union(chosenCards);
+                                Game.allInfo(new Info(playerNames.get(gameState.currentPlayerId())).claimedRoute(route,cardsPlayedForTunnel),players);
+                                gameState = gameState.withClaimedRoute(route, cardsPlayedForTunnel);
+                            }
+                            else {
+                                Game.allInfo(new Info(playerNames.get(gameState.currentPlayerId())).didNotClaimRoute(route),players);
+                            }
                         }
                         else{
                             gameState = gameState.withClaimedRoute(route, initialClaimCards);
+                            Game.allInfo(new Info(playerNames.get(gameState.currentPlayerId())).claimedRoute(route,initialClaimCards),players);
                         }
                         gameState = gameState.withMoreDiscardedCards(SortedBag.of(drawnCardsSB.build()));
                     }
                     if (route.level() == Route.Level.OVERGROUND) {
                         gameState = gameState.withClaimedRoute(route, initialClaimCards);
+                        Game.allInfo(new Info(playerNames.get(gameState.currentPlayerId())).claimedRoute(route,initialClaimCards),players);
                     }
                     gameState = gameState.forNextTurn();
+                }
+                else {
+                    Game.allInfo(new Info(playerNames.get(gameState.currentPlayerId())).didNotClaimRoute(route),players);
                 }
             }
 
@@ -91,10 +108,12 @@ public final class Game {
                     if (gameState.canDrawCards()) {
                         int slot = currentPlayer.drawSlot();
                         if (slot == Constants.DECK_SLOT) {
+                            Game.allInfo(new Info(playerNames.get(gameState.currentPlayerId())).drewBlindCard(),players);
                             gameState = gameState.withCardsDeckRecreatedIfNeeded(rng);
                             gameState = gameState.withBlindlyDrawnCard();
                         }
                         if (slot >= 0 && slot <= 4) {
+                            Game.allInfo(new Info(playerNames.get(gameState.currentPlayerId())).drewVisibleCard(gameState.cardState().faceUpCard(slot)),players);
                             gameState = gameState.withCardsDeckRecreatedIfNeeded(rng);
                             gameState = gameState.withDrawnFaceUpCard(slot);
 
@@ -106,6 +125,8 @@ public final class Game {
 
             if (playerChoice == Player.TurnKind.DRAW_TICKETS && gameState.canDrawTickets()) {
                 tickets = currentPlayer.chooseTickets(gameState.topTickets(3));
+                Game.allInfo(new Info(playerNames.get(gameState.currentPlayerId())).drewTickets(Constants.IN_GAME_TICKETS_COUNT),players);
+                Game.allInfo(new Info(playerNames.get(gameState.currentPlayerId())).keptTickets(tickets.size()),players);
                 gameState = gameState.withChosenAdditionalTickets(gameState.topTickets(3), tickets);
                 gameState = gameState.forNextTurn();
             }
@@ -123,13 +144,25 @@ public final class Game {
 
         if (longestTrailP1.length() > longestTrailP2.length()){
               player1points += 10;
+            Game.allInfo(new Info(playerNames.get(PlayerId.PLAYER_1)).getsLongestTrailBonus(longestTrailP1),players);
         }
         if (longestTrailP1.length() < longestTrailP2.length()){
             player2points += 10;
+            Game.allInfo(new Info(playerNames.get(PlayerId.PLAYER_1)).getsLongestTrailBonus(longestTrailP2),players);
         }
 
-        if (player1points > player2points) {}
-        if (player1points < player2points) {}
-        if (player1points == player2points) {}
+        if (player1points > player2points) {
+            Game.allInfo(new Info(playerNames.get(PlayerId.PLAYER_1)).won(player1points,player2points),players);
+        }
+        if (player1points < player2points) {
+            Game.allInfo(new Info(playerNames.get(PlayerId.PLAYER_2)).won(player1points,player2points),players);
+        }
+        if (player1points == player2points) {Game.allInfo(Info.draw(List.of(playerNames.get(PlayerId.PLAYER_1),playerNames.get(PlayerId.PLAYER_2)),player1points),players);}
+    }
+
+    private static void allInfo(String info,Map<PlayerId, Player> players){
+        for(PlayerId playerId : PlayerId.ALL){
+            players.get(playerId).receiveInfo(info);
+        }
     }
 }
