@@ -65,11 +65,14 @@ public final class Game {
                                 gameState.currentPlayerState().possibleAdditionalCards(cardsToPlay, initialClaimCards,
                                         drawnCardsSB.build());
 
-
+                        //what if player can't claim route??
                         if (possibleAdditionalCards.size() != 0) {
                             SortedBag<Card> chosenCards = currentPlayer.chooseAdditionalCards(possibleAdditionalCards);
                             SortedBag<Card> cardsPlayedForTunnel = initialClaimCards.union(chosenCards);
                             gameState = gameState.withClaimedRoute(route, cardsPlayedForTunnel);
+                        }
+                        else{
+                            gameState = gameState.withClaimedRoute(route, initialClaimCards);
                         }
                         gameState = gameState.withMoreDiscardedCards(SortedBag.of(drawnCardsSB.build()));
                     }
@@ -92,7 +95,9 @@ public final class Game {
                             gameState = gameState.withBlindlyDrawnCard();
                         }
                         if (slot >= 0 && slot <= 4) {
+                            gameState = gameState.withCardsDeckRecreatedIfNeeded(rng);
                             gameState = gameState.withDrawnFaceUpCard(slot);
+
                         }
                     }
                 }
