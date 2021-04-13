@@ -146,7 +146,7 @@ public final class Route {
      * @throws IllegalArgumentException if there are not exactly 3 cards drawn, or if the level isn't underground
      */
     public int additionalClaimCardsCount(SortedBag<Card> claimCards, SortedBag<Card> drawnCards){
-        Preconditions.checkArgument(!(drawnCards.size() != 3 || level != Level.UNDERGROUND));
+        Preconditions.checkArgument(!(drawnCards.size() != Constants.ADDITIONAL_TUNNEL_CARDS || level != Level.UNDERGROUND));
         int additionalClaimCardsCount=0;
         for (Card additional_card : drawnCards){
             SortedBag.Builder<Card> dC = new SortedBag.Builder<>();

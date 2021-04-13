@@ -27,7 +27,7 @@ public class PublicCardState{
      * isn't between 0 (included) and 5 (excluded)
      */
     public PublicCardState(List<Card> faceUpCards, int deckSize, int discardsSize){
-       Preconditions.checkArgument(faceUpCards.size()==5 && deckSize >= 0 && discardsSize >= 0);
+       Preconditions.checkArgument(faceUpCards.size()==Constants.FACE_UP_CARDS_COUNT && deckSize >= 0 && discardsSize >= 0);
        this.faceUpCards= List.copyOf(faceUpCards);
        this.deckSize=deckSize;
        this.discardsSize=discardsSize;
@@ -46,7 +46,7 @@ public class PublicCardState{
      * @throws IndexOutOfBoundsException if slot isn't between 0 (included) and 5 (excluded)
      */
     public Card faceUpCard(int slot){
-        if (slot < 0 || slot >= 5){
+        if (slot < 0 || slot >= Constants.FACE_UP_CARDS_COUNT){
             throw new IndexOutOfBoundsException("index is out of bounds");
         }
         return faceUpCards.get(slot);

@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Random;
 
 /**
- * A game
+ * How a game of tChu unfolds
  *
  * @author Alexandre Kambiz Gunter (324268)
  * @author Selim Jerad (327529)
@@ -47,10 +47,10 @@ public final class Game {
         //the deck is then recreated,
         //then each player receives the info of how many tickets each player has kept
         for(PlayerId playerId : PlayerId.ALL){
-            players.get(playerId).setInitialTicketChoice(gameState.topTickets(5));
+            players.get(playerId).setInitialTicketChoice(gameState.topTickets(Constants.INITIAL_TICKETS_COUNT));
             players.get(playerId).updateState(gameState, gameState.playerState(playerId));
             gameState= gameState.withInitiallyChosenTickets(playerId,players.get(playerId).chooseInitialTickets());
-            gameState=gameState.withoutTopTickets(5);
+            gameState=gameState.withoutTopTickets(Constants.INITIAL_TICKETS_COUNT);
             Game.allInfo(new Info(playerNames.get(playerId)).keptTickets(gameState.playerState(playerId).ticketCount()), players);
         }
 
@@ -278,13 +278,15 @@ public final class Game {
      * @param players map of the players that are playing
      */
     private static void allInfo(String info,Map<PlayerId, Player> players){
-        for(PlayerId playerId : PlayerId.ALL){
-            players.get(playerId).receiveInfo(info);
-        }
+        players.forEach(((playerId, player) -> players.get(playerId).receiveInfo(info)));
     }
+
+    /**
+     * Method that updates the gamestate for both players
+     * @param gameState state of the game
+     * @param players map of player Ids linked to players
+     */
     private static void updateAll(GameState gameState,Map<PlayerId, Player> players ){
-        for(PlayerId playerId : PlayerId.ALL) {
-            players.get(playerId).updateState(gameState, gameState.playerState(playerId));
-        }
+        players.forEach(((playerId, player) -> players.get(playerId).updateState(gameState,gameState.playerState(playerId))));
     }
 }

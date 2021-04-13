@@ -41,7 +41,7 @@ public class PublicPlayerState {
             temp += route.claimPoints();
         }
         claimPoints = temp;
-        carCount = 40 - routes_size;
+        carCount = Constants.INITIAL_CAR_COUNT - routes_size;
     }
 
     /**

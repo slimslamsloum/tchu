@@ -18,8 +18,6 @@ public final class PlayerState extends PublicPlayerState {
     private final SortedBag<Ticket> tickets;
     private final SortedBag<Card> cards;
     private final List<Route> routes;
-    private final int carCount;
-    private final int claimPoints;
 
     /**
      * Player State constructor
@@ -32,14 +30,6 @@ public final class PlayerState extends PublicPlayerState {
         this.tickets = tickets;
         this.cards = cards;
         this.routes = routes;
-        int routes_size=0;
-        int temp =0;
-        for (Route route: routes){
-            routes_size += route.length();
-            temp += route.claimPoints();
-        }
-        claimPoints = temp;
-        carCount = 40 - routes_size;
     }
 
     /**
@@ -50,7 +40,7 @@ public final class PlayerState extends PublicPlayerState {
      * @throws IllegalArgumentException if size of initial cards isn't 4
      */
     public static PlayerState initial(SortedBag<Card> initialCards){
-        Preconditions.checkArgument( initialCards.size()==4);
+        Preconditions.checkArgument( initialCards.size()==Constants.INITIAL_CARDS_COUNT);
         List<Route> routes = new ArrayList<>();
         return new PlayerState(SortedBag.of(), initialCards, routes);
     }
@@ -166,7 +156,7 @@ public final class PlayerState extends PublicPlayerState {
      * @return all possible additional cards that the player has to add
      */
     public List<SortedBag<Card>> possibleAdditionalCards(int additionalCardsCount, SortedBag<Card> initialCards, SortedBag<Card> drawnCards){
-        Preconditions.checkArgument(additionalCardsCount>=1 && additionalCardsCount<=3 && drawnCards.size()==3
+        Preconditions.checkArgument(additionalCardsCount>=1 && additionalCardsCount<=Constants.ADDITIONAL_TUNNEL_CARDS && drawnCards.size()==Constants.ADDITIONAL_TUNNEL_CARDS
                 && initialCards != null && initialCards.size() != 0);
         Preconditions.checkArgument(initialCards.toSet().size()<=2);
 

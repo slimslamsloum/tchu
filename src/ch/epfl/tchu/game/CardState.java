@@ -56,7 +56,7 @@ public final class CardState extends PublicCardState {
      */
     public CardState withDrawnFaceUpCard(int slot){
         Preconditions.checkArgument(!this.isDeckEmpty());
-        if (!(slot >= 0 && slot <5)){
+        if (!(slot >= 0 && slot < Constants.FACE_UP_CARDS_COUNT)){
             throw new IndexOutOfBoundsException("slot is out of bounds");
         }
         ArrayList<Card> faceUp = new ArrayList<>(this.faceUpCards());
