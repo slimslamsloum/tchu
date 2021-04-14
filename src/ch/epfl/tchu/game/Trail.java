@@ -37,6 +37,7 @@ public final class Trail {
      * @param routes takes as an argument the player's routes
      * @return the longest trail the player has. If a player has several longest trails of the same size,
      * returns any of them
+     * @throws NullPointerException if station1 or station2 is null
      */
     public static Trail longest(List<Route> routes){
         if (routes.size() == 0){
@@ -147,6 +148,7 @@ public final class Trail {
      * Method that returns textual representation of a trail
      * @return textual representation of a trail, composed of its different station and at the end its length in parenthisis
      * @throws IllegalArgumentException if the routes aren't all connected to each other
+     * @throws NullPointerException if station2 is null
      */
     @Override
     public String toString(){
