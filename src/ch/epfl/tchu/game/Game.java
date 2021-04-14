@@ -35,6 +35,7 @@ public final class Game {
         for(Map.Entry<PlayerId, Player> playerEntry: players.entrySet()){
             playerEntry.getValue().initPlayers(playerEntry.getKey(),playerNames);
         }
+        zizi
 
         //game state is initialized
         GameState gameState = GameState.initial(tickets,rng);
