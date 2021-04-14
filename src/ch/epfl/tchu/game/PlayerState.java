@@ -156,9 +156,10 @@ public final class PlayerState extends PublicPlayerState {
      * @return all possible additional cards that the player has to add
      */
     public List<SortedBag<Card>> possibleAdditionalCards(int additionalCardsCount, SortedBag<Card> initialCards, SortedBag<Card> drawnCards){
-        Preconditions.checkArgument(additionalCardsCount>=1 && additionalCardsCount<=Constants.ADDITIONAL_TUNNEL_CARDS && drawnCards.size()==Constants.ADDITIONAL_TUNNEL_CARDS
-                && initialCards != null && initialCards.size() != 0);
-        Preconditions.checkArgument(initialCards.toSet().size()<=2);
+        Preconditions.checkArgument(
+                additionalCardsCount>=1 && additionalCardsCount<=Constants.ADDITIONAL_TUNNEL_CARDS
+                        && drawnCards.size()==Constants.ADDITIONAL_TUNNEL_CARDS
+                        && initialCards != null && initialCards.size() != 0 && initialCards.toSet().size()<=2);
 
         SortedBag<Card> newCards = cards.difference(initialCards);
 

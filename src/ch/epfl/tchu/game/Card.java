@@ -29,9 +29,9 @@ public enum Card {
 
     /**
      * Card constructor
-     * @param color
+     * @param color a color
      */
-    private Card(Color color) {
+    Card(Color color) {
         this.color = color;
     }
 

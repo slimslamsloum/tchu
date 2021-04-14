@@ -23,9 +23,9 @@ public class PublicPlayerState {
 
     /**
      *PublicPlayerState constructor
-     * @param ticketCount
-     * @param cardCount
-     * @param routes
+     * @param ticketCount number of tickets
+     * @param cardCount number of cards
+     * @param routes list of routes
      * @throws IllegalArgumentException if cardCount or ticketCount is negative
      * also computes within the constructor the car count the number of claim points
      */

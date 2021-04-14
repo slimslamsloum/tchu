@@ -3,6 +3,7 @@ package ch.epfl.tchu.game;
 import ch.epfl.tchu.Preconditions;
 
 import java.util.List;
+import java.util.Set;
 import java.util.TreeSet;
 
 /**
@@ -25,7 +26,7 @@ public final class Ticket implements Comparable<Ticket> {
      * throws exception if trips is null or starting stations don't match
      */
     public Ticket(List<Trip> trips){
-        Preconditions.checkArgument(!(trips == null || trips.size() == 0));
+        Preconditions.checkArgument(trips != null && trips.size() != 0);
         String expectedStation = trips.get(0).from().toString();
         for(Trip trip : trips){
             String station = trip.from().toString();
@@ -69,7 +70,7 @@ public final class Ticket implements Comparable<Ticket> {
             return String.format("%s - %s (%s)",departure, arrival, points);
         }
         else {
-            TreeSet stations= new TreeSet();
+            Set<String> stations= new TreeSet<>();
             String departure = trips.get(0).from().toString();
             for (Trip trip : trips) {
                 String arrival = trip.to().toString();
@@ -91,14 +92,14 @@ public final class Ticket implements Comparable<Ticket> {
      */
     public int points(StationConnectivity connectivity){
         int ticket_points=0;
-        boolean isconnected=false;
+        boolean isConnected = false;
         for (Trip single_trip : trips){
             if (connectivity.connected(single_trip.from(), single_trip.to()) && single_trip.points()>ticket_points){
-                isconnected=true;
+                isConnected=true;
                 ticket_points = single_trip.points();
             }
         }
-        if(!isconnected){
+        if(!isConnected){
             ticket_points = trips.get(0).points();
             for (Trip single_trip : trips){
                 if (single_trip.points()<ticket_points){

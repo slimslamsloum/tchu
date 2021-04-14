@@ -8,7 +8,7 @@ package ch.epfl.tchu;
  */
 
 public final class Preconditions {
-    private Preconditions(){};
+    private Preconditions(){}
 
     /**
      * @param shouldBeTrue
@@ -16,7 +16,7 @@ public final class Preconditions {
      * throws error if statement given as parameter is false
      **/
     public static void checkArgument (boolean shouldBeTrue){
-        if (shouldBeTrue == false){
+        if (!shouldBeTrue){
             throw new IllegalArgumentException();
         }
     }

@@ -3,6 +3,7 @@ package ch.epfl.tchu.game;
 import ch.epfl.tchu.Preconditions;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * State of public cards (face up)
@@ -27,17 +28,17 @@ public class PublicCardState{
      * isn't between 0 (included) and 5 (excluded)
      */
     public PublicCardState(List<Card> faceUpCards, int deckSize, int discardsSize){
-       Preconditions.checkArgument(faceUpCards.size()==Constants.FACE_UP_CARDS_COUNT && deckSize >= 0 && discardsSize >= 0);
-       this.faceUpCards= List.copyOf(faceUpCards);
-       this.deckSize=deckSize;
-       this.discardsSize=discardsSize;
+        Preconditions.checkArgument(faceUpCards.size()==Constants.FACE_UP_CARDS_COUNT && deckSize >= 0 && discardsSize >= 0);
+        this.faceUpCards= List.copyOf(faceUpCards);
+        this.deckSize=deckSize;
+        this.discardsSize=discardsSize;
     }
 
     /**
      * Methods that computes total number of cards (face up, deck and discard)
      * @return the sum of the sizes of the face up cards, the deck size, and the discard pile size
      */
-    public int totalSize(){ return faceUpCards.size()+deckSize+discardsSize; };
+    public int totalSize(){ return faceUpCards.size()+deckSize+discardsSize; }
 
     /**
      * Methods that returns face up card at a certain index
@@ -46,38 +47,33 @@ public class PublicCardState{
      * @throws IndexOutOfBoundsException if slot isn't between 0 (included) and 5 (excluded)
      */
     public Card faceUpCard(int slot){
-        if (slot < 0 || slot >= Constants.FACE_UP_CARDS_COUNT){
-            throw new IndexOutOfBoundsException("index is out of bounds");
-        }
+        slot = Objects.checkIndex(slot,Constants.FACE_UP_CARDS_COUNT );
         return faceUpCards.get(slot);
-    };
+    }
 
     /**
      * Asks if deck is empty or not
      * @return true if deck is empty, else returns false
      */
     public boolean isDeckEmpty(){
-        if(deckSize==0){
-            return true;
-        }
-        else return false;
-        };
+        return deckSize == 0;
+    }
 
     /**
      * Discard size getter
      * @return discard size
      */
-    public int discardsSize(){ return discardsSize; };
+    public int discardsSize(){ return discardsSize; }
 
     /**
      * Face up cards getter
      * @return face up cards
      */
-    public List<Card>faceUpCards(){ return faceUpCards; };
+    public List<Card>faceUpCards(){ return faceUpCards; }
 
     /**
      * Deck size getter
      * @return deck size
      */
-    public int deckSize(){ return deckSize; };
+    public int deckSize(){ return deckSize; }
 }

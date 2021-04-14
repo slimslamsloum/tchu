@@ -4,9 +4,10 @@ import ch.epfl.tchu.Preconditions;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
- * Trail
+ * Trail composed of routes
  *
  * @author Alexandre Kambiz Gunter (324268)
  * @author Selim Jerad (327529)
@@ -39,25 +40,44 @@ public final class Trail {
      */
     public static Trail longest(List<Route> routes){
         if (routes.size() == 0){
-            return new Trail(null, null, new ArrayList<Route>());
+            return new Trail(null, null, new ArrayList<>());
         }
-        Trail longest_trail = new Trail (routes.get(0).station1(), routes.get(0).station2(), new ArrayList<Route>(List.of(routes.get(0))));
-        List<Trail> all_trails = new ArrayList<Trail>();
+        //the var longest trail will hold the value of the longest trail
+        Trail longest_trail = new Trail (routes.get(0).station1(), routes.get(0).station2(), new ArrayList<>(List.of(routes.get(0))));
+
+        //all trails will contain all the trails the player has
+        List<Trail> all_trails = new ArrayList<>();
+
         for (Route route: routes){
-            all_trails.add(new Trail(route.station1(), route.station2(), new ArrayList<Route>(List.of(route))));
+            //here we add all trails that are composed of one route
+            all_trails.add(new Trail(route.station1(), route.station2(), new ArrayList<>(List.of(route))));
         }
+
+        //in this loop we  find the longest trail (i.e the longest route) out of all of the routes
+        //the player has
         for (Trail trail : all_trails){
             if (trail.length()>longest_trail.length()){
                 longest_trail= new Trail(trail.station1(), trail.station2(), trail.routes);
             }
         }
+
+        //the goal of this loop is to iterate through all the possible trails the player has. To do so, for every
+        //trail composed of one route, we see if we can extend it if the player has a route connected to the trail.
+        //everytime we get a new trail, we compare it to the previous "longest trail" and if it is longer, we assign
+        //it to the var longest_trail.
+        //all_trails is null <=> it is no longer possible to connect a route to an already existing trail
         while (all_trails.size()!=0){
             List<Trail> all_trails_bis = new ArrayList<>();
+
+            //for each trail, and for each route, we check if it is possible to connect the route to the trail
+            //if it is, we create a new trail with the route in question and add it to the list all_trails_bis
             for(Trail trail : all_trails){
                 for (Route route: routes){
                     if (!trail.routes.contains(route)){
-                        List<Route> arbitrary_list = new ArrayList<Route>(trail.routes);
+                        List<Route> arbitrary_list = new ArrayList<>(trail.routes);
                         arbitrary_list.add(route);
+                        Objects.requireNonNull(trail.station1());
+                        Objects.requireNonNull(trail.station2());
                         if(trail.station2().equals(route.station1())){
                             Trail arbitrary_trail = new Trail(trail.station1, route.station2(), arbitrary_list);
                             all_trails_bis.add(arbitrary_trail);
@@ -77,6 +97,10 @@ public final class Trail {
                     }
                 }
             }
+
+            //here, all_trails becomes all_trails_bis. If all_trails isn't null (i.e it was possible to add a route to an
+            //already existing trail), we check again if there is a trail in this list longer than longest_trail. If there is,
+            //longest_trail becomes that trail
             all_trails=all_trails_bis;
             if (all_trails.size() != 0){
                 for (Trail trail : all_trails){
@@ -122,7 +146,7 @@ public final class Trail {
     /**
      * Method that returns textual representation of a trail
      * @return textual representation of a trail, composed of its different station and at the end its length in parenthisis
-     * @throws IllegalArgumentException if the routes aren't all connected to each  other
+     * @throws IllegalArgumentException if the routes aren't all connected to each other
      */
     @Override
     public String toString(){
@@ -130,16 +154,17 @@ public final class Trail {
             return "empty trail!";
         }
         else {
-            String trail_text = "";
+            StringBuilder trail_text = new StringBuilder();
             for (Route route : routes) {
-                trail_text += route.station1().toString() + " - ";
+                trail_text.append(route.station1().toString()).append(" - ");
                 if (routes.indexOf(route) != routes.size() - 1) {
                     Preconditions.checkArgument(route.station2() == routes.get(routes.indexOf(route) + 1).station1());
                 }
             }
-            trail_text += station2.toString();
-            trail_text += " " + "(" + length() + ")";
-            return trail_text;
+            Objects.requireNonNull(station2);
+            trail_text.append(station2);
+            trail_text.append(" " + "(").append(length()).append(")");
+            return trail_text.toString();
         }
     }
 }

@@ -5,6 +5,7 @@ import ch.epfl.tchu.SortedBag;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 
 /**
@@ -56,9 +57,7 @@ public final class CardState extends PublicCardState {
      */
     public CardState withDrawnFaceUpCard(int slot){
         Preconditions.checkArgument(!this.isDeckEmpty());
-        if (!(slot >= 0 && slot < Constants.FACE_UP_CARDS_COUNT)){
-            throw new IndexOutOfBoundsException("slot is out of bounds");
-        }
+        Objects.checkIndex(0, Constants.FACE_UP_CARDS_COUNT);
         ArrayList<Card> faceUp = new ArrayList<>(this.faceUpCards());
         faceUp.set(slot, this.faceDownCards.topCard());
         return new CardState(faceUp, deckSize()-1, discardsSize(), this.faceDownCards.withoutTopCard(), discardCards());

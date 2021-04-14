@@ -7,7 +7,7 @@ import java.util.Map;
 
 public interface Player {
 
-    public enum TurnKind {
+    enum TurnKind {
         //constants for enum TurnKind
         DRAW_TICKETS, DRAW_CARDS, CLAIM_ROUTE;
 

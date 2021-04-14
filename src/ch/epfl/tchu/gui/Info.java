@@ -6,6 +6,7 @@ import ch.epfl.tchu.game.Card;
 import ch.epfl.tchu.game.Route;
 import ch.epfl.tchu.game.Trail;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * In game informations
@@ -14,7 +15,7 @@ import java.util.List;
  * @author Selim Jerad (327529)
  */
 
-public class Info {
+public final class Info {
     //Attribute for Info : player whom informations are shared
     private final String playerName;
 
@@ -69,24 +70,25 @@ public class Info {
      * @param playerNames the names of all players
      * @param points the number of points all players obtained
      * @return a message announcing that the game ended in a draw, if there is more than one player
+     * @throws IllegalArgumentException if the list is empty
      */
     public static String draw(List<String> playerNames, int points){
-        Preconditions.checkArgument( playerNames.size()>1);
-        String players="";
+        Preconditions.checkArgument( playerNames.size()!=0);
+        StringBuilder players= new StringBuilder();
         int cmp = 1;
         for(String player : playerNames){
             if (cmp== playerNames.size()-1){
-                players += player+StringsFr.AND_SEPARATOR;
+                players.append(player).append(StringsFr.AND_SEPARATOR);
             }
             else if(cmp== playerNames.size()){
-                players += player;
+                players.append(player);
             }
             else{
-                players += player+", ";
+                players.append(player).append(", ");
             }
             cmp+=1;
         }
-        return String.format(StringsFr.DRAW,players,points);
+        return String.format(StringsFr.DRAW, players.toString(),points);
     }
 
     /**
@@ -157,12 +159,11 @@ public class Info {
         String s=String.format(StringsFr.ADDITIONAL_CARDS_ARE,setContent(drawnCards));
         if(additionalCost==0){
             s+=StringsFr.NO_ADDITIONAL_COST;
-            return s;
         }
         else {
             s+=String.format(StringsFr.SOME_ADDITIONAL_COST,additionalCost,StringsFr.plural(additionalCost));
-            return s;
         }
+        return s;
     }
 
     /**
@@ -178,7 +179,6 @@ public class Info {
      * @return a message announcing that the last round begins if the player has less than three cars remaining
      */
     public String lastTurnBegins(int carCount){
-        Preconditions.checkArgument(carCount <=2);
         return String.format(StringsFr.LAST_TURN_BEGINS,playerName,carCount,StringsFr.plural(carCount));
     }
 
@@ -186,9 +186,11 @@ public class Info {
      * @param longestTrail the longest trail, or one of them
      * @return a message announcing that the player acquires a bonus at the end of the game, for having built the
      * longest trail
+     * @throws NullPointerException if one of the trail's stations is null
      */
     public String getsLongestTrailBonus(Trail longestTrail){
-        Preconditions.checkArgument(longestTrail.station1()!=null && longestTrail.station2()!=null);
+        Objects.requireNonNull(longestTrail.station1());
+        Objects.requireNonNull(longestTrail.station2());
         String s = longestTrail.station1().toString() + StringsFr.EN_DASH_SEPARATOR+ longestTrail.station2().toString();
         return String.format(StringsFr.GETS_BONUS,playerName,s);
     }
@@ -217,21 +219,21 @@ public class Info {
      * @return the conventional textual representation of a set of cards according to their multiplicity
      */
     private static String setContent(SortedBag<Card> cards){
-        String setContent="";
+        StringBuilder setContent= new StringBuilder();
         int cmp = 1;
         for (Card card: cards.toSet()) {
             int n = cards.countOf(card);
             if (cmp== cards.toSet().size()-1){
-                setContent += n + " "+ cardName(card,n) +StringsFr.AND_SEPARATOR;
+                setContent.append(n).append(" ").append(cardName(card, n)).append(StringsFr.AND_SEPARATOR);
             }
             else if(cmp== cards.toSet().size()){
-                setContent += n + " "+ cardName(card,n);
+                setContent.append(n).append(" ").append(cardName(card, n));
             }
             else{
-                setContent += n + " "+ cardName(card,n) +", ";
+                setContent.append(n).append(" ").append(cardName(card, n)).append(", ");
             }
             cmp+=1;
         }
-        return setContent;
+        return setContent.toString();
     }
 }

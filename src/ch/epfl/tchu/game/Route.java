@@ -23,17 +23,17 @@ public final class Route {
 
     //different types of level for enum Level
     public enum Level{
-        OVERGROUND, UNDERGROUND;
+        OVERGROUND, UNDERGROUND
     }
 
     /**
      * Route constructor
-     * @param id
-     * @param station1
-     * @param station2
-     * @param length
-     * @param level
-     * @param color
+     * @param id id of the route
+     * @param station1 first station of the route
+     * @param station2 ending station of the route
+     * @param length length of the route
+     * @param level level of the route (overground or underground)
+     * @param color color of the route
      * @throws IllegalArgumentException if the 2 stations are the same or route length isn't between 1 and 6
      * @throws NullPointerException if level, a station or route id is null
      */
@@ -61,7 +61,7 @@ public final class Route {
 
     /**
      * Computes opposite station to the one given in argument
-     * @param station
+     * @param station station given as argument
      * @return station opposite to station given as an argument i.e returns ending station if starting station
      * is given as argument and vice-versa
      */
@@ -81,8 +81,10 @@ public final class Route {
         List<SortedBag<Card>> possibleClaimCards = new ArrayList<>();
         SortedBag.Builder<Card> arbitrary_SB = new SortedBag.Builder<>();
         Preconditions.checkArgument(level.equals(Level.OVERGROUND)||level.equals(Level.UNDERGROUND));
+        // first we check if the level is Overground
         if (level.equals(Level.OVERGROUND)){
             if (color == null){
+                // if the color is null, any card can be used to claim the road, except for Locomotives
                 for (Card card: Card.CARS){
                     for (int i = 0; i < length; i ++){
                         arbitrary_SB.add(card);
@@ -92,14 +94,18 @@ public final class Route {
                 }
             }
             else{
+                // if the color is defined, the road can only be take with the necessary number of cards of this color
                 for (int i = 0; i < length; i ++){
                     arbitrary_SB.add(Card.of(color));
                 }
                 possibleClaimCards.add(arbitrary_SB.build());
             }
         }
+        // if the level is not Overground, the it must be Underground
         else {
             if (color == null){
+                // if the color is null, any card can be used to claim the road
+                // we create a List with all the possible combinations, which are stored in SortedBags
                 for (int k = length; k >0; k --){
                     for (Card card: Card.CARS){
                         for (int j=0; j<k; j++){
@@ -112,12 +118,14 @@ public final class Route {
                         arbitrary_SB = new SortedBag.Builder<>();
                     }
                 }
+                // a SortedBag of "length" locomotives are added at the end of the List, which is the last possible option
                 for (int i = 0; i < length; i ++){
                     arbitrary_SB.add(Card.LOCOMOTIVE);
                 }
-                possibleClaimCards.add(arbitrary_SB.build());
             }
             else{
+                // if the color is not null, we build a List with all the possible cards,
+                //  which is composed of the cards of the defined color and locomotives
                 for (int k = length; k >0; k --){
                     for (int j=0; j<k; j++){
                         arbitrary_SB.add(Card.of(color));
@@ -131,11 +139,12 @@ public final class Route {
                 for (int i = 0; i < length; i ++){
                     arbitrary_SB.add(Card.LOCOMOTIVE);
                 }
-                possibleClaimCards.add(arbitrary_SB.build());
             }
+            possibleClaimCards.add(arbitrary_SB.build());
         }
         return possibleClaimCards;
     }
+
 
     /**
      * Method that calculates the number of additional cards a player has to discard when he tries to take

@@ -17,7 +17,7 @@ public final class StationPartition implements StationConnectivity{
 
     /**
      * StationPartition constructor
-     * @param station_partition
+     * @param station_partition partition of stations
      */
     private StationPartition(int[] station_partition){
         this.partition = station_partition;
@@ -33,16 +33,10 @@ public final class StationPartition implements StationConnectivity{
     @Override
     public boolean connected(Station s1, Station s2) {
         if (s1.id() >= partition.length || s2.id() >= partition.length){
-            if (s1.id() == s2.id()){
-                return true;
-            }
-            else return false;
+            return s1.id() == s2.id();
         }
         else{
-            if (partition[s1.id()] == partition[s2.id()]){
-                return true;
-            }
-            else return false;
+            return partition[s1.id()] == partition[s2.id()];
         }
     }
 

@@ -3,8 +3,6 @@ package ch.epfl.tchu.game;
 import ch.epfl.tchu.Preconditions;
 import ch.epfl.tchu.SortedBag;
 import ch.epfl.tchu.gui.Info;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -82,34 +80,18 @@ public final class Game {
             //both players get the info of who is going to play first
             Game.allInfo(new Info(playerNames.get(gameState.currentPlayerId())).canPlay(),players);
 
+
             //if the current player has chosen to draw tickets and if the player can draw tickets,
             //the following block of code runs
             if (playerChoice == Player.TurnKind.DRAW_TICKETS) {
                 //the player chooses amongst the top 3 tickets in the ticket pile
-                if (gameState.ticketsCount() < Constants.IN_GAME_TICKETS_COUNT){
-                    SortedBag<Ticket> topTickets = gameState.topTickets(gameState.ticketsCount());
-                    SortedBag<Ticket> chosenTickets = currentPlayer.chooseTickets(topTickets);
-                    //both players get the info that the current player has drawn tickets and has kept a certain amount
-                    Game.allInfo(new Info(playerNames.get(gameState.currentPlayerId())).drewTickets(Constants.IN_GAME_TICKETS_COUNT),players);
-                    Game.allInfo(new Info(playerNames.get(gameState.currentPlayerId())).keptTickets(chosenTickets.size()),players);
-                    //the player keeps the tickets he chose, the other are discarded
-                    gameState = gameState.withChosenAdditionalTickets(topTickets, chosenTickets);
-                    //the current player becomes the next player
-                    for (Ticket chosenTicket : chosenTickets) {
-                        System.out.println(chosenTicket.text());
-                        // System.out.println(chosenTicket);
-                    }
-                }
-                else {
-                    SortedBag<Ticket> topTickets = gameState.topTickets(Constants.IN_GAME_TICKETS_COUNT);
-                    SortedBag<Ticket> chosenTickets = currentPlayer.chooseTickets(topTickets);
-                    //both players get the info that the current player has drawn tickets and has kept a certain amount
-                    Game.allInfo(new Info(playerNames.get(gameState.currentPlayerId())).drewTickets(Constants.IN_GAME_TICKETS_COUNT),players);
-                    Game.allInfo(new Info(playerNames.get(gameState.currentPlayerId())).keptTickets(chosenTickets.size()),players);
-                    //the player keeps the tickets he chose, the other are discarded
-                    gameState = gameState.withChosenAdditionalTickets(topTickets, chosenTickets);
-                    //the current player becomes the next player
-                }
+                SortedBag<Ticket> topTickets = gameState.topTickets(Constants.IN_GAME_TICKETS_COUNT);
+                SortedBag<Ticket> chosenTickets = currentPlayer.chooseTickets(topTickets);
+                //both players get the info that the current player has drawn tickets and has kept a certain amount
+                Game.allInfo(new Info(playerNames.get(gameState.currentPlayerId())).drewTickets(Constants.IN_GAME_TICKETS_COUNT),players);
+                Game.allInfo(new Info(playerNames.get(gameState.currentPlayerId())).keptTickets(chosenTickets.size()),players);
+                //the player keeps the tickets he chose, the other are discarded
+                gameState = gameState.withChosenAdditionalTickets(topTickets, chosenTickets);
             }
 
             //if the current player chooses to draw cards, the following
@@ -234,10 +216,7 @@ public final class Game {
         }
 
         //both player have their gamestates updated at the end of the game
-
         Game.updateAll(gameState,players);
-
-
         //each player's number of points is computed in terms of claim points and ticket points
         int player1points = gameState.playerState(PlayerId.PLAYER_1).finalPoints();
         int player2points = gameState.playerState(PlayerId.PLAYER_2).finalPoints();

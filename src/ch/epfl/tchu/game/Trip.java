@@ -26,12 +26,12 @@ public final class Trip {
      * @param from starting station
      * @param to ending station
      * @param points number of points given for the trip
-     * @throws IllegalArgumentException
-     * throws exception if the number of points is smaller or equal to 0
+     * @throws IllegalArgumentException if the number of points is smaller or equal to 0
+     * @throws NullPointerException if one of the station is null
      */
     public Trip(Station from, Station to, int points){
         Preconditions.checkArgument(points>0);
-        this.from=Objects.requireNonNull(from);;
+        this.from=Objects.requireNonNull(from);
         this.to=Objects.requireNonNull(to);
         this.points=points;
     }
@@ -42,12 +42,11 @@ public final class Trip {
      * @param to List of a certain amount of ending stations
      * @param points Number of points given for each trip
      * @return a list with the trips connecting all the starting stations to all the ending stations
+     * @throws IllegalArgumentException if one of the lists is empty, or if the number of points is not positive
      */
     public static List<Trip> all(List<Station> from, List<Station> to, int points){
-        if (from == null || to == null || points <= 0){
-            throw new IllegalArgumentException();
-        }
-        ArrayList allTrips = new ArrayList();
+        Preconditions.checkArgument(from != null && to != null && points > 0);
+        List <Trip> allTrips = new ArrayList<>();
         for (Station station1 : from){
             for (Station station2 : to){
                 Trip trip= new Trip(station1, station2, points);
@@ -72,12 +71,11 @@ public final class Trip {
      * Trip's points getter
      * @return number of points for the trip
      */
-    public int points(){ return points;
-    }
+    public int points(){ return points; }
 
     /**
      * method that increases or decreases number of points depending on if 2 stations were connected or not
-     * @param connectivity
+     * @param connectivity the connectivity between two stations
      * @return the number of points if the stations are connected, else returns the number of points * -1
      */
     public int points(StationConnectivity connectivity){

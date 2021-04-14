@@ -5,6 +5,7 @@ import ch.epfl.tchu.Preconditions;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class PublicGameState {
 
@@ -28,9 +29,8 @@ public class PublicGameState {
      */
     public PublicGameState(int ticketsCount, PublicCardState cardState, PlayerId currentPlayerId, Map<PlayerId, PublicPlayerState> playerState, PlayerId lastPlayer){
         Preconditions.checkArgument(ticketsCount >= 0 && playerState.size() == 2);
-        if (cardState == null || currentPlayerId == null){
-            throw new NullPointerException("current Player Id or cardstate is null");
-        }
+        Objects.requireNonNull(cardState);
+        Objects.requireNonNull(currentPlayerId);
         this.ticketCount =ticketsCount;
         this.cardState=cardState;
         this.currentPlayerId=currentPlayerId;
@@ -51,10 +51,7 @@ public class PublicGameState {
      * @return true if deck isn't empty, else returns false
      */
     public boolean canDrawTickets(){
-        if (ticketCount == 0){
-            return false;
-        }
-        else return true;
+        return ticketCount != 0;
     }
 
     /**
@@ -68,10 +65,7 @@ public class PublicGameState {
      * @return true if discard size + deck size is bigger than 5 (i.e total size >10), else returns false
      */
     public boolean canDrawCards(){
-        if (cardState.totalSize() >= 10){
-            return true;
-        }
-        else return false;
+        return cardState.totalSize() >= 10;
     }
 
     /**
@@ -82,7 +76,7 @@ public class PublicGameState {
 
     /**
      * Player state getter
-     * @param playerId
+     * @param playerId the id of the player
      * @return player state of player given in argument
      */
     public PublicPlayerState playerState(PlayerId playerId){ return playerState.get(playerId); }
@@ -98,13 +92,9 @@ public class PublicGameState {
      * @return all claimed routes of both players
      */
     public List<Route> claimedRoutes(){
-        List<Route> totalRoutes= new ArrayList<Route>();
-        for (Route route: playerState.get(currentPlayerId).routes()){
-            totalRoutes.add(route);
-        }
-        for (Route route: playerState.get(currentPlayerId.next()).routes()){
-            totalRoutes.add(route);
-        }
+        List<Route> totalRoutes= new ArrayList<>();
+        totalRoutes.addAll(playerState.get(currentPlayerId).routes());
+        totalRoutes.addAll(playerState.get(currentPlayerId.next()).routes());
         return totalRoutes;
     }
 
@@ -113,7 +103,6 @@ public class PublicGameState {
      * @return null if last player id is unknown, else returns last player id
      */
     public PlayerId lastPlayer(){
-        if (lastPlayer == null){ return null; }
-        else return lastPlayer;
+        return lastPlayer;
     }
 }
