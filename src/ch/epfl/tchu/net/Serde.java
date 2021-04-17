@@ -1,5 +1,7 @@
 package ch.epfl.tchu.net;
 
+import ch.epfl.tchu.SortedBag;
+
 import java.util.List;
 import java.util.function.Function;
 
@@ -28,12 +30,12 @@ public interface Serde <T>{
     }
 
 
-    static <T> Serde<T> ListOf(Serde serde, char separator){
+    static <T> Serde<List<T>> ListOf(Serde serde, String separator){
 
     }
 
 
-    static <T> Serde<T> BagOf(Serde serde, char separator){
+    static <T extends Comparable<T>> Serde<SortedBag<T>> BagOf(Serde serde, String separator){
 
     }
 
