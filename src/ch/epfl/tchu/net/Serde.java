@@ -30,12 +30,12 @@ public interface Serde <T>{
     }
 
 
-    static <T> Serde<List<T>> ListOf(Serde serde, String separator){
+    static <T> Serde<List<T>> ListOf(Serde serde, char separator){
 
     }
 
 
-    static <T extends Comparable<T>> Serde<SortedBag<T>> BagOf(Serde serde, String separator){
+    static <T extends Comparable<T>> Serde<SortedBag<T>> BagOf(Serde serde, char separator){
 
     }
 
