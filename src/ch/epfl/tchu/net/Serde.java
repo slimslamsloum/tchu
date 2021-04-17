@@ -5,20 +5,20 @@ import java.util.function.Function;
 
 public interface Serde <T>{
 
-    String serialize(T JavaObj);
+    String serialize(T t);
 
     T deserialize(String string);
 
     static <T> Serde<T> of(Function<T, String> serialize, Function<String, T> deserialize){
         return new Serde<T>() {
             @Override
-            public String serialize(T JavaObj) {
-                return serialize(JavaObj);
+            public String serialize(T t) {
+                return serialize.apply(t);
             }
 
             @Override
-            public T deserialize(String string) {
-                return deserialize(string);
+            public T deserialize(String s) {
+                return deserialize.apply(s) ;
             }
         };
     }
