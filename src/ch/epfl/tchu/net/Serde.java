@@ -2,6 +2,7 @@ package ch.epfl.tchu.net;
 
 import ch.epfl.tchu.SortedBag;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
@@ -37,24 +38,45 @@ public interface Serde <T>{
             @Override
             public String serialize(List<T> list) {
                 String string = "";
-                for (T t : list){
-                    string += serde.serialize(t);
-                }
-               String stringWithChar
-                return string;
+                for (T t : list){ string += serde.serialize(t); }
+                List<String> l = Arrays.asList(string);
+                return String.join(Character.toString(separator), l);
             }
 
             @Override
             public List<T> deserialize(String string) {
-                return null;
+                String[] noSeparator = string.split(Character.toString(separator), -1);
+                ArrayList<T> Tlist = new ArrayList<>();
+                for (String toDeserialize: noSeparator){
+                    Tlist.add((T) serde.deserialize(toDeserialize));
+                }
+                return Tlist;
             }
-        }
+        };
 
     }
 
 
     static <T extends Comparable<T>> Serde<SortedBag<T>> bagOf(Serde serde, char separator){
+        return new Serde<SortedBag<T>>() {
+            @Override
+            public String serialize(SortedBag<T> SB) {
+                String string = "";
+                for (T t : SB){ string += serde.serialize(t); }
+                List<String> l = Arrays.asList(string);
+                return String.join(Character.toString(separator), l);
+            }
 
+            @Override
+            public SortedBag<T> deserialize(String string) {
+                String[] noSeparator = string.split(Character.toString(separator), -1);
+                SortedBag.Builder<T> builder = new SortedBag.Builder<>();
+                for (String toDeserialize: noSeparator){
+                    builder.add((T) serde.deserialize(toDeserialize));
+                }
+                return builder.build();
+            }
+        };
     }
 
 }
