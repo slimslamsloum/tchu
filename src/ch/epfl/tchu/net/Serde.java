@@ -40,19 +40,19 @@ public interface Serde <T>{
     }
 
 
-    static <T> Serde<List<T>> listOf(Serde serde, char separator){
+    static <T> Serde<List<T>> listOf(Serde serde, String separator){
         return new Serde<List<T>>() {
             @Override
             public String serialize(List<T> list) {
                 String string = "";
                 for (T t : list){ string += serde.serialize(t); }
                 List<String> l = Arrays.asList(string);
-                return String.join(Character.toString(separator), l);
+                return String.join(separator, l);
             }
 
             @Override
             public List<T> deserialize(String string) {
-                String[] noSeparator = string.split(Character.toString(separator), -1);
+                String[] noSeparator = string.split(separator, -1);
                 ArrayList<T> Tlist = new ArrayList<>();
                 for (String toDeserialize: noSeparator){
                     Tlist.add((T) serde.deserialize(toDeserialize));
@@ -63,19 +63,19 @@ public interface Serde <T>{
     }
 
 
-    static <T extends Comparable<T>> Serde<SortedBag<T>> bagOf(Serde serde, char separator){
+    static <T extends Comparable<T>> Serde<SortedBag<T>> bagOf(Serde serde, String separator){
         return new Serde<SortedBag<T>>() {
             @Override
             public String serialize(SortedBag<T> SB) {
                 String string = "";
                 for (T t : SB){ string += serde.serialize(t); }
                 List<String> l = Arrays.asList(string);
-                return String.join(Character.toString(separator), l);
+                return String.join(separator, l);
             }
 
             @Override
             public SortedBag<T> deserialize(String string) {
-                String[] noSeparator = string.split(Character.toString(separator), -1);
+                String[] noSeparator = string.split(separator, -1);
                 SortedBag.Builder<T> builder = new SortedBag.Builder<>();
                 for (String toDeserialize: noSeparator){
                     builder.add((T) serde.deserialize(toDeserialize));
