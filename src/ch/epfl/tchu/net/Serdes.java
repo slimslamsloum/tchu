@@ -43,6 +43,7 @@ public class Serdes {
   public final static Serde<PublicPlayerState> publicPlayerStateSerde = Serde.of(
           i -> String.join(";", intSerde.serialize(i.ticketCount()), intSerde.serialize(i.cardCount()), listRouteSerde.serialize(i.routes())),
 
+
   );
 
   public final static Serde<PlayerState> playerStateSerde =Serde.of(
