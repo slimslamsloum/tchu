@@ -40,7 +40,7 @@ public interface Serde <T>{
     }
 
 
-    static <T> Serde<List<T>> listOf(Serde serde, String separator){
+    static <T> Serde<List<T>> listOf(Serde<T> serde, String separator) {
         return new Serde<List<T>>() {
             @Override
             public String serialize(List<T> list) {
@@ -53,11 +53,11 @@ public interface Serde <T>{
             @Override
             public List<T> deserialize(String string) {
                 String[] noSeparator = string.split(separator, -1);
-                ArrayList<T> Tlist = new ArrayList<>();
-                for (String toDeserialize: noSeparator){
-                    Tlist.add((T) serde.deserialize(toDeserialize));
+                List<T> tList = new ArrayList<>();
+                for (String toDeserialize : noSeparator) {
+                    tList.add((T) serde.deserialize(toDeserialize));
                 }
-                return Tlist;
+                return tList;
             }
         };
     }
