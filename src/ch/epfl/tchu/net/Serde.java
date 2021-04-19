@@ -37,14 +37,10 @@ public interface Serde <T>{
             @Override
             public String serialize(List<T> list) {
                 String string = "";
-                int i=0;
                 for (T t : list){
-                    i++;
                     string += serde.serialize(t);
-                    if (i != list.size()){
-                        string += separator;
-                    }
                 }
+               String stringWithChar
                 return string;
             }
 
