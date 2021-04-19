@@ -27,9 +27,16 @@ public interface Serde <T>{
     }
 
     static <T> Serde<T> oneOf(List<T> ValEnum){
+        return new Serde<T>() {
+            @Override
+            public String serialize(T t) {
+                return String.valueOf(ValEnum.indexOf(t)); }
 
-
-
+            @Override
+            public T deserialize(String s) {
+                return ValEnum.get(Integer.parseInt(s));
+            }
+        };
     }
 
 
@@ -53,7 +60,6 @@ public interface Serde <T>{
                 return Tlist;
             }
         };
-
     }
 
 
