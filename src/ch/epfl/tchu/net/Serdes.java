@@ -15,6 +15,10 @@ public class Serdes {
           i -> Integer.toString(i),
           Integer::parseInt);
 
+  public final static Serde<String> stringSerde=Serde.of(
+          i -> Base64.getEncoder().encodeToString(i.getBytes(StandardCharsets.UTF_8)),
+          i -> Arrays.toString(Base64.getDecoder().decode(new String(i.getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8))));
+
   public final static Serde<Card> cardSerde = Serde.oneOf(Card.ALL);
 
   public final static Serde<Route> routeSerde = Serde.oneOf(ChMap.routes());
