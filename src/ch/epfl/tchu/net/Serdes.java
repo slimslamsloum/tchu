@@ -19,6 +19,10 @@ public class Serdes {
           i -> Base64.getEncoder().encodeToString(i.getBytes(StandardCharsets.UTF_8)),
           i -> Arrays.toString(Base64.getDecoder().decode(new String(i.getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8))));
 
+  public final static Serde<PlayerId> playerIdSerde = Serde.oneOf(PlayerId.ALL);
+
+  public final static Serde<Player.TurnKind> turnKindSerde = Serde.oneOf(Player.TurnKind.ALL);
+
   public final static Serde<Card> cardSerde = Serde.oneOf(Card.ALL);
 
   public final static Serde<Route> routeSerde = Serde.oneOf(ChMap.routes());
@@ -55,7 +59,9 @@ public class Serdes {
   );
 
   public final static Serde<PublicGameState> publicGameStateSerde = Serde.of(
-          i -> String.join(":", intSerde.serialize(i.ticketsCount()), publicCardStateSerde.serialize(i.cardState()), , playerStateSerde.serialize(i.playerState(PlayerId.PLAYER_1)),       )
+          i -> String.join(":", intSerde.serialize(i.ticketsCount()), publicCardStateSerde.serialize(i.cardState()), playerIdSerde.serialize(i.currentPlayerId()) ,
+                  playerStateSerde.serialize(i.playerState(PlayerId.PLAYER_1)), playerStateSerde.serialize(i.playerState(PlayerId.PLAYER_2)), playerIdSerde.serialize(i.lastPlayer())),
+
 
   );
 
