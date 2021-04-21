@@ -5,9 +5,7 @@ import ch.epfl.tchu.SortedBag;
 import ch.epfl.tchu.game.*;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.List;
+import java.util.*;
 
 public class Serdes {
 
@@ -43,26 +41,42 @@ public class Serdes {
 
   public final static Serde<PublicCardState> publicCardStateSerde = Serde.of(
           i -> String.join(";", listCardSerde.serialize(i.faceUpCards()), intSerde.serialize(i.deckSize()), intSerde.serialize(i.discardsSize())),
-
-
+                  str -> {
+            String[] noSeparator = str.split(";", -1);
+            return new PublicCardState(listCardSerde.deserialize(noSeparator[0]), intSerde.deserialize(noSeparator[1]), intSerde.deserialize(noSeparator[2]));
+          }
           );
 
 
   public final static Serde<PublicPlayerState> publicPlayerStateSerde = Serde.of(
           i -> String.join(";", intSerde.serialize(i.ticketCount()), intSerde.serialize(i.cardCount()), listRouteSerde.serialize(i.routes())),
+          str ->{
+            String[] noSeparator = str.split(";", -1);
+            return new PublicPlayerState(intSerde.deserialize(noSeparator[0]), intSerde.deserialize(noSeparator[1]), listRouteSerde.deserialize(noSeparator[2]));
+          }
 
 
   );
 
   public final static Serde<PlayerState> playerStateSerde =Serde.of(
           i -> String.join(";", sbTicketSerde.serialize(i.tickets()), sbCardSerde.serialize(i.cards()), listRouteSerde.serialize(i.routes())),
+          str -> {
+            String[] noSeparator = str.split(";", -1);
+            return new PlayerState(sbTicketSerde.deserialize(noSeparator[0]), sbCardSerde.deserialize(noSeparator[1]), listRouteSerde.deserialize(noSeparator[2]));
+          }
   );
 
   public final static Serde<PublicGameState> publicGameStateSerde = Serde.of(
           i -> String.join(":", intSerde.serialize(i.ticketsCount()), publicCardStateSerde.serialize(i.cardState()), playerIdSerde.serialize(i.currentPlayerId()) ,
-                  playerStateSerde.serialize(i.playerState(PlayerId.PLAYER_1)), playerStateSerde.serialize(i.playerState(PlayerId.PLAYER_2)), playerIdSerde.serialize(i.lastPlayer())),
-
-
+                  publicPlayerStateSerde.serialize(i.playerState(PlayerId.PLAYER_1)), publicPlayerStateSerde.serialize(i.playerState(PlayerId.PLAYER_2)), playerIdSerde.serialize(i.lastPlayer())),
+          str-> {
+            String[] noSeparator = str.split(";", -1);
+            Map<PlayerId, PublicPlayerState> playerIdPlayerStateMap = new HashMap<>();
+            playerIdPlayerStateMap.put(PlayerId.PLAYER_1, publicPlayerStateSerde.deserialize(noSeparator[3]));
+            playerIdPlayerStateMap.put(PlayerId.PLAYER_2, publicPlayerStateSerde.deserialize(noSeparator[4]));
+            return new PublicGameState(intSerde.deserialize(noSeparator[0]), publicCardStateSerde.deserialize(noSeparator[1]), playerIdSerde.deserialize(noSeparator[2]),
+                   playerIdPlayerStateMap, playerIdSerde.deserialize(noSeparator[5]));
+          }
   );
 
 
