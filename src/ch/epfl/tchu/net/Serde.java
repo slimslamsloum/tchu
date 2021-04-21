@@ -14,7 +14,7 @@ public interface Serde <T>{
     T deserialize(String string);
 
     static <T> Serde<T> of(Function<T, String> serialize, Function<String, T> deserialize){
-        return new Serde<T>() {
+        return new Serde<>() {
             @Override
             public String serialize(T t) {
                 return serialize.apply(t); }
@@ -27,7 +27,7 @@ public interface Serde <T>{
     }
 
     static <T> Serde<T> oneOf(List<T> ValEnum){
-        return new Serde<T>() {
+        return new Serde<>() {
             @Override
             public String serialize(T t) {
                 return String.valueOf(ValEnum.indexOf(t)); }
@@ -41,12 +41,11 @@ public interface Serde <T>{
 
 
     static <T> Serde<List<T>> listOf(Serde<T> serde, String separator) {
-        return new Serde<List<T>>() {
+        return new Serde<>() {
             @Override
             public String serialize(List<T> list) {
-                String string = "";
-                for (T t : list){ string += serde.serialize(t); }
-                List<String> l = Arrays.asList(string);
+                List<String> l = new ArrayList<>();
+                for (T t : list){ l.add(serde.serialize(t)); }
                 return String.join(separator, l);
             }
 
@@ -55,7 +54,7 @@ public interface Serde <T>{
                 String[] noSeparator = string.split(separator, -1);
                 List<T> tList = new ArrayList<>();
                 for (String toDeserialize : noSeparator) {
-                    tList.add((T) serde.deserialize(toDeserialize));
+                    tList.add(serde.deserialize(toDeserialize));
                 }
                 return tList;
             }
@@ -63,13 +62,12 @@ public interface Serde <T>{
     }
 
 
-    static <T extends Comparable<T>> Serde<SortedBag<T>> bagOf(Serde serde, String separator){
-        return new Serde<SortedBag<T>>() {
+    static <T extends Comparable<T>> Serde<SortedBag<T>> bagOf(Serde<T> serde, String separator){
+        return new Serde<>() {
             @Override
             public String serialize(SortedBag<T> SB) {
-                String string = "";
-                for (T t : SB){ string += serde.serialize(t); }
-                List<String> l = Arrays.asList(string);
+                List<String> l = new ArrayList<>();
+                for (T t : SB){ l.add(serde.serialize(t)); }
                 return String.join(separator, l);
             }
 
@@ -78,7 +76,7 @@ public interface Serde <T>{
                 String[] noSeparator = string.split(separator, -1);
                 SortedBag.Builder<T> builder = new SortedBag.Builder<>();
                 for (String toDeserialize: noSeparator){
-                    builder.add((T) serde.deserialize(toDeserialize));
+                    builder.add(serde.deserialize(toDeserialize));
                 }
                 return builder.build();
             }
