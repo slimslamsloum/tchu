@@ -7,38 +7,89 @@ import ch.epfl.tchu.game.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+/**
+ * Different types of Serde specific to tChu that will be used
+ *
+ * @author Alexandre Kambiz Gunter (324268)
+ * @author Selim Jerad (327529)
+ */
+
+//All serdes below are final and static because they will be used in other classes
+//and won't be subject to any further changes
 public class Serdes {
 
+    /**
+     * Serde that de/serializes a integer
+     */
     public final static Serde<Integer> intSerde = Serde.of(
             i -> Integer.toString(i),
             Integer::parseInt);
 
+    /**
+     * Serde that de/serializes a string
+     */
     public final static Serde<String> stringSerde=Serde.of(
             i -> Base64.getEncoder().encodeToString(i.getBytes(StandardCharsets.UTF_8)),
             i -> new String(Base64.getDecoder().decode(i.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8));
 
+    /**
+     * Serde that de/serializes a playerId
+     */
     public final static Serde<PlayerId> playerIdSerde = Serde.oneOf(PlayerId.ALL);
 
+    /**
+     * Serde that de/serializes a turnkind
+     */
     public final static Serde<Player.TurnKind> turnKindSerde = Serde.oneOf(Player.TurnKind.ALL);
 
+    /**
+     * Serde that de/serializes a card
+     */
     public final static Serde<Card> cardSerde = Serde.oneOf(Card.ALL);
 
+    /**
+     * Serde that de/serializes a route
+     */
     public final static Serde<Route> routeSerde = Serde.oneOf(ChMap.routes());
 
+    /**
+     * Serde that de/serializes a ticket
+     */
     public final static Serde<Ticket> ticketSerde = Serde.oneOf(ChMap.tickets());
 
+    /**
+     * Serde that de/serializes a list of cards
+     */
     public final static Serde<List<Card>> listCardSerde = Serde.listOf(cardSerde, ",");
 
+    /**
+     * Serde that de/serializes a list of routes
+     */
     public final static Serde<List<Route>> listRouteSerde = Serde.listOf(routeSerde, ",");
 
+    /**
+     * Serde that de/serializes a list of string
+     */
     public final static Serde<List<String>> listStringSerde = Serde.listOf(stringSerde, ",");
 
+    /**
+     * Serde that de/serializes a SortedBag of Cards
+     */
     public final static Serde<SortedBag<Card>> sbCardSerde = Serde.bagOf(cardSerde, ",");
 
+    /**
+     * Serde that de/serializes a SortedBag of tickets
+     */
     public final static Serde<SortedBag<Ticket>> sbTicketSerde = Serde.bagOf(ticketSerde, ",");
 
+    /**
+     * Serde that de/serializes a list of SortedBags of tickets
+     */
     public final static Serde<List<SortedBag<Card>>> listSbCardSerde = Serde.listOf(sbCardSerde, ";");
 
+    /**
+     * Serde that de/serializes a Public Card State
+     */
     public final static Serde<PublicCardState> publicCardStateSerde = Serde.of(
             i -> String.join(";", listCardSerde.serialize(i.faceUpCards()), intSerde.serialize(i.deckSize()), intSerde.serialize(i.discardsSize())),
             str -> {
@@ -47,16 +98,20 @@ public class Serdes {
             }
     );
 
+    /**
+     * Serde that de/serializes a Public Player State
+     */
     public final static Serde<PublicPlayerState> publicPlayerStateSerde = Serde.of(
             i -> String.join(";", intSerde.serialize(i.ticketCount()), intSerde.serialize(i.cardCount()), listRouteSerde.serialize(i.routes())),
             str ->{
                 String[] noSeparator = str.split(";", -1);
                 return new PublicPlayerState(intSerde.deserialize(noSeparator[0]), intSerde.deserialize(noSeparator[1]), listRouteSerde.deserialize(noSeparator[2]));
             }
-
-
     );
 
+    /**
+     * Serde that de/serializes a list of Player State
+     */
     public final static Serde<PlayerState> playerStateSerde =Serde.of(
             i -> String.join(";", sbTicketSerde.serialize(i.tickets()), sbCardSerde.serialize(i.cards()), listRouteSerde.serialize(i.routes())),
             str -> {
@@ -65,11 +120,14 @@ public class Serdes {
             }
     );
 
+    /**
+     * Serde that de/serializes a Public Game State
+     */
     public final static Serde<PublicGameState> publicGameStateSerde = Serde.of(
             i -> String.join(":", intSerde.serialize(i.ticketsCount()), publicCardStateSerde.serialize(i.cardState()), playerIdSerde.serialize(i.currentPlayerId()) ,
                     publicPlayerStateSerde.serialize(i.playerState(PlayerId.PLAYER_1)), publicPlayerStateSerde.serialize(i.playerState(PlayerId.PLAYER_2)), playerIdSerde.serialize(i.lastPlayer())),
             str-> {
-                String[] noSeparator = str.split(";", -1);
+                String[] noSeparator = str.split(":", -1);
                 Map<PlayerId, PublicPlayerState> playerIdPlayerStateMap = new HashMap<>();
                 playerIdPlayerStateMap.put(PlayerId.PLAYER_1, publicPlayerStateSerde.deserialize(noSeparator[3]));
                 playerIdPlayerStateMap.put(PlayerId.PLAYER_2, publicPlayerStateSerde.deserialize(noSeparator[4]));
@@ -77,13 +135,4 @@ public class Serdes {
                         playerIdPlayerStateMap, playerIdSerde.deserialize(noSeparator[5]));
             }
     );
-
-    public static void main(String[] args){
-        Serde<Integer> intSerde = Serde.of(
-                i -> Integer.toString(i),
-                Integer::parseInt);
-        //System.out.println((new String(Base64.getDecoder().decode("Q2hhcmxlcw==".getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8)));
-        Serde<Player.TurnKind> turnKindSerde = Serde.oneOf(Player.TurnKind.ALL);
-    }
-
 }
