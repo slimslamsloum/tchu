@@ -71,7 +71,7 @@ public interface Player {
     Route claimedRoute();
 
     /**
-     *Retunrs tickets player chose to keep amongst tickets "options"
+     *Returns tickets player chose to keep amongst tickets "options"
      * @param options tickets the player has drawn from the ticket pile
      * @return tickets the player chose to keep
      */
