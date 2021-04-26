@@ -6,6 +6,7 @@ import ch.epfl.tchu.game.*;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * Different types of Serde specific to tChu that will be used
@@ -93,7 +94,7 @@ public class Serdes {
     public final static Serde<PublicCardState> publicCardStateSerde = Serde.of(
             i -> String.join(";", listCardSerde.serialize(i.faceUpCards()), intSerde.serialize(i.deckSize()), intSerde.serialize(i.discardsSize())),
             str -> {
-                String[] noSeparator = str.split(";", -1);
+                String[] noSeparator = str.split(Pattern.quote(";"), -1);
                 return new PublicCardState(listCardSerde.deserialize(noSeparator[0]), intSerde.deserialize(noSeparator[1]), intSerde.deserialize(noSeparator[2]));
             }
     );
@@ -104,7 +105,7 @@ public class Serdes {
     public final static Serde<PublicPlayerState> publicPlayerStateSerde = Serde.of(
             i -> String.join(";", intSerde.serialize(i.ticketCount()), intSerde.serialize(i.cardCount()), listRouteSerde.serialize(i.routes())),
             str ->{
-                String[] noSeparator = str.split(";", -1);
+                String[] noSeparator = str.split(Pattern.quote(";"), -1);
                 return new PublicPlayerState(intSerde.deserialize(noSeparator[0]), intSerde.deserialize(noSeparator[1]), listRouteSerde.deserialize(noSeparator[2]));
             }
     );
@@ -115,7 +116,7 @@ public class Serdes {
     public final static Serde<PlayerState> playerStateSerde =Serde.of(
             i -> String.join(";", sbTicketSerde.serialize(i.tickets()), sbCardSerde.serialize(i.cards()), listRouteSerde.serialize(i.routes())),
             str -> {
-                String[] noSeparator = str.split(";", -1);
+                String[] noSeparator = str.split(Pattern.quote(";"), -1);
                 return new PlayerState(sbTicketSerde.deserialize(noSeparator[0]), sbCardSerde.deserialize(noSeparator[1]), listRouteSerde.deserialize(noSeparator[2]));
             }
     );
@@ -127,7 +128,7 @@ public class Serdes {
             i -> String.join(":", intSerde.serialize(i.ticketsCount()), publicCardStateSerde.serialize(i.cardState()), playerIdSerde.serialize(i.currentPlayerId()) ,
                     publicPlayerStateSerde.serialize(i.playerState(PlayerId.PLAYER_1)), publicPlayerStateSerde.serialize(i.playerState(PlayerId.PLAYER_2)), playerIdSerde.serialize(i.lastPlayer())),
             str-> {
-                String[] noSeparator = str.split(":", -1);
+                String[] noSeparator = str.split(Pattern.quote(":"), -1);
                 Map<PlayerId, PublicPlayerState> playerIdPlayerStateMap = new HashMap<>();
                 playerIdPlayerStateMap.put(PlayerId.PLAYER_1, publicPlayerStateSerde.deserialize(noSeparator[3]));
                 playerIdPlayerStateMap.put(PlayerId.PLAYER_2, publicPlayerStateSerde.deserialize(noSeparator[4]));

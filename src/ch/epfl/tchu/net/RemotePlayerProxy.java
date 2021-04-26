@@ -7,6 +7,7 @@ import java.io.*;
 import java.net.Socket;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
 
@@ -119,7 +120,7 @@ public class RemotePlayerProxy implements Player {
                                     US_ASCII));
 
             String line = (r.readLine());
-            String[] seperatedLine = line.split(" ", -1);
+            String[] seperatedLine = line.split(Pattern.quote(" "), -1);
             return seperatedLine[1];
         }
         catch (IOException e) {

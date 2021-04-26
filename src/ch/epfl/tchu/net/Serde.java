@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 
 /**
  * An object able to de/serialize
@@ -100,7 +101,7 @@ public interface Serde <T>{
             public List<T> deserialize(String string) {
                 if (string.equals("")){return List.of();}
                 else {
-                    String[] noSeparator = string.split(separator, -1);
+                    String[] noSeparator = string.split(Pattern.quote(separator), -1);
                     List<T> tList = new ArrayList<>();
                     for (String toDeserialize : noSeparator) {
                         tList.add(serde.deserialize(toDeserialize));
@@ -137,7 +138,7 @@ public interface Serde <T>{
             public SortedBag<T> deserialize(String string) {
                 if (string.equals("")){return SortedBag.of();}
                 else{
-                    String[] noSeparator = string.split(separator, -1);
+                    String[] noSeparator = string.split(Pattern.quote(separator), -1);
                     SortedBag.Builder<T> builder = new SortedBag.Builder<>();
                     for (String toDeserialize : noSeparator) {
                         builder.add(serde.deserialize(toDeserialize));
