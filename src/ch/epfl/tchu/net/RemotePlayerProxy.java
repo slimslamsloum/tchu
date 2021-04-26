@@ -83,7 +83,7 @@ public class RemotePlayerProxy implements Player {
     @Override
     public SortedBag<Card> chooseAdditionalCards(List<SortedBag<Card>> options) {
         String serializedSbTickets = Serdes.listSbCardSerde.serialize(options);
-        sendMessage(List.of(serializedSbTickets), MessageId.CHOOSE_TICKETS);
+        sendMessage(List.of(serializedSbTickets), MessageId.CHOOSE_ADDITIONAL_CARDS);
         return Serdes.sbCardSerde.deserialize(receiveMessage());
     }
 
