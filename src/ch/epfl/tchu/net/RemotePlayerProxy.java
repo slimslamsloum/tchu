@@ -119,9 +119,7 @@ public class RemotePlayerProxy implements Player {
                             new InputStreamReader(socket.getInputStream(),
                                     US_ASCII));
 
-            String line = (r.readLine());
-            String[] seperatedLine = line.split(Pattern.quote(" "), -1);
-            return seperatedLine[1];
+            return r.readLine();
         }
         catch (IOException e) {
             throw new UncheckedIOException(e);
