@@ -14,8 +14,21 @@ import static java.nio.charset.StandardCharsets.US_ASCII;
 public class RemotePlayerProxy implements Player {
 
     private Socket socket;
+    private BufferedReader r;
+    private BufferedWriter w;
 
-    public RemotePlayerProxy(Socket socket){ this.socket=socket; }
+    public RemotePlayerProxy(Socket socket) throws IOException {
+        r =
+                new BufferedReader(
+                        new InputStreamReader(socket.getInputStream(),
+                                US_ASCII));
+        w =
+                new BufferedWriter(
+                        new OutputStreamWriter(socket.getOutputStream(),
+                                US_ASCII));
+
+        this.socket=socket;
+    }
 
     @Override
     public void initPlayers(PlayerId ownId, Map<PlayerId, String> playerNames) {
@@ -89,11 +102,6 @@ public class RemotePlayerProxy implements Player {
 
     private void sendMessage(List<String> list, MessageId messageId){
         try {
-            BufferedWriter w =
-                    new BufferedWriter(
-                            new OutputStreamWriter(socket.getOutputStream(),
-                                    US_ASCII));
-
             w.write(messageId.name());
             w.write(" ");
             int i = 0;
@@ -114,16 +122,10 @@ public class RemotePlayerProxy implements Player {
 
     private String receiveMessage(){
         try {
-            BufferedReader r =
-                    new BufferedReader(
-                            new InputStreamReader(socket.getInputStream(),
-                                    US_ASCII));
-
             return r.readLine();
         }
         catch (IOException e) {
             throw new UncheckedIOException(e);
         }
     }
-
 }
