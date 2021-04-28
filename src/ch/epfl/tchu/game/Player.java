@@ -5,6 +5,13 @@ import ch.epfl.tchu.SortedBag;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A player
+ *
+ * @author Alexandre Kambiz Gunter (324268)
+ * @author Selim Jerad (327529)
+ */
+
 public interface Player {
 
     enum TurnKind {

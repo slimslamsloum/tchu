@@ -5,6 +5,13 @@ import ch.epfl.tchu.SortedBag;
 
 import java.util.*;
 
+/**
+ * The state of a tChu game
+ *
+ * @author Alexandre Kambiz Gunter (324268)
+ * @author Selim Jerad (327529)
+ */
+
 public final class GameState extends PublicGameState {
 
     //private attributes for GameState: map of private player states, tickets, and private elements of card state
