@@ -2,6 +2,7 @@ package ch.epfl.tchu.gui;
 
 import ch.epfl.tchu.game.*;
 import javafx.beans.property.*;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import java.util.ArrayList;
@@ -9,29 +10,44 @@ import java.util.List;
 
 public class ObservableGameState {
 
+    private PlayerId ownPlayerId;
+
     //properties de l'etat public de la partie
 
-    private final SimpleIntegerProperty percentageTickets = null;
-    private final SimpleIntegerProperty percentageCards = null;
-    private final List<ObjectProperty<Card>> faceUpCards =
-            createFaceUpCards();
-    private final List<ObjectProperty<PlayerId>> allRoutes = createRoutes();
+    private final SimpleIntegerProperty percentageTickets;
+    private final SimpleIntegerProperty percentageCards;
+    private final List<ObjectProperty<Card>> faceUpCards;
+    private final List<ObjectProperty<PlayerId>> allRoutes;
 
     //properties qui concerne l'etat public des deux joueurs
 
-    private final List<SimpleIntegerProperty> nbTickets = null;
-    private final List<SimpleIntegerProperty> nbCards = null;
-    private final List<SimpleIntegerProperty> nbCars = null;
-    private final List<SimpleIntegerProperty> nbPoints = null;
+    private final List<SimpleIntegerProperty> nbTickets;
+    private final List<SimpleIntegerProperty> nbCards;
+    private final List<SimpleIntegerProperty> nbCars;
+    private final List<SimpleIntegerProperty> nbPoints;
 
     //properties de l'etat complet du joueur
 
-    private final ObservableList<Ticket> playerTickers = null;
-    private final List<SimpleIntegerProperty> numberPerCard = null;
-    private final List<SimpleBooleanProperty> booleanForEachRoute = null;
+    private final ObservableList<Ticket> playerTickets;
+    private final List<SimpleIntegerProperty> numberPerCard;
+    private final List<SimpleBooleanProperty> booleanForEachRoute;
 
     public ObservableGameState(PlayerId playerId){
+        ownPlayerId=playerId;
 
+        percentageCards=null;
+        percentageTickets=null;
+        faceUpCards=createFaceUpCards();
+        allRoutes=createRoutes();
+
+        nbTickets=null;
+        nbCards=null;
+        nbCars=null;
+        nbPoints=null;
+
+        playerTickets=FXCollections.observableArrayList();
+        numberPerCard=null;
+        booleanForEachRoute=null;
     }
 
     public void setState(PublicGameState newGameState, PlayerState newPlayerState){
@@ -72,6 +88,11 @@ public class ObservableGameState {
         }
 
         //properties de l'etat complet du joueur
+
+        for(Ticket ticket : newPlayerState.tickets()){
+            playerTickets.add(ticket);
+        }
+
 
 
 
