@@ -10,7 +10,7 @@ import java.util.List;
 
 public class ObservableGameState {
 
-    private PlayerId ownPlayerId;
+    private final PlayerId ownPlayerId;
 
     //group1
     private final SimpleIntegerProperty percentageTickets;
