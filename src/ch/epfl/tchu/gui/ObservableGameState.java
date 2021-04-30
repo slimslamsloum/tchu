@@ -159,7 +159,7 @@ public class ObservableGameState {
     public ReadOnlyIntegerProperty nbCarsPROP(PlayerId playerid){return nbCars.get(PlayerId.ALL.indexOf(playerid));}
     public ReadOnlyIntegerProperty nbPointsPROP(PlayerId playerid){return nbPoints.get(PlayerId.ALL.indexOf(playerid));}
 
-    public ReadOnlyObjectProperty<ObservableList<Ticket>> playerTicketsPROP(){return playerTickets;}
+    public ReadOnlyObjectProperty<List<Ticket>> playerTicketsPROP(){return playerTickets;}
     public ReadOnlyIntegerProperty numberPerCardPROP(Card card){return numberPerCard.get(Card.ALL.indexOf(card));}
     public ReadOnlyBooleanProperty booleanForEachRoutePROP(Route route){
         return booleanForEachRoute.get(ChMap.routes().indexOf(route));}
