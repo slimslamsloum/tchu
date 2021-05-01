@@ -13,6 +13,8 @@ import java.util.Map;
 public class ObservableGameState {
 
     private final PlayerId ownPlayerId;
+    private PublicGameState publicGameState;
+    private PlayerState playerState;
 
     //group1
     private final SimpleIntegerProperty percentageTickets;
@@ -50,6 +52,8 @@ public class ObservableGameState {
     }
 
     public void setState(PublicGameState newGameState, PlayerState newPlayerState){
+        publicGameState=newGameState;
+        playerState=newPlayerState;
 
         //group1
         percentageTickets.set((newGameState.ticketsCount()/Constants.IN_GAME_TICKETS_COUNT)*100);
@@ -155,13 +159,13 @@ public class ObservableGameState {
     public ReadOnlyBooleanProperty booleanForEachRoute(Route route){
         return booleanForEachRoute.get(route);}
 
-    public boolean canDrawTickets(PublicGameState publicGameState){
+    public boolean canDrawTickets(){
         return publicGameState.canDrawTickets();
     }
-    public boolean canDrawCards(PublicGameState publicGameState){
+    public boolean canDrawCards(){
         return publicGameState.canDrawCards();
     }
-    public List<SortedBag<Card>> possibleClaimCards(PlayerState playerState, Route route){
+    public List<SortedBag<Card>> possibleClaimCards(Route route){
         return playerState.possibleClaimCards(route);
     }
 }
