@@ -1,11 +1,11 @@
 package ch.epfl.tchu.gui;
 
+import ch.epfl.tchu.SortedBag;
 import ch.epfl.tchu.game.*;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import javax.swing.text.html.ListView;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -141,13 +141,13 @@ public class ObservableGameState {
     }
     public ReadOnlyIntegerProperty percentageTickets(){return percentageTickets;}
     public ReadOnlyIntegerProperty percentageCards(){return percentageCards;}
-    public ReadOnlyObjectProperty<PlayerId> route(Route route){ return allRoutes.get(route);}
+    public ReadOnlyObjectProperty<PlayerId> routePlayerId(Route route){ return allRoutes.get(route);}
 
     public ReadOnlyIntegerProperty nbTickets(PlayerId playerid){
         return nbTickets.get(playerid);}
     public ReadOnlyIntegerProperty nbCards(PlayerId playerid){return nbCards.get(playerid);}
     public ReadOnlyIntegerProperty nbCars(PlayerId playerid){return nbCars.get(playerid);}
-    public ReadOnlyIntegerProperty nbPoints(PlayerId playerid){return nbPoints.get((playerid);}
+    public ReadOnlyIntegerProperty nbPoints(PlayerId playerid){return nbPoints.get((playerid));}
 
     public ObservableList<Ticket> playerTickets(){return FXCollections.unmodifiableObservableList(playerTickets);}
 
@@ -155,5 +155,13 @@ public class ObservableGameState {
     public ReadOnlyBooleanProperty booleanForEachRoute(Route route){
         return booleanForEachRoute.get(route);}
 
-
+    public boolean canDrawTickets(PublicGameState publicGameState){
+        return publicGameState.canDrawTickets();
+    }
+    public boolean canDrawCards(PublicGameState publicGameState){
+        return publicGameState.canDrawCards();
+    }
+    public List<SortedBag<Card>> possibleClaimCards(PlayerState playerState, Route route){
+        return playerState.possibleClaimCards(route);
+    }
 }
