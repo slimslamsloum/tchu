@@ -5,8 +5,10 @@ import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import javax.swing.text.html.ListView;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class ObservableGameState {
 
@@ -16,35 +18,35 @@ public class ObservableGameState {
     private final SimpleIntegerProperty percentageTickets;
     private final SimpleIntegerProperty percentageCards;
     private final List<ObjectProperty<Card>> faceUpCards;
-    private final List<ObjectProperty<PlayerId>> allRoutes;
+    private final Map<Route, SimpleObjectProperty<PlayerId>> allRoutes;
 
     //group2
-    private final List<SimpleIntegerProperty> nbTickets;
-    private final List<SimpleIntegerProperty> nbCards;
-    private final List<SimpleIntegerProperty> nbCars;
-    private final List<SimpleIntegerProperty> nbPoints;
+    private final Map<PlayerId, SimpleIntegerProperty> nbTickets;
+    private final Map<PlayerId, SimpleIntegerProperty> nbCards;
+    private final Map<PlayerId, SimpleIntegerProperty> nbCars;
+    private final Map<PlayerId, SimpleIntegerProperty> nbPoints;
 
     //group3
     private final ObservableList<Ticket> playerTickets;
-    private final List<SimpleIntegerProperty> numberPerCard;
-    private final List<SimpleBooleanProperty> booleanForEachRoute;
+    private final Map<Card, SimpleIntegerProperty> numberPerCard;
+    private final Map<Route, SimpleBooleanProperty> booleanForEachRoute;
 
     public ObservableGameState(PlayerId playerId){
         ownPlayerId=playerId;
 
-        percentageCards=null;
-        percentageTickets=null;
+        percentageCards=new SimpleIntegerProperty();
+        percentageTickets=new SimpleIntegerProperty();
         faceUpCards=createFaceUpCards();
-        allRoutes=createRoutes();
+        allRoutes=new SimpleMapProperty<Route, SimpleObjectProperty<PlayerId>>();
 
-        nbTickets=null;
-        nbCards=null;
-        nbCars=null;
-        nbPoints=null;
+        nbTickets=new SimpleMapProperty<PlayerId, SimpleIntegerProperty>();
+        nbCards=new SimpleMapProperty<PlayerId, SimpleIntegerProperty>();
+        nbCars=new SimpleMapProperty<PlayerId, SimpleIntegerProperty>();
+        nbPoints=new SimpleMapProperty<PlayerId, SimpleIntegerProperty>();
 
         playerTickets=FXCollections.observableArrayList();
-        numberPerCard=null;
-        booleanForEachRoute=null;
+        numberPerCard=new SimpleMapProperty<Card, SimpleIntegerProperty>();
+        booleanForEachRoute=new SimpleMapProperty<Route, SimpleBooleanProperty>();
     }
 
     public void setState(PublicGameState newGameState, PlayerState newPlayerState){
@@ -60,38 +62,34 @@ public class ObservableGameState {
 
         for (Route route: ChMap.routes()) {
             if (newGameState.playerState(PlayerId.PLAYER_1).routes().contains(route)){
-                allRoutes.get(ChMap.routes().indexOf(route)).set(PlayerId.PLAYER_1);
+                allRoutes.put(route, new SimpleObjectProperty<PlayerId>(PlayerId.PLAYER_1));
             }
             if (newGameState.playerState(PlayerId.PLAYER_2).routes().contains(route)){
-                allRoutes.get(ChMap.routes().indexOf(route)).set(PlayerId.PLAYER_2);
+                allRoutes.put(route, new SimpleObjectProperty<PlayerId>(PlayerId.PLAYER_2));
             }
             else{
-                allRoutes.get(ChMap.routes().indexOf(route)).set(null);
+                allRoutes.put(route, null);
             }
-
         }
 
         //group2
         for (PlayerId playerId: PlayerId.ALL){
-            nbTickets.get(PlayerId.ALL.indexOf(playerId)).set(newGameState.playerState(playerId).ticketCount());
-            nbCards.get(PlayerId.ALL.indexOf(playerId)).set(newGameState.playerState(playerId).cardCount());
-            nbCars.get(PlayerId.ALL.indexOf(playerId)).set(newGameState.playerState(playerId).carCount());
-            nbPoints.get(PlayerId.ALL.indexOf(playerId)).set(newGameState.playerState(playerId).claimPoints());
+            nbTickets.put(playerId, new SimpleIntegerProperty(newGameState.playerState(playerId).ticketCount()));
+            nbCards.put(playerId, new SimpleIntegerProperty(newGameState.playerState(playerId).cardCount()));
+            nbCars.put(playerId, new SimpleIntegerProperty(newGameState.playerState(playerId).carCount()));
+            nbPoints.put(playerId, new SimpleIntegerProperty(newGameState.playerState(playerId).claimPoints()));
         }
 
         //group3
-        for(Ticket ticket : newPlayerState.tickets()){
-            playerTickets.add(ticket);
-        }
+        playerTickets.setAll(newPlayerState.tickets().toList());
+
         for (Card card : Card.ALL){
-            int numberCards=newPlayerState.cards().countOf(card);
-            numberPerCard.get(Card.ALL.indexOf(card)).set(numberCards);
+            numberPerCard.put(card, new SimpleIntegerProperty(newPlayerState.cards().countOf(card)));
         }
         for(Route route : ChMap.routes()){
-            int index = ChMap.routes().indexOf(route);
             boolean bool = (alreadyClaimed(route, newPlayerState) &&
                     isCurrentPlayer(newGameState, ownPlayerId) && canClaim(newPlayerState, route));
-            booleanForEachRoute.get(index).set(bool);
+            booleanForEachRoute.put(route, new SimpleBooleanProperty(bool));
         }
     }
 
@@ -99,14 +97,6 @@ public class ObservableGameState {
         List<ObjectProperty<Card>> l = new ArrayList();
         for (int i =0; i<Constants.FACE_UP_CARDS_COUNT; i++){
             l.add(new SimpleObjectProperty<Card>());
-        }
-        return l;
-    }
-
-    private List<ObjectProperty<PlayerId>> createRoutes(){
-        List<ObjectProperty<PlayerId>> l = new ArrayList();
-        for (int i =0; i<ChMap.routes().size(); i++){
-            l.add(new SimpleObjectProperty<PlayerId>());
         }
         return l;
     }
@@ -146,21 +136,24 @@ public class ObservableGameState {
         return !(doubleRoutes(route)==null);
     }
 
-    public ReadOnlyObjectProperty<Card> faceUpCardPROP(int slot) {
+    public ReadOnlyObjectProperty<Card> faceUpCard(int slot) {
         return faceUpCards.get(slot);
     }
-    public ReadOnlyIntegerProperty percentageTicketsPROP(){return percentageTickets;}
-    public ReadOnlyIntegerProperty percentageCardsPROP(){return percentageCards;}
-    public ReadOnlyObjectProperty<PlayerId> playerIdPROP(int slot){ return allRoutes.get(slot);}
+    public ReadOnlyIntegerProperty percentageTickets(){return percentageTickets;}
+    public ReadOnlyIntegerProperty percentageCards(){return percentageCards;}
+    public ReadOnlyObjectProperty<PlayerId> route(Route route){ return allRoutes.get(route);}
 
-    public ReadOnlyIntegerProperty nbTicketsPROP(PlayerId playerid){
-        return nbTickets.get(PlayerId.ALL.indexOf(playerid));}
-    public ReadOnlyIntegerProperty nbCardsPROP(PlayerId playerid){return nbCards.get(PlayerId.ALL.indexOf(playerid));}
-    public ReadOnlyIntegerProperty nbCarsPROP(PlayerId playerid){return nbCars.get(PlayerId.ALL.indexOf(playerid));}
-    public ReadOnlyIntegerProperty nbPointsPROP(PlayerId playerid){return nbPoints.get(PlayerId.ALL.indexOf(playerid));}
+    public ReadOnlyIntegerProperty nbTickets(PlayerId playerid){
+        return nbTickets.get(playerid);}
+    public ReadOnlyIntegerProperty nbCards(PlayerId playerid){return nbCards.get(playerid);}
+    public ReadOnlyIntegerProperty nbCars(PlayerId playerid){return nbCars.get(playerid);}
+    public ReadOnlyIntegerProperty nbPoints(PlayerId playerid){return nbPoints.get((playerid);}
 
-    public ReadOnlyObjectProperty<List<Ticket>> playerTicketsPROP(){return playerTickets;}
-    public ReadOnlyIntegerProperty numberPerCardPROP(Card card){return numberPerCard.get(Card.ALL.indexOf(card));}
-    public ReadOnlyBooleanProperty booleanForEachRoutePROP(Route route){
-        return booleanForEachRoute.get(ChMap.routes().indexOf(route));}
+    public ObservableList<Ticket> playerTickets(){return FXCollections.unmodifiableObservableList(playerTickets);}
+
+    public ReadOnlyIntegerProperty numberPerCard(Card card){return numberPerCard.get(card);}
+    public ReadOnlyBooleanProperty booleanForEachRoute(Route route){
+        return booleanForEachRoute.get(route);}
+
+
 }
