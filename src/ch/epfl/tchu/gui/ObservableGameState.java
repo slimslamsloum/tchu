@@ -10,29 +10,44 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Observable state of the game
+ *
+ * @author Alexandre Kambiz Gunter (324268)
+ * @author Selim Jerad (327529)
+ */
+
 public class ObservableGameState {
 
+    //attributes (non property) needed for an Observable Game State: the player id of the player
+    //watching the game state, a public game state and a player state
     private final PlayerId ownPlayerId;
     private PublicGameState publicGameState;
     private PlayerState playerState;
 
-    //group1
+    //properties that concern public information about the game state
     private final SimpleIntegerProperty percentageTickets;
     private final SimpleIntegerProperty percentageCards;
     private final List<ObjectProperty<Card>> faceUpCards;
     private final Map<Route, SimpleObjectProperty<PlayerId>> allRoutes;
 
-    //group2
+    //properties that concern public information about both players
     private final Map<PlayerId, SimpleIntegerProperty> nbTickets;
     private final Map<PlayerId, SimpleIntegerProperty> nbCards;
     private final Map<PlayerId, SimpleIntegerProperty> nbCars;
     private final Map<PlayerId, SimpleIntegerProperty> nbPoints;
 
-    //group3
+    //properties that concern private information about the player watching the game state
     private final ObservableList<Ticket> playerTickets;
     private final Map<Card, SimpleIntegerProperty> numberPerCard;
     private final Map<Route, SimpleBooleanProperty> booleanForEachRoute;
 
+    /**
+     * Observable Game state constructor
+     * @param playerId playerId of the player watching the game state
+     * ownPlayerId is initialized with the playerId given as argument, all properties are initialized with default
+     * constructor (i.e: are all null)
+     */
     public ObservableGameState(PlayerId playerId){
         ownPlayerId=playerId;
 
@@ -91,12 +106,16 @@ public class ObservableGameState {
             numberPerCard.put(card, new SimpleIntegerProperty(newPlayerState.cards().countOf(card)));
         }
         for(Route route : ChMap.routes()){
-            boolean bool = (alreadyClaimed(route, newPlayerState) &&
+            boolean bool = (notClaimed(route) &&
                     isCurrentPlayer(newGameState, ownPlayerId) && canClaim(newPlayerState, route));
             booleanForEachRoute.put(route, new SimpleBooleanProperty(bool));
         }
     }
 
+    /**
+     * Face Up Cards Creator
+     * @return List of 5 Object Properties of Cards (one for each face up card)
+     */
     private List<ObjectProperty<Card>> createFaceUpCards(){
         List<ObjectProperty<Card>> l = new ArrayList();
         for (int i =0; i<Constants.FACE_UP_CARDS_COUNT; i++){
@@ -105,6 +124,11 @@ public class ObservableGameState {
         return l;
     }
 
+    /**
+     * Gives neighboring route of a route, returns null if there isn't any
+     * @param route for which we want to find the neighboring route
+     * @return neighboring route if there is one, else returns null
+     */
     private List<Route> doubleRoutes(Route route){
         for (Route route1: ChMap.routes()){
             if (route!=route1 && route.station1().equals(route1.station1())
@@ -115,40 +139,57 @@ public class ObservableGameState {
         return null;
     }
 
+    /**
+     * Checks if playerId given in argument is the current player
+     * @param gameState current game state
+     * @param playerId a player Id
+     * @return true iff playerId is the current player
+     */
     private boolean isCurrentPlayer(PublicGameState gameState, PlayerId playerId){
         return gameState.currentPlayerId().equals(playerId);
     }
 
-    private boolean alreadyClaimed(Route route, PlayerState playerState){
-        if (!playerState.routes().contains(route)){
+    /**
+     * Checks, if a certain route has already been claimed or not
+     * @param route route to be checked
+     * @return true, if route is single and hasn't been claimed OR if route is double and the two routes haven't
+     * been claimed, returns false in all other scenarios
+     */
+    private boolean notClaimed(Route route){
+        if (allRoutes.get(route).equals(null)){
             if (isDouble(route)){
-                if (!playerState.routes().contains(doubleRoutes(route).get(1))){
-                    return true;
-                }
-                else return false;
+                return allRoutes.get(doubleRoutes(route)).equals(null);
             }
-            return true;
+            else return true;
         }
-        return false;
+        else return false;
     }
 
+    /**
+     * Checks if player of the player state given in argument can claim the route
+     * @param playerState current player state
+     * @param route route to be claimed
+     * @return true iff player of the player state can claim the route
+     */
     private boolean canClaim(PlayerState playerState, Route route){
         return playerState.canClaimRoute(route);
     }
 
+    /**
+     * Checks if route given in argument has a neighboring route
+     * @param route route to be checked
+     * @return true iff route has a neighboring route
+     */
     private boolean isDouble(Route route){
         return !(doubleRoutes(route)==null);
     }
 
-    public ReadOnlyObjectProperty<Card> faceUpCard(int slot) {
-        return faceUpCards.get(slot);
-    }
+    public ReadOnlyObjectProperty<Card> faceUpCard(int slot) { return faceUpCards.get(slot); }
     public ReadOnlyIntegerProperty percentageTickets(){return percentageTickets;}
     public ReadOnlyIntegerProperty percentageCards(){return percentageCards;}
     public ReadOnlyObjectProperty<PlayerId> routePlayerId(Route route){ return allRoutes.get(route);}
 
-    public ReadOnlyIntegerProperty nbTickets(PlayerId playerid){
-        return nbTickets.get(playerid);}
+    public ReadOnlyIntegerProperty nbTickets(PlayerId playerid){ return nbTickets.get(playerid);}
     public ReadOnlyIntegerProperty nbCards(PlayerId playerid){return nbCards.get(playerid);}
     public ReadOnlyIntegerProperty nbCars(PlayerId playerid){return nbCars.get(playerid);}
     public ReadOnlyIntegerProperty nbPoints(PlayerId playerid){return nbPoints.get((playerid));}
@@ -156,8 +197,7 @@ public class ObservableGameState {
     public ObservableList<Ticket> playerTickets(){return FXCollections.unmodifiableObservableList(playerTickets);}
 
     public ReadOnlyIntegerProperty numberPerCard(Card card){return numberPerCard.get(card);}
-    public ReadOnlyBooleanProperty booleanForEachRoute(Route route){
-        return booleanForEachRoute.get(route);}
+    public ReadOnlyBooleanProperty booleanForEachRoute(Route route){ return booleanForEachRoute.get(route);}
 
     public boolean canDrawTickets(){
         return publicGameState.canDrawTickets();
