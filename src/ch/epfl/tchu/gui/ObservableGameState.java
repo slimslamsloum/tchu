@@ -70,40 +70,6 @@ public class ObservableGameState {
         booleanForEachRoute=booleanPropertyMap();
     }
 
-    private Map<Route, SimpleObjectProperty<PlayerId>> routePropertyMap(){
-        Map<Route, SimpleObjectProperty<PlayerId>> map = new HashMap<>();
-        for (Route route : ChMap.routes()){
-            map.put(route, new SimpleObjectProperty<PlayerId>());
-        }
-        return map;
-    }
-
-    private Map<PlayerId, SimpleIntegerProperty> PlayerIdIntegerPropertyMap(){
-        Map<PlayerId, SimpleIntegerProperty> map = new HashMap<>();
-        for (PlayerId player: PlayerId.ALL){
-            map.put(player, new SimpleIntegerProperty());
-        }
-        return map;
-    }
-
-    private Map<Card, SimpleIntegerProperty> numberCardPropertyMap(){
-        Map<Card, SimpleIntegerProperty> map = new HashMap<>();
-        for (Card card : Card.ALL){
-            map.put(card, new SimpleIntegerProperty());
-        }
-        return map;
-    }
-
-    private Map<Route, SimpleBooleanProperty> booleanPropertyMap(){
-        Map<Route, SimpleBooleanProperty> map = new HashMap<>();
-        for (Route route : ChMap.routes()){
-            map.put(route, new SimpleBooleanProperty(false));
-        }
-        return map;
-    }
-
-
-
     public void setState(PublicGameState newGameState, PlayerState newPlayerState){
         //setting new values for the ObservableGameState's PublicGameState and PlayerState attributes
         publicGameState=newGameState;
@@ -146,7 +112,7 @@ public class ObservableGameState {
         }
         for(Route route : ChMap.routes()){
             boolean bool = (notClaimed(route) &&
-                    isCurrentPlayer(newGameState, ownPlayerId) && canClaim(newPlayerState, route));
+                    isCurrentPlayer(newGameState, ownPlayerId) && newPlayerState.canClaimRoute(route));
             booleanForEachRoute.get(route).set(bool);
         }
     }
@@ -196,31 +162,12 @@ public class ObservableGameState {
      */
     private boolean notClaimed(Route route){
         if (allRoutes.get(route).equals(null)){
-            if (isDouble(route)){
+            if (doubleRoutes(route) != null){
                 return allRoutes.get(doubleRoutes(route)).equals(null);
             }
             else return true;
         }
         else return false;
-    }
-
-    /**
-     * Checks if player of the player state given in argument can claim the route
-     * @param playerState current player state
-     * @param route route to be claimed
-     * @return true iff player of the player state can claim the route
-     */
-    private boolean canClaim(PlayerState playerState, Route route){
-        return playerState.canClaimRoute(route);
-    }
-
-    /**
-     * Checks if route given in argument has a neighboring route
-     * @param route route to be checked
-     * @return true iff route has a neighboring route
-     */
-    private boolean isDouble(Route route){
-        return !(doubleRoutes(route)==null);
     }
 
     /**
@@ -320,5 +267,37 @@ public class ObservableGameState {
      */
     public List<SortedBag<Card>> possibleClaimCards(Route route){
         return playerState.possibleClaimCards(route);
+    }
+
+    private Map<Route, SimpleObjectProperty<PlayerId>> routePropertyMap(){
+        Map<Route, SimpleObjectProperty<PlayerId>> map = new HashMap<>();
+        for (Route route : ChMap.routes()){
+            map.put(route, new SimpleObjectProperty<PlayerId>());
+        }
+        return map;
+    }
+
+    private Map<PlayerId, SimpleIntegerProperty> PlayerIdIntegerPropertyMap(){
+        Map<PlayerId, SimpleIntegerProperty> map = new HashMap<>();
+        for (PlayerId player: PlayerId.ALL){
+            map.put(player, new SimpleIntegerProperty());
+        }
+        return map;
+    }
+
+    private Map<Card, SimpleIntegerProperty> numberCardPropertyMap(){
+        Map<Card, SimpleIntegerProperty> map = new HashMap<>();
+        for (Card card : Card.ALL){
+            map.put(card, new SimpleIntegerProperty());
+        }
+        return map;
+    }
+
+    private Map<Route, SimpleBooleanProperty> booleanPropertyMap(){
+        Map<Route, SimpleBooleanProperty> map = new HashMap<>();
+        for (Route route : ChMap.routes()){
+            map.put(route, new SimpleBooleanProperty(false));
+        }
+        return map;
     }
 }
