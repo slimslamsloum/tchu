@@ -7,6 +7,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -55,19 +56,53 @@ public class ObservableGameState {
         percentageCards=new SimpleIntegerProperty();
         percentageTickets=new SimpleIntegerProperty();
         faceUpCards=createFaceUpCards();
-        allRoutes=new SimpleMapProperty<Route, SimpleObjectProperty<PlayerId>>();
+        allRoutes=routePropertyMap();
 
         //initialization of the properties that concern public information about both players
-        nbTickets=new SimpleMapProperty<PlayerId, SimpleIntegerProperty>();
-        nbCards=new SimpleMapProperty<PlayerId, SimpleIntegerProperty>();
-        nbCars=new SimpleMapProperty<PlayerId, SimpleIntegerProperty>();
-        nbPoints=new SimpleMapProperty<PlayerId, SimpleIntegerProperty>();
+        nbTickets=PlayerIdIntegerPropertyMap();
+        nbCards=PlayerIdIntegerPropertyMap();
+        nbCars=PlayerIdIntegerPropertyMap();
+        nbPoints=PlayerIdIntegerPropertyMap();
 
         //initialization of properties concerning information about the player with id "ownPlayerId"
         playerTickets=FXCollections.observableArrayList();
-        numberPerCard=new SimpleMapProperty<Card, SimpleIntegerProperty>();
-        booleanForEachRoute=new SimpleMapProperty<Route, SimpleBooleanProperty>();
+        numberPerCard=numberCardPropertyMap();
+        booleanForEachRoute=booleanPropertyMap();
     }
+
+    private Map<Route, SimpleObjectProperty<PlayerId>> routePropertyMap(){
+        Map<Route, SimpleObjectProperty<PlayerId>> map = new HashMap<>();
+        for (Route route : ChMap.routes()){
+            map.put(route, new SimpleObjectProperty<PlayerId>());
+        }
+        return map;
+    }
+
+    private Map<PlayerId, SimpleIntegerProperty> PlayerIdIntegerPropertyMap(){
+        Map<PlayerId, SimpleIntegerProperty> map = new HashMap<>();
+        for (PlayerId player: PlayerId.ALL){
+            map.put(player, new SimpleIntegerProperty());
+        }
+        return map;
+    }
+
+    private Map<Card, SimpleIntegerProperty> numberCardPropertyMap(){
+        Map<Card, SimpleIntegerProperty> map = new HashMap<>();
+        for (Card card : Card.ALL){
+            map.put(card, new SimpleIntegerProperty());
+        }
+        return map;
+    }
+
+    private Map<Route, SimpleBooleanProperty> booleanPropertyMap(){
+        Map<Route, SimpleBooleanProperty> map = new HashMap<>();
+        for (Route route : ChMap.routes()){
+            map.put(route, new SimpleBooleanProperty(false));
+        }
+        return map;
+    }
+
+
 
     public void setState(PublicGameState newGameState, PlayerState newPlayerState){
         //setting new values for the ObservableGameState's PublicGameState and PlayerState attributes
@@ -85,34 +120,34 @@ public class ObservableGameState {
 
         for (Route route: ChMap.routes()) {
             if (newGameState.playerState(PlayerId.PLAYER_1).routes().contains(route)){
-                allRoutes.put(route, new SimpleObjectProperty<PlayerId>(PlayerId.PLAYER_1));
+                allRoutes.get(route).set(PlayerId.PLAYER_1);
             }
             if (newGameState.playerState(PlayerId.PLAYER_2).routes().contains(route)){
-                allRoutes.put(route, new SimpleObjectProperty<PlayerId>(PlayerId.PLAYER_2));
+                allRoutes.get(route).set(PlayerId.PLAYER_2);
             }
             else{
-                allRoutes.put(route, null);
+                allRoutes.get(route).set(null);
             }
         }
 
         //setting new values for the second set of properties
         for (PlayerId playerId: PlayerId.ALL){
-            nbTickets.put(playerId, new SimpleIntegerProperty(newGameState.playerState(playerId).ticketCount()));
-            nbCards.put(playerId, new SimpleIntegerProperty(newGameState.playerState(playerId).cardCount()));
-            nbCars.put(playerId, new SimpleIntegerProperty(newGameState.playerState(playerId).carCount()));
-            nbPoints.put(playerId, new SimpleIntegerProperty(newGameState.playerState(playerId).claimPoints()));
+            nbTickets.get(playerId).set(newGameState.playerState(playerId).ticketCount());
+            nbCards.get(playerId).set(newGameState.playerState(playerId).cardCount());
+            nbCars.get(playerId).set((newGameState.playerState(playerId).carCount()));
+            nbPoints.get(playerId).set(newGameState.playerState(playerId).claimPoints());
         }
 
         //setting new values for the third set of properties
         playerTickets.setAll(newPlayerState.tickets().toList());
 
         for (Card card : Card.ALL){
-            numberPerCard.put(card, new SimpleIntegerProperty(newPlayerState.cards().countOf(card)));
+            numberPerCard.get(card).set(newPlayerState.cards().countOf(card));
         }
         for(Route route : ChMap.routes()){
             boolean bool = (notClaimed(route) &&
                     isCurrentPlayer(newGameState, ownPlayerId) && canClaim(newPlayerState, route));
-            booleanForEachRoute.put(route, new SimpleBooleanProperty(bool));
+            booleanForEachRoute.get(route).set(bool);
         }
     }
 
