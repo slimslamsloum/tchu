@@ -7,7 +7,6 @@ import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 
@@ -25,56 +24,93 @@ class MapViewCreator {
     private MapViewCreator() {
     }
 
-    public void createMapView(ObservableGameState observableGameState,
-                              ObjectProperty<ClaimRouteHandler> claimRouteHandlerProperty,
-                              CardChooser cardChooser){
+    public static Pane createMapView(ObservableGameState observableGameState,
+                                     ObjectProperty<ClaimRouteHandler> claimRouteHandlerProperty,
+                                     CardChooser cardChooser) {
         Pane mapPane = new Pane();
         mapPane.getStylesheets().addAll("map.css", "colors.css");
         mapPane.getChildren().add(new ImageView());
-        Map<Route, Group> routeNodeMap = new HashMap<>();
 
-        for (Route route : ChMap.routes()){ // est on sur de devoir utiliser CHMAP???
-            Group carGroup = nodeForCar();
-            Group caseGroup = nodeForCase(carGroup);
-            Group routeGroup = nodeForRoute(route,caseGroup);
+        for (Route route : ChMap.routes()) {
+
+            Group routeGroup = new Group();
             routeGroup.setId(route.toString());
-            routeGroup.getStyleClass().addAll("route",route.level().toString(),"NEUTRAL");
-            routeNodeMap.put(route,routeGroup);
-            ReadOnlyObjectProperty<PlayerId> routePlayerId = observableGameState.routePlayerId(route);
-            if (routePlayerId != null){
-                routeGroup.getStyleClass().addAll("route",route.level().toString(), routePlayerId.getName()); // pas sur du get name
+            routeGroup.getStyleClass().addAll("route", route.level().toString(), "NEUTRAL");
+
+            for (int i = 0; i < route.length(); ++i) {
+
+                Group caseGroup = new Group();
+                caseGroup.setId(route.toString() + "_" + (i + 1));
+
+                Group carGroup = new Group();
+                carGroup.getStyleClass().add("car");
+
+                Rectangle caseRectangle = new Rectangle(RECTANGLE_LENGTH, RECTANGLE_HEIGHT);
+                caseRectangle.getStyleClass().addAll("track", "filled");
+                caseGroup.getChildren().add(caseRectangle);
+
+                Rectangle carRectangle = new Rectangle(RECTANGLE_LENGTH, RECTANGLE_HEIGHT);
+                carRectangle.getStyleClass().add("filled");
+
+                Circle c1 = new Circle(CIRCLE_CENTER, CIRCLE_SPACING, CIRCLE_RADIUS);
+                Circle c2 = new Circle(CIRCLE_CENTER * 2, CIRCLE_SPACING, CIRCLE_RADIUS);
+
+                carGroup.getChildren().addAll(carRectangle, c1, c2);
+                caseGroup.getChildren().add(carGroup);
+                routeGroup.getChildren().add(caseGroup);
             }
-            else{
-                routeGroup.disableProperty().bind(routePlayerId.isNull().or(observableGameState.booleanForEachRoute(route).not()));
-            } // asbolument pas certain de la méthode booleanForEachRoute, il faut que tu m'expliques les différents properties
+            mapPane.getChildren().add(routeGroup);
 
+            routeGroup.disableProperty()
+                    .bind(claimRouteHandlerProperty.isNull().
+                            or(observableGameState.booleanForEachRoute(route).not()));
+
+            observableGameState.routePlayerId(route).addListener((property, oldVal, newVal)
+                            -> {
+                        routeGroup.getStyleClass().add(newVal.name());
+                    }
+            );
+
+
+            routeGroup.setOnMouseClicked(
+                    e -> {
+                        List<SortedBag<Card>> possibleClaimCards = route.possibleClaimCards();
+                        ClaimRouteHandler claimRouteH = claimRouteHandlerProperty.get();
+                        if (possibleClaimCards.size() == 1) {
+                            claimRouteH.onClaimRoute(route, possibleClaimCards.get(0));
+                        } else {
+                            ChooseCardsHandler chooseCardsH =
+                                    chosenCards -> claimRouteH.onClaimRoute(route, chosenCards);
+                            cardChooser.chooseCards(possibleClaimCards, chooseCardsH);
+                        }
+                    }
+            );
         }
-
-        mapPane.getChildren().addAll(routeNodeMap.values());
-
+        return mapPane;
     }
 
-    private Group nodeForRoute(Route route, Group c){
+    private static Group nodeForRoute(Route route, Group c) {
         List<Node> children = new ArrayList<>();
-        for (int i=0; i<route.length(); ++i){
-            c.setId(route.toString()+"_"+(i+1));
+        for (int i = 0; i < route.length(); ++i) {
+            c.setId(route.toString() + "_" + (i + 1));
             children.add(c);
         }
         return new Group(children);
     }
 
-    private Group nodeForCase(Group car){
-        Rectangle r = new Rectangle(RECTANGLE_LENGTH,RECTANGLE_HEIGHT);
+    private static Group nodeForCase(Group car) {
+        Rectangle r = new Rectangle(RECTANGLE_LENGTH, RECTANGLE_HEIGHT);
         r.getStyleClass().addAll("track", "filled");
         return new Group(r, car);
     }
 
-    private Group nodeForCar(){
-        Rectangle rectangle = new Rectangle(RECTANGLE_LENGTH,RECTANGLE_HEIGHT);
-        Circle c1 = new Circle(CIRCLE_CENTER, CIRCLE_SPACING,CIRCLE_RADIUS);
-        Circle c2 = new Circle(CIRCLE_CENTER*2, CIRCLE_SPACING,CIRCLE_RADIUS);
-        Group carGroup =new Group(rectangle, c1, c2);
-        carGroup.getStyleClass().addAll("car", "filled");
+    private static Group nodeForCar() {
+        Rectangle rectangle = new Rectangle(RECTANGLE_LENGTH, RECTANGLE_HEIGHT);
+        rectangle.getStyleClass().add("filled");
+        Circle c1 = new Circle(CIRCLE_CENTER, CIRCLE_SPACING, CIRCLE_RADIUS);
+        Circle c2 = new Circle(CIRCLE_CENTER * 2, CIRCLE_SPACING, CIRCLE_RADIUS);
+        Group carGroup = new Group(rectangle, c1, c2);
+        carGroup.getStyleClass().add("car");
         return carGroup;
     }
 
