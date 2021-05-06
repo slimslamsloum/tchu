@@ -239,6 +239,10 @@ public class ObservableGameState {
         return publicGameState.canDrawCards();
     }
 
+    /**
+     * Creator of map of routes
+     * @return creates a map with all routes and a simple object property associated to each route
+     */
     private Map<Route, SimpleObjectProperty<PlayerId>> routePropertyMap(){
         Map<Route, SimpleObjectProperty<PlayerId>> map = new HashMap<>();
         for (Route route : ChMap.routes()){
@@ -247,6 +251,10 @@ public class ObservableGameState {
         return map;
     }
 
+    /**
+     * Creator of map of playerIds
+     * @return creates a map with both player Ids and a simple object property associated to each playerId
+     */
     private Map<PlayerId, SimpleIntegerProperty> PlayerIdIntegerPropertyMap(){
         Map<PlayerId, SimpleIntegerProperty> map = new HashMap<>();
         for (PlayerId player: PlayerId.ALL){
@@ -255,6 +263,10 @@ public class ObservableGameState {
         return map;
     }
 
+    /**
+     * Creator of map of cards
+     * @return creates a map with all cards and a simple object property associated to each card
+     */
     private Map<Card, SimpleIntegerProperty> numberCardPropertyMap(){
         Map<Card, SimpleIntegerProperty> map = new HashMap<>();
         for (Card card : Card.ALL){
@@ -263,6 +275,10 @@ public class ObservableGameState {
         return map;
     }
 
+    /**
+     * Creator of map of playerIds
+     * @return creates a map with all routes and a simple boolean property associated to each route
+     */
     private Map<Route, SimpleBooleanProperty> booleanPropertyMap(){
         Map<Route, SimpleBooleanProperty> map = new HashMap<>();
         for (Route route : ChMap.routes()){
