@@ -117,7 +117,7 @@ public class ObservableGameState {
      * @return List of 5 Object Properties of Cards (one for each face up card)
      */
     private List<ObjectProperty<Card>> createFaceUpCards(){
-        List<ObjectProperty<Card>> l = new ArrayList();
+        List<ObjectProperty<Card>> l = new ArrayList<>();
         for (int i =0; i<Constants.FACE_UP_CARDS_COUNT; i++){
             l.add(new SimpleObjectProperty<>());
         }
