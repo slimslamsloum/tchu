@@ -34,13 +34,24 @@ class MapViewCreator {
         for (Route route : ChMap.routes()) {
 
             Group routeGroup = new Group();
-            routeGroup.setId(route.toString());
-            routeGroup.getStyleClass().addAll("route", route.level().toString(), "NEUTRAL");
+            routeGroup.setId(route.id());
+            routeGroup.getStyleClass().add("route");
+
+            if (route.level().equals(Route.Level.UNDERGROUND)){
+                routeGroup.getStyleClass().add("UNDERGROUND");
+            }
+
+            if(route.color() == null){
+                routeGroup.getStyleClass().add("NEUTRAL");
+            }
+            else {
+                routeGroup.getStyleClass().addAll( route.color().toString());
+            }
 
             for (int i = 0; i < route.length(); ++i) {
 
                 Group caseGroup = new Group();
-                caseGroup.setId(route.toString() + "_" + (i + 1));
+                caseGroup.setId(route.id() + "_" + (i + 1));
 
                 Group carGroup = new Group();
                 carGroup.getStyleClass().add("car");
