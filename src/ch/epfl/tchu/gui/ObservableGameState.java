@@ -1,6 +1,5 @@
 package ch.epfl.tchu.gui;
 
-import ch.epfl.tchu.SortedBag;
 import ch.epfl.tchu.game.*;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
@@ -85,14 +84,10 @@ public class ObservableGameState {
         }
 
         for (Route route: ChMap.routes()) {
-            if (newGameState.playerState(PlayerId.PLAYER_1).routes().contains(route)){
-                allRoutes.get(route).set(PlayerId.PLAYER_1);
-            }
-            if (newGameState.playerState(PlayerId.PLAYER_2).routes().contains(route)){
-                allRoutes.get(route).set(PlayerId.PLAYER_2);
-            }
-            else{
-                allRoutes.get(route).set(null);
+            for (PlayerId player : PlayerId.ALL){
+                if (newGameState.playerState(player).routes().contains(route)){
+                    allRoutes.get(route).set(player);
+                }
             }
         }
 
@@ -112,7 +107,7 @@ public class ObservableGameState {
         }
         for(Route route : ChMap.routes()){
             boolean bool = (notClaimed(route) &&
-                    isCurrentPlayer(newGameState, ownPlayerId) && newPlayerState.canClaimRoute(route));
+                    newGameState.currentPlayerId().equals(ownPlayerId) && newPlayerState.canClaimRoute(route));
             booleanForEachRoute.get(route).set(bool);
         }
     }
@@ -124,7 +119,7 @@ public class ObservableGameState {
     private List<ObjectProperty<Card>> createFaceUpCards(){
         List<ObjectProperty<Card>> l = new ArrayList();
         for (int i =0; i<Constants.FACE_UP_CARDS_COUNT; i++){
-            l.add(new SimpleObjectProperty<Card>());
+            l.add(new SimpleObjectProperty<>());
         }
         return l;
     }
@@ -136,22 +131,8 @@ public class ObservableGameState {
      */
     private List<Route> doubleRoutes(Route route){
         for (Route route1: ChMap.routes()){
-            if (route!=route1 && route.station1().equals(route1.station1())
-                    && route.station2().equals(route1.station2())){
-                return List.of(route, route1);
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Checks if playerId given in argument is the current player
-     * @param gameState current game state
-     * @param playerId a player Id
-     * @return true iff playerId is the current player
-     */
-    private boolean isCurrentPlayer(PublicGameState gameState, PlayerId playerId){
-        return gameState.currentPlayerId().equals(playerId);
+            if (route.stations().equals(route1.stations())){ return List.of(route, route1); }
+        }return List.of(route);
     }
 
     /**
@@ -161,13 +142,11 @@ public class ObservableGameState {
      * been claimed, returns false in all other scenarios
      */
     private boolean notClaimed(Route route){
-        if (allRoutes.get(route).equals(null)){
-            if (doubleRoutes(route) != null){
-                return allRoutes.get(doubleRoutes(route)).equals(null);
-            }
-            else return true;
-        }
-        else return false;
+        if (!publicGameState.claimedRoutes().contains(route)){
+            if (doubleRoutes(route).size() == 2){
+                return !publicGameState.claimedRoutes().contains(doubleRoutes(route).get(1));
+            } else return true;
+        } else return false;
     }
 
     /**
@@ -260,19 +239,10 @@ public class ObservableGameState {
         return publicGameState.canDrawCards();
     }
 
-    /**
-     * Possible claim cards
-     * @param route route to be used in possible claim cards
-     * @return the method possible claim cards applied to the current player state with argument route
-     */
-    public List<SortedBag<Card>> possibleClaimCards(Route route){
-        return playerState.possibleClaimCards(route);
-    }
-
     private Map<Route, SimpleObjectProperty<PlayerId>> routePropertyMap(){
         Map<Route, SimpleObjectProperty<PlayerId>> map = new HashMap<>();
         for (Route route : ChMap.routes()){
-            map.put(route, new SimpleObjectProperty<PlayerId>());
+            map.put(route, new SimpleObjectProperty<>());
         }
         return map;
     }
