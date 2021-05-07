@@ -35,23 +35,29 @@ class InfoViewCreator {
 
             TextFlow gameInfo = new TextFlow();
             gameInfo.setId("game-info");
-            Bindings.bindContent(gameInfo.getChildren(), observableTexts);
 
             infoPane.getChildren().addAll(playerStats, separator, gameInfo);
 
-            TextFlow playerN = new TextFlow();
-            playerStats.getChildren().add(playerN);
-            playerN.getStyleClass().add("PLAYER_N");
+            Bindings.bindContent(gameInfo.getChildren(), observableTexts);
 
-            Circle circle = new Circle(CIRCLE_SIZE);
-            playerN.getChildren().add(circle);
-            circle.getStyleClass().add("filled");
+            for (PlayerId player : PlayerId.ALL){
 
-            Text textStats = new Text();
-            playerN.getChildren().add(textStats);
-            textStats.getStyleClass().add("filled");
+                TextFlow playerN = new TextFlow();
+                playerStats.getChildren().add(playerN);
+                playerN.getStyleClass().add(player.toString());
 
-            StringExpression stringExpression;
+                Circle circle = new Circle(CIRCLE_SIZE);
+                playerN.getChildren().add(circle);
+                circle.getStyleClass().add("filled");
+
+                Text textStats = new Text();
+                playerN.getChildren().add(textStats);
+                textStats.getStyleClass().add("filled");
+
+                textStats.setText(StringsFr.PLAYER_STATS);
+
+            }
+
 
 
 
