@@ -21,8 +21,7 @@ class MapViewCreator {
     private static final int CIRCLE_SPACING = 6;
     private static final int CIRCLE_CENTER = 12;
 
-    private MapViewCreator() {
-    }
+    private MapViewCreator() {}
 
     public static Pane createMapView(ObservableGameState observableGameState,
                                      ObjectProperty<ClaimRouteHandler> claimRouteHandlerProperty,
