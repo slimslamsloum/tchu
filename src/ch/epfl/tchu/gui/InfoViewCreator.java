@@ -18,7 +18,7 @@ import java.util.Map;
 
 class InfoViewCreator {
 
-    private static int CIRCLE_SIZE = 5;
+    private static int CIRCLE_RADIUS = 5;
 
     private InfoViewCreator(){}
 
@@ -36,39 +36,30 @@ class InfoViewCreator {
             TextFlow gameInfo = new TextFlow();
             gameInfo.setId("game-info");
 
-            infoPane.getChildren().addAll(playerStats, separator, gameInfo);
-
             Bindings.bindContent(gameInfo.getChildren(), observableTexts);
 
             for (PlayerId player : PlayerId.ALL){
 
                 TextFlow playerN = new TextFlow();
                 playerStats.getChildren().add(playerN);
-                playerN.getStyleClass().add(player.toString());
+                playerN.getStyleClass().add(player.name());
 
-                Circle circle = new Circle(CIRCLE_SIZE);
-                playerN.getChildren().add(circle);
+                Circle circle = new Circle(CIRCLE_RADIUS);
                 circle.getStyleClass().add("filled");
 
-                Text textStats = new Text();
-                playerN.getChildren().add(textStats);
-                textStats.getStyleClass().add("filled");
+                Text playerStatsText = new Text();
 
-                textStats.setText(StringsFr.PLAYER_STATS);
+                StringExpression stringExpression = Bindings.format(StringsFr.PLAYER_STATS, playerNames.get(player),
+                        observableGameState.nbTickets(player), observableGameState.nbCards(player),
+                        observableGameState.nbCars(player), observableGameState.nbPoints(player));
 
+                playerStatsText.textProperty().bind(stringExpression);
+
+                playerN.getChildren().addAll(circle, playerStatsText);
             }
 
+            infoPane.getChildren().addAll(playerStats, separator, gameInfo);
 
-
-
-
-
-
-
-
-
-
-
-
+            return infoPane;
     }
 }
