@@ -37,6 +37,10 @@ public final class Stage9Test extends Application {
                 new SimpleObjectProperty<>(Stage9Test::drawCard);
 
         Node mapView = MapViewCreator.createMapView(gameState, claimRoute, Stage9Test::chooseCards);
+        Node cardsView = DecksViewCreator
+                .createCardsView(gameState, drawTickets, drawCard);
+        Node handView = DecksViewCreator
+                .createHandView(gameState);
 
         Map<PlayerId, String> playerNames =
                 Map.of(PLAYER_1, "Ada", PLAYER_2, "Charles");
@@ -47,7 +51,7 @@ public final class Stage9Test extends Application {
                 .createInfoView(PLAYER_1, playerNames, gameState, infos);
 
         BorderPane mainPane =
-                new BorderPane(mapView, null, null, null, infoView);
+                new BorderPane(mapView, null, cardsView, handView, infoView);
 
         primaryStage.setScene(new Scene(mainPane));
         primaryStage.show();
