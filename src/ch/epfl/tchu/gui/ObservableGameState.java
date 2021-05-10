@@ -75,9 +75,8 @@ public class ObservableGameState {
         playerState=newPlayerState;
 
         //setting new values for the first set of properties
-        percentageTickets.set((newGameState.ticketsCount()/Constants.IN_GAME_TICKETS_COUNT)*100);
-        percentageCards.set((newGameState.cardState().deckSize()/Constants.INITIAL_CARDS_COUNT)*100);
-
+        percentageTickets.set((newGameState.ticketsCount()*100)/Constants.TOTAL_TICKET_COUNT);
+        percentageCards.set((newGameState.cardState().deckSize()*100)/Constants.TOTAL_CARDS_COUNT);
         for (int slot : Constants.FACE_UP_CARD_SLOTS) {
             Card newCard = newGameState.cardState().faceUpCard(slot);
             faceUpCards.get(slot).set(newCard);

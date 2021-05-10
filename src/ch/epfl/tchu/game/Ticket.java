@@ -118,4 +118,11 @@ public final class Ticket implements Comparable<Ticket> {
     public String text(){
         return text;
     }
+
+    /**
+     * Textual representation getter
+     * @return ticket textual representation
+     */
+    @Override
+    public String toString(){ return text; }
 }

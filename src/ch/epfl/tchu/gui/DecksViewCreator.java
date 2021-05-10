@@ -42,7 +42,7 @@ class DecksViewCreator {
     public static HBox createHandView(ObservableGameState obsGameState){
         //Creation of the visual representation of the hand
         HBox handView = new HBox();
-        handView.getStylesheets().addAll("deck.css", "colors.css");
+        handView.getStylesheets().addAll("decks.css", "colors.css");
 
         //Creation of the view of all player's tickets
         ListView<Ticket> ticketListView = new ListView<>(obsGameState.playerTickets());
@@ -87,6 +87,7 @@ class DecksViewCreator {
             //Creation of the text that represents the number of cards of a single type
             //the player has in his possession
             Text countText = new Text();
+            countText.getStyleClass().add("count");
             countText.textProperty().bind(Bindings.convert(countPpt));
             //verifying that the number of cards of a certain type can be seen only if there is more than one card
             countText.visibleProperty().bind(Bindings.greaterThan(countPpt, 1));
@@ -112,36 +113,11 @@ class DecksViewCreator {
                                        ObjectProperty<DrawCardHandler> drawCardHP){
         // Creation of the global view of the deck
         VBox deckView = new VBox();
-        deckView.getStylesheets().addAll("deck.css", "colors.css");
+        deckView.getStylesheets().addAll("decks.css", "colors.css");
         deckView.setId("card-pane");
 
-        //Creation of the button to draw cards from the card's stock
-        Button cardDeckButton = new Button();
-        cardDeckButton.getStyleClass().add("gauged");
-
-        //Creation of the group that contains the gauge which indicates the number of cards remaining in the stock
-        Group cardDBGroup = new Group();
-
-        //Creation of the shapes that make up the gauge
-        Rectangle cardGaugeBackground = new Rectangle(GAUGE_RECTANGLE_LENGTH,GAUGE_RECTANGLE_HEIGHT);
-        cardGaugeBackground.getStyleClass().add("background");
-
-        Rectangle cardGaugeForeground = new Rectangle(GAUGE_RECTANGLE_LENGTH,GAUGE_RECTANGLE_HEIGHT);
-        cardGaugeForeground.getStyleClass().add("foreground");
-
-        // Use of a property to modify the view of the gauge in function of the percentage of cards remaining
-        // In the stock
-        ReadOnlyIntegerProperty cardPctProperty = obsGameState.percentageCards();
-        cardGaugeForeground.widthProperty().bind(cardPctProperty.multiply(50).divide(100));
-
-        //The gauge is added as a children of the cards group, and the group is then added as a part of the button
-        //Then the Button is added as a component of the Deck's view
-        cardDBGroup.getChildren().addAll(cardGaugeForeground,cardGaugeBackground);
-        cardDeckButton.setGraphic(cardDBGroup);
-        deckView.getChildren().add(cardDeckButton);
-
         //Creation of the button to draw tickets from the card's stock
-        Button ticketDeckButton = new Button();
+        Button ticketDeckButton = new Button("Billets");
         ticketDeckButton.getStyleClass().add("gauged");
 
         //Creation of the group that contains the gauge which indicates the number of tickets remaining in the stock
@@ -157,38 +133,19 @@ class DecksViewCreator {
         // Use of a property to modify the view of the gauge in function of the percentage of tickets remaining
         // In the stock
         ReadOnlyIntegerProperty ticketPctProperty = obsGameState.percentageTickets();
-        ticketGaugeForeground.widthProperty().bind(ticketPctProperty.multiply(50).divide(100));
+        ticketGaugeForeground.widthProperty().bind(ticketPctProperty.multiply(GAUGE_RECTANGLE_LENGTH).divide(100));
 
         //The gauge is added as a children of the tickets group, and the group is then added as a part of the button
         //Then the Button is added as a component of the Deck's view
-        ticketDBGroup.getChildren().addAll(ticketGaugeForeground,ticketGaugeBackground);
+        ticketDBGroup.getChildren().addAll(ticketGaugeBackground,ticketGaugeForeground);
         ticketDeckButton.setGraphic(ticketDBGroup);
         deckView.getChildren().add(ticketDeckButton);
-
-        //In case the player doesn't want to draw a card or a ticket, the use of the buttons is disabled
-        cardDeckButton.disableProperty().bind(drawCardHP.isNull());
-        ticketDBGroup.disableProperty().bind(drawTicketsHP.isNull());
-
-        //Handles the distribution of cards / tickets in case the player does press on one of the button
-        cardDeckButton.setOnMouseClicked(event -> drawCardHP.get().onDrawCard(Constants.DECK_SLOT));
-        cardDeckButton.setOnMouseClicked(event -> drawTicketsHP.get().onDrawTickets());
 
         //iteration on all the slots from which cards facing up can be drawn
         for(int slot : Constants.FACE_UP_CARD_SLOTS){
 
             //Creation of the view of all faceUpCards
             StackPane faceUpCardView = new StackPane();
-
-            //According to the slot, the card is obtained via the observer
-            Card faceUpCard = obsGameState.faceUpCard(slot).getValue();
-
-            // Applies the right visual representation of the card according to its color
-            if (faceUpCard.equals(Card.LOCOMOTIVE)){
-                faceUpCardView.getStyleClass().addAll("NEUTRAL","card");
-            }
-            else {
-                faceUpCardView.getStyleClass().addAll(faceUpCard.color().name(),"card");
-            }
 
             //Creation of the shapes that make up the view of the card
             Rectangle outsideRectangle = new Rectangle(OUTSIDE_RECTANGLE_LENGTH,OUTSIDE_RECTANGLE_HEIGHT);
@@ -205,14 +162,58 @@ class DecksViewCreator {
             deckView.getChildren().add(faceUpCardView);
 
             //Adds the new card on the deck if ever a card is drawn by a player
-            obsGameState.faceUpCard(slot).addListener((prop,oldVal,newVal) -> faceUpCardView.getStyleClass().add(newVal.color().name()));
+            obsGameState.faceUpCard(slot).addListener((prop,oldVal,newVal) -> {
+                if(newVal.equals(Card.LOCOMOTIVE)){
+                    faceUpCardView.getStyleClass().addAll("NEUTRAL","card");
+                }
+                else {
+                    faceUpCardView.getStyleClass().addAll(newVal.color().name(), "card");
+                }
+            });
 
             //If the player doesn't want to draw cards, the use of the faceUpCard is disabled
             faceUpCardView.disableProperty().bind(drawCardHP.isNull());
 
             //Calls the action handler in case the players clicks on a card with his mice
             faceUpCardView.setOnMouseClicked(event -> drawCardHP.get().onDrawCard(slot));
+
+            // Applies the right visual representation of the card according to its color
+
         }
+        //Creation of the button to draw cards from the card's stock
+        Button cardDeckButton = new Button("Cartes");
+        cardDeckButton.getStyleClass().add("gauged");
+
+        //Creation of the group that contains the gauge which indicates the number of cards remaining in the stock
+        Group cardGauge = new Group();
+
+        //Creation of the shapes that make up the gauge
+        Rectangle cardGaugeBackground = new Rectangle(GAUGE_RECTANGLE_LENGTH,GAUGE_RECTANGLE_HEIGHT);
+        cardGaugeBackground.getStyleClass().add("background");
+
+        Rectangle cardGaugeForeground = new Rectangle(GAUGE_RECTANGLE_LENGTH,GAUGE_RECTANGLE_HEIGHT);
+        cardGaugeForeground.getStyleClass().add("foreground");
+
+
+        //The gauge is added as a children of the cards group, and the group is then added as a part of the button
+        //Then the Button is added as a component of the Deck's view
+        cardGauge.getChildren().addAll(cardGaugeBackground, cardGaugeForeground);
+        cardDeckButton.setGraphic(cardGauge);
+        deckView.getChildren().add(cardDeckButton);
+
+        // Use of a property to modify the view of the gauge in function of the percentage of cards remaining
+        // In the stock
+        ReadOnlyIntegerProperty cardPctProperty = obsGameState.percentageCards();
+        cardGaugeForeground.widthProperty().bind(cardPctProperty.multiply(GAUGE_RECTANGLE_LENGTH).divide(100));
+
+        //Handles the distribution of cards / tickets in case the player does press on one of the button
+        cardDeckButton.setOnMouseClicked(event -> drawCardHP.get().onDrawCard(Constants.DECK_SLOT));
+        ticketDeckButton.setOnMouseClicked(event -> drawTicketsHP.get().onDrawTickets());
+
+        //In case the player doesn't want to draw a card or a ticket, the use of the buttons is disabled
+        cardDeckButton.disableProperty().bind(drawCardHP.isNull());
+        ticketDBGroup.disableProperty().bind(drawTicketsHP.isNull());
+
         return deckView;
     }
 }

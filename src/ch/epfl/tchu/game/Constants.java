@@ -24,6 +24,11 @@ public final class Constants {
             LOCOMOTIVE_CARDS_COUNT + CAR_CARDS_COUNT * Color.COUNT;
 
     /**
+     * Nombre total de tickets dans le jeu.
+     */
+    public static final int TOTAL_TICKET_COUNT = 46;
+
+    /**
      * Ensemble de toutes les cartes (110 au total).
      */
     public static final SortedBag<Card> ALL_CARDS = computeAllCards();
