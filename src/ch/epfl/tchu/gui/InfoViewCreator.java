@@ -23,7 +23,7 @@ import java.util.Map;
 class InfoViewCreator {
 
     //constant representing the radius of a circle
-    private static int CIRCLE_RADIUS = 5;
+    private final static int CIRCLE_RADIUS = 5;
 
     /**
      * Private class constructor so that class isn't instantiable
