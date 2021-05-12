@@ -2,6 +2,8 @@ package ch.epfl.tchu.gui;
 
 import ch.epfl.tchu.SortedBag;
 import ch.epfl.tchu.game.*;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.StringExpression;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -31,6 +33,8 @@ public class GraphicalPlayer {
     private final SimpleObjectProperty<ActionHandlers.DrawTicketsHandler> drawTicketsHandler = new SimpleObjectProperty<>();
     private final SimpleObjectProperty<ActionHandlers.DrawCardHandler> drawCardHandler = new SimpleObjectProperty<>();
     private final SimpleObjectProperty<ActionHandlers.ClaimRouteHandler> claimRouteHandler = new SimpleObjectProperty<>();
+
+    private Button button;
 
     private ObservableList<Text> texts;
 
@@ -94,6 +98,40 @@ public class GraphicalPlayer {
 
     public void chooseTickets(ActionHandlers.ChooseTicketsHandler handler, SortedBag<Ticket> tickets){
         assert isFxApplicationThread();
+        Stage stage = new Stage(StageStyle.UTILITY);
+        stage.setTitle(StringsFr.TICKETS_CHOICE);
+        VBox vbox = new VBox();
+        Scene scene = new Scene(vbox);
+        scene.getStylesheets().add("chooser.css");
+        stage.initOwner(mainStage);
+        stage.initModality(Modality.WINDOW_MODAL);
+
+        TextFlow textFlow = new TextFlow();
+        ObservableList<Ticket> listTickets = FXCollections.observableList(tickets.toList());
+        ListView listView = new ListView (listTickets);
+
+        button = new Button();
+
+        String s;
+        if (tickets.size() == 1){ s=" "; }
+        else s= "s";
+
+        String introText = String.format(StringsFr.CHOOSE_TICKETS, tickets.size(), s );
+        Text text = new Text(introText);
+
+        listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
+        textFlow.getChildren().add(text);
+        stage.setScene(scene);
+        vbox.getChildren().addAll(textFlow, listView, button);
+        stage.show();
+
+        ObservableList<Ticket> selectedItems = listView.getSelectionModel().getSelectedItems();
+
+        button.disableProperty()
+                .bind(Bindings.lessThan(Bindings.size(selectedItems), Constants.DISCARDABLE_TICKETS_COUNT));
+
+
 
     }
 
@@ -104,30 +142,10 @@ public class GraphicalPlayer {
             handler.onDrawCard(i);
             emptyHandlers();
         });
-
-
     }
 
     public void chooseClaimCards(ActionHandlers.ChooseCardsHandler handler, List<SortedBag<Card>> possibleClaimCards){
         assert isFxApplicationThread();
-        Stage stage = choiceCardStage(StringsFr.CHOOSE_CARDS, possibleClaimCards);
-        stage.show();
-
-    }
-
-    public void chooseAdditionalCards(ActionHandlers.ChooseCardsHandler handler, List<SortedBag<Card>> additionalCards){
-        assert isFxApplicationThread();
-        Stage stage = choiceCardStage(StringsFr.CHOOSE_ADDITIONAL_CARDS, additionalCards);
-        stage.show();
-    }
-
-    private void emptyHandlers(){
-        this.claimRouteHandler.set(null);
-        this.drawTicketsHandler.set(null);
-        this.drawCardHandler.set(null);
-    }
-
-    private Stage choiceCardStage(String intro, List<SortedBag<Card>> choices){
         Stage stage = new Stage(StageStyle.UTILITY);
         stage.setTitle(StringsFr.CARDS_CHOICE);
         VBox vbox = new VBox();
@@ -137,12 +155,9 @@ public class GraphicalPlayer {
         stage.initModality(Modality.WINDOW_MODAL);
 
         TextFlow textFlow = new TextFlow();
-        ListView<SortedBag<Card>> listView = new ListView<SortedBag<Card>>(choices);
-        Button button = new Button();
-        Text text = new Text(intro);
-
-        //for multiple selection
-        //listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        ListView<SortedBag<Card>> listView = new ListView<SortedBag<Card>>(FXCollections.observableList(possibleClaimCards));
+        button = new Button();
+        Text text = new Text(StringsFr.CHOOSE_CARDS);
 
         listView.setCellFactory(v ->
                 new TextFieldListCell<>(new CardBagStringConverter()));
@@ -150,13 +165,17 @@ public class GraphicalPlayer {
         textFlow.getChildren().add(text);
         stage.setScene(scene);
         vbox.getChildren().addAll(textFlow, listView, button);
+        stage.show();
 
-        return stage;
+        ObservableList<SortedBag<Card>> selectedItems = listView.getSelectionModel().getSelectedItems();
+
+
     }
 
-    private Stage choiceCardStage(List<SortedBag<Ticket>> choices){
+    public void chooseAdditionalCards(ActionHandlers.ChooseCardsHandler handler, List<SortedBag<Card>> additionalCards){
+        assert isFxApplicationThread();
         Stage stage = new Stage(StageStyle.UTILITY);
-        stage.setTitle(StringsFr.TICKETS_CHOICE);
+        stage.setTitle(StringsFr.CARDS_CHOICE);
         VBox vbox = new VBox();
         Scene scene = new Scene(vbox);
         scene.getStylesheets().add("chooser.css");
@@ -164,12 +183,9 @@ public class GraphicalPlayer {
         stage.initModality(Modality.WINDOW_MODAL);
 
         TextFlow textFlow = new TextFlow();
-        ListView<SortedBag<Card>> listView = new ListView<SortedBag<Ticket>>(choices);
-        Button button = new Button();
-        Text text = new Text(StringsFr.CHOOSE_TICKETS);
-
-        //for multiple selection
-        //listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        ListView<SortedBag<Card>> listView = new ListView<SortedBag<Card>>(FXCollections.observableList(additionalCards));
+        button = new Button();
+        Text text = new Text(StringsFr.CHOOSE_ADDITIONAL_CARDS);
 
         listView.setCellFactory(v ->
                 new TextFieldListCell<>(new CardBagStringConverter()));
@@ -177,12 +193,17 @@ public class GraphicalPlayer {
         textFlow.getChildren().add(text);
         stage.setScene(scene);
         vbox.getChildren().addAll(textFlow, listView, button);
+        stage.show();
 
-        return stage;
+        ObservableList<SortedBag<Card>> selectedItems = listView.getSelectionModel().getSelectedItems();
+
     }
 
-
-
+    private void emptyHandlers(){
+        this.claimRouteHandler.set(null);
+        this.drawTicketsHandler.set(null);
+        this.drawCardHandler.set(null);
+    }
 
     private static class CardBagStringConverter extends StringConverter<SortedBag<Card>> {
         @Override
