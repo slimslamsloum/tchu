@@ -3,7 +3,6 @@ package ch.epfl.tchu.gui;
 import ch.epfl.tchu.SortedBag;
 import ch.epfl.tchu.game.*;
 import javafx.beans.binding.Bindings;
-import javafx.beans.binding.StringExpression;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -22,7 +21,6 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.StringConverter;
 
-import java.awt.*;
 import java.util.List;
 import java.util.Map;
 
@@ -36,7 +34,7 @@ public class GraphicalPlayer {
 
     private Button button;
 
-    private ObservableList<Text> texts;
+    private ObservableList<Text> texts = FXCollections.observableList(List.of());
 
     private ObservableGameState observableGameState;
 
@@ -45,8 +43,10 @@ public class GraphicalPlayer {
     public GraphicalPlayer(PlayerId playerId, Map<PlayerId, String> playerNames){
         assert isFxApplicationThread();
 
+        observableGameState=new ObservableGameState(playerId);
+
         Node infoView = InfoViewCreator.createInfoView(playerId, playerNames, observableGameState, texts);
-        Node mapView = MapViewCreator.createMapView(observableGameState, claimRouteHandler, );
+        Node mapView = MapViewCreator.createMapView(observableGameState, claimRouteHandler, (cards,handler)->chooseClaimCards(handler,cards));
         Node cardsView = DecksViewCreator.createCardsView(observableGameState, drawTicketsHandler, drawCardHandler);
         Node handView = DecksViewCreator.createHandView(observableGameState);
 
@@ -59,7 +59,6 @@ public class GraphicalPlayer {
     public void setState(PublicGameState newGameState, PlayerState newPlayerState){
         assert isFxApplicationThread();
         observableGameState.setState(newGameState, newPlayerState);
-
     }
 
     public void receiveInfo(String message){
@@ -131,8 +130,6 @@ public class GraphicalPlayer {
         button.disableProperty()
                 .bind(Bindings.lessThan(Bindings.size(selectedItems), Constants.DISCARDABLE_TICKETS_COUNT));
 
-
-
     }
 
     public void drawCard(ActionHandlers.DrawCardHandler handler){
@@ -169,6 +166,8 @@ public class GraphicalPlayer {
 
         ObservableList<SortedBag<Card>> selectedItems = listView.getSelectionModel().getSelectedItems();
 
+        button.disableProperty()
+                .bind(Bindings.equal(0, Bindings.size(selectedItems)));
 
     }
 
@@ -196,7 +195,6 @@ public class GraphicalPlayer {
         stage.show();
 
         ObservableList<SortedBag<Card>> selectedItems = listView.getSelectionModel().getSelectedItems();
-
     }
 
     private void emptyHandlers(){
