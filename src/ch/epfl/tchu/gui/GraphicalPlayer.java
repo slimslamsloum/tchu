@@ -66,6 +66,12 @@ public class GraphicalPlayer {
     public void drawCard(ActionHandlers.DrawCardHandler handler){
         assert isFxApplicationThread();
 
+        this.drawCardHandler.set(i -> {
+            handler.onDrawCard(i);
+            emptyHandlers();
+        });
+
+
     }
 
     public void chooseClaimCards(ActionHandlers.ChooseCardsHandler handler, List<SortedBag<Card>> possibleClaimCards){
