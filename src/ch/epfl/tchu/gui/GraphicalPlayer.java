@@ -3,7 +3,20 @@ package ch.epfl.tchu.gui;
 import ch.epfl.tchu.SortedBag;
 import ch.epfl.tchu.game.*;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.ObservableList;
+import javafx.scene.Node;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.ListView;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
+import java.awt.*;
 import java.util.List;
 import java.util.Map;
 
@@ -15,19 +28,36 @@ public class GraphicalPlayer {
     private final SimpleObjectProperty<ActionHandlers.DrawCardHandler> drawCardHandler = new SimpleObjectProperty<>();
     private final SimpleObjectProperty<ActionHandlers.ClaimRouteHandler> claimRouteHandler = new SimpleObjectProperty<>();
 
+    private ObservableList<Text> texts;
+
     private ObservableGameState observableGameState;
+
+    private Stage mainStage = new Stage();
 
     public GraphicalPlayer(PlayerId playerId, Map<PlayerId, String> playerNames){
         assert isFxApplicationThread();
+
+        Node infoView = InfoViewCreator.createInfoView(playerId, playerNames, observableGameState, texts);
+        Node mapView = MapViewCreator.createMapView(observableGameState, claimRouteHandler, );
+        Node cardsView = DecksViewCreator.createCardsView(observableGameState, drawTicketsHandler, drawCardHandler);
+        Node handView = DecksViewCreator.createHandView(observableGameState);
+
+        BorderPane mainPane = new BorderPane(mapView, null, cardsView, handView, infoView);
+        mainStage.setScene(new Scene(mainPane));
+        mainStage.setTitle("tChu \u2014"+playerNames.get(playerId));
+        mainStage.show();
     }
 
     public void setState(PublicGameState newGameState, PlayerState newPlayerState){
         assert isFxApplicationThread();
         observableGameState.setState(newGameState, newPlayerState);
+
     }
 
     public void receiveInfo(String message){
         assert isFxApplicationThread();
+        if (texts.size() == 5){ texts.remove(0); }
+        texts.add(new Text(message));
     }
 
     public void startTurn(ActionHandlers.DrawTicketsHandler drawTicketsHandler,
@@ -87,6 +117,28 @@ public class GraphicalPlayer {
         this.claimRouteHandler.set(null);
         this.drawTicketsHandler.set(null);
         this.drawCardHandler.set(null);
+    }
+
+    private Stage choiceCardStage(String intro, ObservableList<SortedBag<Card>> choices){
+        Stage stage = new Stage(StageStyle.UTILITY);
+        stage.setTitle(StringsFr.CARDS_CHOICE);
+        VBox vbox = new VBox();
+        Scene scene = new Scene(vbox);
+        scene.getStylesheets().add("chooser.css");
+        stage.initOwner(mainStage);
+        stage.initModality(Modality.WINDOW_MODAL);
+
+        TextFlow textFlow = new TextFlow();
+        ListView<SortedBag<Card>> listView = new ListView<SortedBag<Card>>(choices);
+        Button button = new Button();
+        Text text = new Text(intro);
+
+        textFlow.getChildren().add(text);
+        stage.setScene(scene);
+        vbox.getChildren().addAll(textFlow, listView, button);
+
+        return stage;
+
     }
 
 }
