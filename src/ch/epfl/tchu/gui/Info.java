@@ -218,7 +218,7 @@ public final class Info {
      * @param cards a set of cards
      * @return the conventional textual representation of a set of cards according to their multiplicity
      */
-    private static String setContent(SortedBag<Card> cards){
+    public static String setContent(SortedBag<Card> cards){
         StringBuilder setContent= new StringBuilder();
         int cmp = 1;
         for (Card card: cards.toSet()) {
@@ -236,4 +236,6 @@ public final class Info {
         }
         return setContent.toString();
     }
+
+
 }

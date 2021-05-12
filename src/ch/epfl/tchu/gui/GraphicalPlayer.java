@@ -3,11 +3,14 @@ package ch.epfl.tchu.gui;
 import ch.epfl.tchu.SortedBag;
 import ch.epfl.tchu.game.*;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -15,6 +18,7 @@ import javafx.scene.text.TextFlow;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.util.StringConverter;
 
 import java.awt.*;
 import java.util.List;
@@ -106,11 +110,15 @@ public class GraphicalPlayer {
 
     public void chooseClaimCards(ActionHandlers.ChooseCardsHandler handler, List<SortedBag<Card>> possibleClaimCards){
         assert isFxApplicationThread();
+        Stage stage = choiceCardStage(StringsFr.CHOOSE_CARDS, possibleClaimCards);
+        stage.show();
 
     }
 
     public void chooseAdditionalCards(ActionHandlers.ChooseCardsHandler handler, List<SortedBag<Card>> additionalCards){
         assert isFxApplicationThread();
+        Stage stage = choiceCardStage(StringsFr.CHOOSE_ADDITIONAL_CARDS, additionalCards);
+        stage.show();
     }
 
     private void emptyHandlers(){
@@ -119,7 +127,7 @@ public class GraphicalPlayer {
         this.drawCardHandler.set(null);
     }
 
-    private Stage choiceCardStage(String intro, ObservableList<SortedBag<Card>> choices){
+    private Stage choiceCardStage(String intro, List<SortedBag<Card>> choices){
         Stage stage = new Stage(StageStyle.UTILITY);
         stage.setTitle(StringsFr.CARDS_CHOICE);
         VBox vbox = new VBox();
@@ -133,12 +141,59 @@ public class GraphicalPlayer {
         Button button = new Button();
         Text text = new Text(intro);
 
+        //for multiple selection
+        //listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
+        listView.setCellFactory(v ->
+                new TextFieldListCell<>(new CardBagStringConverter()));
+
         textFlow.getChildren().add(text);
         stage.setScene(scene);
         vbox.getChildren().addAll(textFlow, listView, button);
 
         return stage;
+    }
 
+    private Stage choiceCardStage(List<SortedBag<Ticket>> choices){
+        Stage stage = new Stage(StageStyle.UTILITY);
+        stage.setTitle(StringsFr.TICKETS_CHOICE);
+        VBox vbox = new VBox();
+        Scene scene = new Scene(vbox);
+        scene.getStylesheets().add("chooser.css");
+        stage.initOwner(mainStage);
+        stage.initModality(Modality.WINDOW_MODAL);
+
+        TextFlow textFlow = new TextFlow();
+        ListView<SortedBag<Card>> listView = new ListView<SortedBag<Ticket>>(choices);
+        Button button = new Button();
+        Text text = new Text(StringsFr.CHOOSE_TICKETS);
+
+        //for multiple selection
+        //listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
+        listView.setCellFactory(v ->
+                new TextFieldListCell<>(new CardBagStringConverter()));
+
+        textFlow.getChildren().add(text);
+        stage.setScene(scene);
+        vbox.getChildren().addAll(textFlow, listView, button);
+
+        return stage;
+    }
+
+
+
+
+    private static class CardBagStringConverter extends StringConverter<SortedBag<Card>> {
+        @Override
+        public String toString(SortedBag<Card> object) {
+            return Info.setContent(object);
+        }
+
+        @Override
+        public SortedBag<Card> fromString(String string){
+            throw new UnsupportedOperationException();
+        }
     }
 
 }
