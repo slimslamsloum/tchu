@@ -6,6 +6,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.Event;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -106,29 +107,34 @@ public class GraphicalPlayer {
         stage.initModality(Modality.WINDOW_MODAL);
 
         TextFlow textFlow = new TextFlow();
-        ObservableList<Ticket> listTickets = FXCollections.observableList(tickets.toList());
-        ListView listView = new ListView (listTickets);
+        ListView<Ticket> listView = new ListView<>(FXCollections.observableList(tickets.toList()));
 
-        Button button_1 = new Button();
+        Button choiceButton = new Button();
 
-        String s;
-        if (tickets.size() == 1){ s=" "; }
-        else s= "s";
-
-        String introText = String.format(StringsFr.CHOOSE_TICKETS, tickets.size(), s );
+        int ticketBagSize = tickets.size();
+        String introText = String.format(StringsFr.CHOOSE_TICKETS, ticketBagSize, StringsFr.plural(ticketBagSize));
         Text text = new Text(introText);
 
         listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         textFlow.getChildren().add(text);
         stage.setScene(scene);
-        vbox.getChildren().addAll(textFlow, listView, button_1);
+        vbox.getChildren().addAll(textFlow, listView, choiceButton);
         stage.show();
 
-        ObservableList<Ticket> selectedItems = listView.getSelectionModel().getSelectedItems();
+        choiceButton.disableProperty()
+                .bind(Bindings.equal(0, Bindings.size(listView.getSelectionModel().getSelectedItems())));
 
-        button_1.disableProperty()
-                .bind(Bindings.lessThan(Bindings.size(selectedItems), Constants.DISCARDABLE_TICKETS_COUNT));
+        choiceButton.setOnAction(event -> {
+            stage.hide();
+            List<Ticket> ticketList = listView.getSelectionModel().getSelectedItems();
+            SortedBag.Builder<Ticket> ticketBuilder = new SortedBag.Builder<>();
+            for (Ticket ticket : ticketList) {
+                ticketBuilder.add(ticket);
+            }
+            handler.onChooseTickets(ticketBuilder.build());
+        });
+        stage.setOnCloseRequest(Event::consume);
 
     }
 
@@ -152,8 +158,8 @@ public class GraphicalPlayer {
         stage.initModality(Modality.WINDOW_MODAL);
 
         TextFlow textFlow = new TextFlow();
-        ListView<SortedBag<Card>> listView = new ListView<SortedBag<Card>>(FXCollections.observableList(possibleClaimCards));
-        Button button_2 = new Button();
+        ListView<SortedBag<Card>> listView = new ListView<>(FXCollections.observableList(possibleClaimCards));
+        Button choiceButton = new Button();
         Text text = new Text(StringsFr.CHOOSE_CARDS);
 
         listView.setCellFactory(v ->
@@ -161,14 +167,17 @@ public class GraphicalPlayer {
 
         textFlow.getChildren().add(text);
         stage.setScene(scene);
-        vbox.getChildren().addAll(textFlow, listView, button_2);
+        vbox.getChildren().addAll(textFlow, listView, choiceButton);
         stage.show();
 
-        ObservableList<SortedBag<Card>> selectedItems = listView.getSelectionModel().getSelectedItems();
+        choiceButton.disableProperty()
+                .bind(Bindings.equal(0, Bindings.size(listView.getSelectionModel().getSelectedItems())));
 
-        button_2.disableProperty()
-                .bind(Bindings.equal(0, Bindings.size(selectedItems)));
-
+        stage.setOnCloseRequest(Event::consume);
+        choiceButton.setOnAction(event -> {
+            stage.hide();
+            handler.onChooseCards(listView.getSelectionModel().getSelectedItem());
+        });
     }
 
     public void chooseAdditionalCards(ActionHandlers.ChooseCardsHandler handler, List<SortedBag<Card>> additionalCards){
@@ -182,8 +191,8 @@ public class GraphicalPlayer {
         stage.initModality(Modality.WINDOW_MODAL);
 
         TextFlow textFlow = new TextFlow();
-        ListView<SortedBag<Card>> listView = new ListView<SortedBag<Card>>(FXCollections.observableList(additionalCards));
-        Button button_3 = new Button();
+        ListView<SortedBag<Card>> listView = new ListView<>(FXCollections.observableList(additionalCards));
+        Button choiceButton = new Button();
         Text text = new Text(StringsFr.CHOOSE_ADDITIONAL_CARDS);
 
         listView.setCellFactory(v ->
@@ -191,9 +200,17 @@ public class GraphicalPlayer {
 
         textFlow.getChildren().add(text);
         stage.setScene(scene);
-        vbox.getChildren().addAll(textFlow, listView, button_3);
+        vbox.getChildren().addAll(textFlow, listView, choiceButton);
         stage.show();
 
+        choiceButton.disableProperty()
+                .bind(Bindings.equal(0, Bindings.size(listView.getSelectionModel().getSelectedItems())));
+
+        stage.setOnCloseRequest(Event::consume);
+        choiceButton.setOnAction(event -> {
+            stage.hide();
+            handler.onChooseCards(listView.getSelectionModel().getSelectedItem());
+        });
     }
 
     private void emptyHandlers(){
