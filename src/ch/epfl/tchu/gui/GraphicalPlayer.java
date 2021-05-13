@@ -21,6 +21,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.StringConverter;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -32,9 +33,7 @@ public class GraphicalPlayer {
     private final SimpleObjectProperty<ActionHandlers.DrawCardHandler> drawCardHandler = new SimpleObjectProperty<>();
     private final SimpleObjectProperty<ActionHandlers.ClaimRouteHandler> claimRouteHandler = new SimpleObjectProperty<>();
 
-    private Button button;
-
-    private ObservableList<Text> texts = FXCollections.observableList(List.of());
+    private ObservableList<Text> texts = FXCollections.observableList(new ArrayList<>());
 
     private ObservableGameState observableGameState;
 
@@ -81,16 +80,17 @@ public class GraphicalPlayer {
         else{ this.drawTicketsHandler.set(null); }
 
         this.claimRouteHandler.set((route,cards) ->{
-            this.claimRouteHandler.get().onClaimRoute(route, cards);
+            claimRouteHandler.onClaimRoute(route, cards);
             emptyHandlers();
          });
 
         this.drawTicketsHandler.set(() -> {
+            drawTicketsHandler.onDrawTickets();
             emptyHandlers();
         });
 
         this.drawCardHandler.set( i -> {
-            this.drawCardHandler.get().onDrawCard(i);
+            drawCardHandler.onDrawCard(i);
             emptyHandlers();
         } );
     }
@@ -109,7 +109,7 @@ public class GraphicalPlayer {
         ObservableList<Ticket> listTickets = FXCollections.observableList(tickets.toList());
         ListView listView = new ListView (listTickets);
 
-        button = new Button();
+        Button button_1 = new Button();
 
         String s;
         if (tickets.size() == 1){ s=" "; }
@@ -122,12 +122,12 @@ public class GraphicalPlayer {
 
         textFlow.getChildren().add(text);
         stage.setScene(scene);
-        vbox.getChildren().addAll(textFlow, listView, button);
+        vbox.getChildren().addAll(textFlow, listView, button_1);
         stage.show();
 
         ObservableList<Ticket> selectedItems = listView.getSelectionModel().getSelectedItems();
 
-        button.disableProperty()
+        button_1.disableProperty()
                 .bind(Bindings.lessThan(Bindings.size(selectedItems), Constants.DISCARDABLE_TICKETS_COUNT));
 
     }
@@ -153,7 +153,7 @@ public class GraphicalPlayer {
 
         TextFlow textFlow = new TextFlow();
         ListView<SortedBag<Card>> listView = new ListView<SortedBag<Card>>(FXCollections.observableList(possibleClaimCards));
-        button = new Button();
+        Button button_2 = new Button();
         Text text = new Text(StringsFr.CHOOSE_CARDS);
 
         listView.setCellFactory(v ->
@@ -161,12 +161,12 @@ public class GraphicalPlayer {
 
         textFlow.getChildren().add(text);
         stage.setScene(scene);
-        vbox.getChildren().addAll(textFlow, listView, button);
+        vbox.getChildren().addAll(textFlow, listView, button_2);
         stage.show();
 
         ObservableList<SortedBag<Card>> selectedItems = listView.getSelectionModel().getSelectedItems();
 
-        button.disableProperty()
+        button_2.disableProperty()
                 .bind(Bindings.equal(0, Bindings.size(selectedItems)));
 
     }
@@ -183,7 +183,7 @@ public class GraphicalPlayer {
 
         TextFlow textFlow = new TextFlow();
         ListView<SortedBag<Card>> listView = new ListView<SortedBag<Card>>(FXCollections.observableList(additionalCards));
-        button = new Button();
+        Button button_3 = new Button();
         Text text = new Text(StringsFr.CHOOSE_ADDITIONAL_CARDS);
 
         listView.setCellFactory(v ->
@@ -191,10 +191,9 @@ public class GraphicalPlayer {
 
         textFlow.getChildren().add(text);
         stage.setScene(scene);
-        vbox.getChildren().addAll(textFlow, listView, button);
+        vbox.getChildren().addAll(textFlow, listView, button_3);
         stage.show();
 
-        ObservableList<SortedBag<Card>> selectedItems = listView.getSelectionModel().getSelectedItems();
     }
 
     private void emptyHandlers(){
