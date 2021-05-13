@@ -80,8 +80,8 @@ public class GraphicalPlayer {
         if(observableGameState.canDrawTickets()){ this.drawTicketsHandler.set(drawTicketsHandler);}
         else{ this.drawTicketsHandler.set(null); }
 
-        this.claimRouteHandler.set((cards,route) ->{
-            claimRouteHandler.onClaimRoute(cards,route);
+        this.claimRouteHandler.set((route,cards) ->{
+            this.claimRouteHandler.get().onClaimRoute(route, cards);
             emptyHandlers();
          });
 
@@ -90,7 +90,7 @@ public class GraphicalPlayer {
         });
 
         this.drawCardHandler.set( i -> {
-            drawCardHandler.onDrawCard(i);
+            this.drawCardHandler.get().onDrawCard(i);
             emptyHandlers();
         } );
     }
