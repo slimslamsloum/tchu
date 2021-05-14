@@ -114,7 +114,7 @@ class MapViewCreator {
             //Allow the players to take the route with their mouse
             routeGroup.setOnMouseClicked(
                     e -> {
-                        List<SortedBag<Card>> possibleClaimCards = route.possibleClaimCards();
+                        List<SortedBag<Card>> possibleClaimCards = observableGameState.playerstate(route);
                         ClaimRouteHandler claimRouteH = claimRouteHandlerProperty.get();
                         //If the player has only one choice, the route is automatically taken with these cards
                         if (possibleClaimCards.size() == 1) {

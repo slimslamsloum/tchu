@@ -1,5 +1,6 @@
 package ch.epfl.tchu.gui;
 
+import ch.epfl.tchu.SortedBag;
 import ch.epfl.tchu.game.*;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
@@ -272,6 +273,15 @@ public class ObservableGameState {
             map.put(card, new SimpleIntegerProperty());
         }
         return map;
+    }
+
+    /**
+     * Returns possible claim cards given a certain route, using player state
+     * @param route route to be checked
+     * @return possible claim cards to claim the route
+     */
+    public List<SortedBag<Card>> playerstate (Route route){
+        return playerState.possibleClaimCards(route);
     }
 
     /**
