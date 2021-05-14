@@ -288,15 +288,15 @@ public class GraphicalPlayer {
             case 2:
                 stage.setTitle(StringsFr.CARDS_CHOICE);
                 text = new Text(StringsFr.CHOOSE_CARDS);
-                listView.setCellFactory(v ->
-                        new TextFieldListCell<>(new CardBagStringConverter()));
+                //listView.setCellFactory(v ->
+                  //      new TextFieldListCell<>(new CardBagStringConverter()));
                 break;
 
             case 3:
                 stage.setTitle(StringsFr.CARDS_CHOICE);
                 text = new Text(StringsFr.CHOOSE_ADDITIONAL_CARDS);
-                listView.setCellFactory(v ->
-                        new TextFieldListCell<>(new CardBagStringConverter()));
+                //listView.setCellFactory(v ->
+                  //      new TextFieldListCell<>(new CardBagStringConverter()));
                 break;
         }
 
@@ -305,8 +305,23 @@ public class GraphicalPlayer {
         vbox.getChildren().addAll(textFlow, listView, choiceButton);
         stage.show();
 
+        switch (i){
+            case 1:
+
+                break;
+
+            case 2:
+
+                break;
+
+            case 3:
+
+                break;
+        }
 
 
+
+        return stage;
     }
 
     /**
