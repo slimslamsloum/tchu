@@ -91,7 +91,7 @@ public class GraphicalPlayer {
      */
     public void receiveInfo(String message){
         assert isFxApplicationThread();
-        if (texts.size() == Constants.MAX_MESSAGE_DISPLAYED){ texts.remove(0); }
+        if (texts.size() == GuiConstants.MAX_MESSAGE_DISPLAYED){ texts.remove(0); }
         texts.add(new Text(message));
     }
 

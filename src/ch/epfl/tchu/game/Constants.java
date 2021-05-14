@@ -110,8 +110,4 @@ public final class Constants {
      */
     public static final int LONGEST_TRAIL_BONUS_POINTS = 10;
 
-    /**
-     * Nombre de messages maximum qui s'affichent sur l'ecran.
-     */
-    public static final int MAX_MESSAGE_DISPLAYED = 5;
 }
