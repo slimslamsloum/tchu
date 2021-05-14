@@ -35,7 +35,6 @@ import static javafx.application.Platform.isFxApplicationThread;
  * @author Selim Jerad (327529)
  */
 
-
 public class GraphicalPlayer {
 
     //We need to 3 handlers that are in properties to handle the startTurn method
@@ -151,9 +150,7 @@ public class GraphicalPlayer {
 
         TextFlow textFlow = new TextFlow();
         ListView<Ticket> listView = new ListView<>(FXCollections.observableList(tickets.toList()));
-
         Button choiceButton = new Button();
-
         int ticketBagSize = tickets.size();
         String introText = String.format(StringsFr.CHOOSE_TICKETS, ticketBagSize, StringsFr.plural(ticketBagSize));
         Text text = new Text(introText);
@@ -268,6 +265,48 @@ public class GraphicalPlayer {
             stage.hide();
             handler.onChooseCards(listView.getSelectionModel().getSelectedItem());
         });
+    }
+
+    private <T extends Comparable<T>> Stage choiceStage(int i, List<SortedBag<T>> items){
+        Stage stage = new Stage(StageStyle.UTILITY);
+        VBox vbox = new VBox();
+        Scene scene = new Scene(vbox);
+        scene.getStylesheets().add("chooser.css");
+        stage.initOwner(mainStage);
+        stage.initModality(Modality.WINDOW_MODAL);
+
+        TextFlow textFlow = new TextFlow();
+        ListView<SortedBag<T>> listView = new ListView<>(FXCollections.observableList(items));
+        Button choiceButton = new Button();
+        Text text = new Text();
+
+        switch (i){
+            case 1:
+                stage.setTitle(StringsFr.TICKETS_CHOICE);
+                break;
+
+            case 2:
+                stage.setTitle(StringsFr.CARDS_CHOICE);
+                text = new Text(StringsFr.CHOOSE_CARDS);
+                listView.setCellFactory(v ->
+                        new TextFieldListCell<>(new CardBagStringConverter()));
+                break;
+
+            case 3:
+                stage.setTitle(StringsFr.CARDS_CHOICE);
+                text = new Text(StringsFr.CHOOSE_ADDITIONAL_CARDS);
+                listView.setCellFactory(v ->
+                        new TextFieldListCell<>(new CardBagStringConverter()));
+                break;
+        }
+
+        textFlow.getChildren().add(text);
+        stage.setScene(scene);
+        vbox.getChildren().addAll(textFlow, listView, choiceButton);
+        stage.show();
+
+
+
     }
 
     /**
