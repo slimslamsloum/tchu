@@ -28,58 +28,96 @@ import java.util.Map;
 
 import static javafx.application.Platform.isFxApplicationThread;
 
+/**
+ * Graphical player
+ *
+ * @author Alexandre Kambiz Gunter (324268)
+ * @author Selim Jerad (327529)
+ */
+
+
 public class GraphicalPlayer {
 
+    //We need to 3 handlers that are in properties to handle the startTurn method
     private final SimpleObjectProperty<ActionHandlers.DrawTicketsHandler> drawTicketsHandler = new SimpleObjectProperty<>();
     private final SimpleObjectProperty<ActionHandlers.DrawCardHandler> drawCardHandler = new SimpleObjectProperty<>();
     private final SimpleObjectProperty<ActionHandlers.ClaimRouteHandler> claimRouteHandler = new SimpleObjectProperty<>();
 
+    //observable list of texts that will be displayed in the InfoView
     private ObservableList<Text> texts = FXCollections.observableList(new ArrayList<>());
 
+    //Observable state of the game in an attribute
     private ObservableGameState observableGameState;
 
+    //main stage of the game
     private Stage mainStage = new Stage();
 
+    /**
+     * Graphical player constructor
+     * @param playerId playerId of the player watching the game
+     * @param playerNames map of the player names associated to the playerIds
+     */
     public GraphicalPlayer(PlayerId playerId, Map<PlayerId, String> playerNames){
         assert isFxApplicationThread();
 
         observableGameState=new ObservableGameState(playerId);
 
+        //creation of the view of the map, info, cards and hand
         Node infoView = InfoViewCreator.createInfoView(playerId, playerNames, observableGameState, texts);
         Node mapView = MapViewCreator.createMapView(observableGameState, claimRouteHandler, (cards,handler)->chooseClaimCards(handler,cards));
         Node cardsView = DecksViewCreator.createCardsView(observableGameState, drawTicketsHandler, drawCardHandler);
         Node handView = DecksViewCreator.createHandView(observableGameState);
 
+        //creation of the borderpane, which will be associated with mainStage
         BorderPane mainPane = new BorderPane(mapView, null, cardsView, handView, infoView);
         mainStage.setScene(new Scene(mainPane));
         mainStage.setTitle("tChu \u2014"+playerNames.get(playerId));
         mainStage.show();
     }
 
+    /**
+     * Call to the method setStage in observableGameState
+     * @param newGameState the new game state
+     * @param newPlayerState the new player state
+     */
     public void setState(PublicGameState newGameState, PlayerState newPlayerState){
         assert isFxApplicationThread();
         observableGameState.setState(newGameState, newPlayerState);
     }
 
+    /**
+     * Adds a message to the list of messages displayed on screen, with a maximum of 5 messages displayed.
+     * @param message message to be added to the list
+     */
     public void receiveInfo(String message){
         assert isFxApplicationThread();
-        if (texts.size() == 5){ texts.remove(0); }
+        if (texts.size() == Constants.MAX_MESSAGE_DISPLAYED){ texts.remove(0); }
         texts.add(new Text(message));
     }
 
+    /**
+     * Method that handles the start of a player's turn
+     * @param drawTicketsHandler handler for drawing tickets
+     * @param drawCardHandler handler for drawing cards
+     * @param claimRouteHandler handler for claiming a route
+     */
     public void startTurn(ActionHandlers.DrawTicketsHandler drawTicketsHandler,
                           ActionHandlers.DrawCardHandler drawCardHandler,
                           ActionHandlers.ClaimRouteHandler claimRouteHandler){
         assert isFxApplicationThread();
 
+        //claimRouteHandler is always filled
         this.claimRouteHandler.set(claimRouteHandler);
 
+        //drawCardHandler is filled only if player can draw cards
         if(observableGameState.canDrawCards()){ this.drawCardHandler.set(drawCardHandler); }
         else{ this.drawCardHandler.set(null); }
 
+        //drawTicketsHandler is filled only if player can draw tickets
         if(observableGameState.canDrawTickets()){ this.drawTicketsHandler.set(drawTicketsHandler);}
         else{ this.drawTicketsHandler.set(null); }
 
+        //independent of which handler is called, all handlers are then set to null with the method emptyHandlers
         this.claimRouteHandler.set((route,cards) ->{
             claimRouteHandler.onClaimRoute(route, cards);
             emptyHandlers();
@@ -96,6 +134,11 @@ public class GraphicalPlayer {
         } );
     }
 
+    /**
+     * Method that handles the tab when a player is choosing tickets
+     * @param handler ticket handler
+     * @param tickets all the tickets from which the player can choose from
+     */
     public void chooseTickets(ActionHandlers.ChooseTicketsHandler handler, SortedBag<Ticket> tickets){
         assert isFxApplicationThread();
         Stage stage = new Stage(StageStyle.UTILITY);
@@ -138,6 +181,10 @@ public class GraphicalPlayer {
 
     }
 
+    /**
+     * Method that is called when the player is drawing a card for the second time
+     * @param handler drawCard handler
+     */
     public void drawCard(ActionHandlers.DrawCardHandler handler){
         assert isFxApplicationThread();
 
@@ -147,6 +194,11 @@ public class GraphicalPlayer {
         });
     }
 
+    /**
+     * Method that handles the tab when the player decides to choose the cards to claim a route
+     * @param handler chooseCardsHandler
+     * @param possibleClaimCards list of possible SortedBags of cards from which the player can choose from
+     */
     public void chooseClaimCards(ActionHandlers.ChooseCardsHandler handler, List<SortedBag<Card>> possibleClaimCards){
         assert isFxApplicationThread();
         Stage stage = new Stage(StageStyle.UTILITY);
@@ -180,6 +232,11 @@ public class GraphicalPlayer {
         });
     }
 
+    /**
+     * Method that handles the tab when a player chooses additional cards (when attempting to claim a tunnel)
+     * @param handler chooseCardsHandler
+     * @param additionalCards list of possible SortedBags of additional cards from which the player can choose from
+     */
     public void chooseAdditionalCards(ActionHandlers.ChooseCardsHandler handler, List<SortedBag<Card>> additionalCards){
         assert isFxApplicationThread();
         Stage stage = new Stage(StageStyle.UTILITY);
@@ -213,12 +270,18 @@ public class GraphicalPlayer {
         });
     }
 
+    /**
+     * Private method that sets the 3 handlers to null
+     */
     private void emptyHandlers(){
         this.claimRouteHandler.set(null);
         this.drawTicketsHandler.set(null);
         this.drawCardHandler.set(null);
     }
 
+    /**
+     * Nested static class to give textual representation of a sorted bag of cards
+     */
     private static class CardBagStringConverter extends StringConverter<SortedBag<Card>> {
         @Override
         public String toString(SortedBag<Card> object) {

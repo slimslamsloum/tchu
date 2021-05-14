@@ -109,4 +109,9 @@ public final class Constants {
      * Nombre de points bonus obtenus par le(s) joueur(s) disposant du plus long chemin.
      */
     public static final int LONGEST_TRAIL_BONUS_POINTS = 10;
+
+    /**
+     * Nombre de messages maximum qui s'affichent sur l'ecran.
+     */
+    public static final int MAX_MESSAGE_DISPLAYED = 5;
 }
