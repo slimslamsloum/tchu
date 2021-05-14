@@ -212,7 +212,7 @@ class DecksViewCreator {
 
         //In case the player doesn't want to draw a card or a ticket, the use of the buttons is disabled
         cardDeckButton.disableProperty().bind(drawCardHP.isNull());
-        ticketDBGroup.disableProperty().bind(drawTicketsHP.isNull());
+        ticketDeckButton.disableProperty().bind(drawTicketsHP.isNull());
 
         return deckView;
     }
