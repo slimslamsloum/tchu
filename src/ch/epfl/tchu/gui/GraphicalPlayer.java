@@ -116,7 +116,7 @@ public class GraphicalPlayer {
         if(observableGameState.canDrawTickets()){ this.drawTicketsHandler.set(drawTicketsHandler);}
         else{ this.drawTicketsHandler.set(null); }
 
-        //independent of which handler is called, all handlers are then set to null with the method emptyHandlers
+        //independently of which handler is called, all handlers are then set to null with the method emptyHandlers
         this.claimRouteHandler.set((route,cards) ->{
             claimRouteHandler.onClaimRoute(route, cards);
             emptyHandlers();
@@ -140,31 +140,24 @@ public class GraphicalPlayer {
      */
     public void chooseTickets(ActionHandlers.ChooseTicketsHandler handler, SortedBag<Ticket> tickets){
         assert isFxApplicationThread();
-        Stage stage = new Stage(StageStyle.UTILITY);
-        stage.setTitle(StringsFr.TICKETS_CHOICE);
-        VBox vbox = new VBox();
-        Scene scene = new Scene(vbox);
-        scene.getStylesheets().add("chooser.css");
-        stage.initOwner(mainStage);
-        stage.initModality(Modality.WINDOW_MODAL);
 
-        TextFlow textFlow = new TextFlow();
+        //listView, button and intro Text are created
         ListView<Ticket> listView = new ListView<>(FXCollections.observableList(tickets.toList()));
         Button choiceButton = new Button();
         int ticketBagSize = tickets.size();
         String introText = String.format(StringsFr.CHOOSE_TICKETS, ticketBagSize, StringsFr.plural(ticketBagSize));
-        Text text = new Text(introText);
 
+        //stage is created with auxiliary method choiceStage
+        Stage stage = choiceStage(listView, StringsFr.TICKETS_CHOICE, introText, choiceButton);
+
+        //selection mode becomes MULTIPLE
         listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-        textFlow.getChildren().add(text);
-        stage.setScene(scene);
-        vbox.getChildren().addAll(textFlow, listView, choiceButton);
-        stage.show();
-
+        //choiceButton is disabled while player hasn't selected more or exactly ticketBagSize-2 tickets
         choiceButton.disableProperty()
-                .bind(Bindings.equal(0, Bindings.size(listView.getSelectionModel().getSelectedItems())));
+                .bind(Bindings.lessThan(ticketBagSize-2, Bindings.size(listView.getSelectionModel().getSelectedItems())));
 
+        //tab can't be closed while picking tickets
         choiceButton.setOnAction(event -> {
             stage.hide();
             List<Ticket> ticketList = listView.getSelectionModel().getSelectedItems();
@@ -175,7 +168,6 @@ public class GraphicalPlayer {
             handler.onChooseTickets(ticketBuilder.build());
         });
         stage.setOnCloseRequest(Event::consume);
-
     }
 
     /**
@@ -198,30 +190,17 @@ public class GraphicalPlayer {
      */
     public void chooseClaimCards(ActionHandlers.ChooseCardsHandler handler, List<SortedBag<Card>> possibleClaimCards){
         assert isFxApplicationThread();
-        Stage stage = new Stage(StageStyle.UTILITY);
-        stage.setTitle(StringsFr.CARDS_CHOICE);
-        VBox vbox = new VBox();
-        Scene scene = new Scene(vbox);
-        scene.getStylesheets().add("chooser.css");
-        stage.initOwner(mainStage);
-        stage.initModality(Modality.WINDOW_MODAL);
-
-        TextFlow textFlow = new TextFlow();
+        //listView, choiceButton and stage are created
         ListView<SortedBag<Card>> listView = new ListView<>(FXCollections.observableList(possibleClaimCards));
         Button choiceButton = new Button();
-        Text text = new Text(StringsFr.CHOOSE_CARDS);
+        //stage is created with auxiliary method choiceStage
+        Stage stage = choiceStage(listView, StringsFr.CARDS_CHOICE, StringsFr.CHOOSE_CARDS, choiceButton);
 
-        listView.setCellFactory(v ->
-                new TextFieldListCell<>(new CardBagStringConverter()));
-
-        textFlow.getChildren().add(text);
-        stage.setScene(scene);
-        vbox.getChildren().addAll(textFlow, listView, choiceButton);
-        stage.show();
-
+        //button is disabled while player hasn't chosen a combination of cards
         choiceButton.disableProperty()
                 .bind(Bindings.equal(0, Bindings.size(listView.getSelectionModel().getSelectedItems())));
 
+        //tab can't be closed while picking cards
         stage.setOnCloseRequest(Event::consume);
         choiceButton.setOnAction(event -> {
             stage.hide();
@@ -236,30 +215,14 @@ public class GraphicalPlayer {
      */
     public void chooseAdditionalCards(ActionHandlers.ChooseCardsHandler handler, List<SortedBag<Card>> additionalCards){
         assert isFxApplicationThread();
-        Stage stage = new Stage(StageStyle.UTILITY);
-        stage.setTitle(StringsFr.CARDS_CHOICE);
-        VBox vbox = new VBox();
-        Scene scene = new Scene(vbox);
-        scene.getStylesheets().add("chooser.css");
-        stage.initOwner(mainStage);
-        stage.initModality(Modality.WINDOW_MODAL);
 
-        TextFlow textFlow = new TextFlow();
+        //listView, button and stage are created
         ListView<SortedBag<Card>> listView = new ListView<>(FXCollections.observableList(additionalCards));
         Button choiceButton = new Button();
-        Text text = new Text(StringsFr.CHOOSE_ADDITIONAL_CARDS);
+        //stage is created with choiceStage method
+        Stage stage = choiceStage(listView, StringsFr.CARDS_CHOICE, StringsFr.CHOOSE_ADDITIONAL_CARDS, choiceButton);
 
-        listView.setCellFactory(v ->
-                new TextFieldListCell<>(new CardBagStringConverter()));
-
-        textFlow.getChildren().add(text);
-        stage.setScene(scene);
-        vbox.getChildren().addAll(textFlow, listView, choiceButton);
-        stage.show();
-
-        choiceButton.disableProperty()
-                .bind(Bindings.equal(0, Bindings.size(listView.getSelectionModel().getSelectedItems())));
-
+        //tab can't be closed while picking cards
         stage.setOnCloseRequest(Event::consume);
         choiceButton.setOnAction(event -> {
             stage.hide();
@@ -267,59 +230,43 @@ public class GraphicalPlayer {
         });
     }
 
-    private <T extends Comparable<T>> Stage choiceStage(int i, List<SortedBag<T>> items){
+    /**
+     * method that constructs a tab when a player is drawing tickets, or claiming a route
+     * @param listView View of the list of items (cards or tickets)
+     * @param title title of the tab
+     * @param intro intro text
+     * @param choiceButton button of the tab
+     * @return stage of the new tab
+     */
+    private Stage choiceStage(ListView listView, String title, String intro, Button choiceButton){
+
+        //creation of stage, vbox. scene, textflow
         Stage stage = new Stage(StageStyle.UTILITY);
         VBox vbox = new VBox();
         Scene scene = new Scene(vbox);
         scene.getStylesheets().add("chooser.css");
         stage.initOwner(mainStage);
         stage.initModality(Modality.WINDOW_MODAL);
-
         TextFlow textFlow = new TextFlow();
-        ListView<SortedBag<T>> listView = new ListView<>(FXCollections.observableList(items));
-        Button choiceButton = new Button();
-        Text text = new Text();
 
-        switch (i){
-            case 1:
-                stage.setTitle(StringsFr.TICKETS_CHOICE);
-                break;
+        //stage is given new title
+        stage.setTitle(title);
 
-            case 2:
-                stage.setTitle(StringsFr.CARDS_CHOICE);
-                text = new Text(StringsFr.CHOOSE_CARDS);
-                //listView.setCellFactory(v ->
-                  //      new TextFieldListCell<>(new CardBagStringConverter()));
-                break;
+        //textual representation of elements in listView are converted with CardBagStringConverter class only
+        //if player isn't drawing tickets
+        if (!title.equals(StringsFr.TICKETS_CHOICE)){
+            listView.setCellFactory(v ->
+                    new TextFieldListCell<>(new CardBagStringConverter()));
 
-            case 3:
-                stage.setTitle(StringsFr.CARDS_CHOICE);
-                text = new Text(StringsFr.CHOOSE_ADDITIONAL_CARDS);
-                //listView.setCellFactory(v ->
-                  //      new TextFieldListCell<>(new CardBagStringConverter()));
-                break;
         }
 
-        textFlow.getChildren().add(text);
+        //intro text is added
+        textFlow.getChildren().add(new Text(intro));
+
+        //vbox children are created, stage is then shown
         stage.setScene(scene);
         vbox.getChildren().addAll(textFlow, listView, choiceButton);
         stage.show();
-
-        switch (i){
-            case 1:
-
-                break;
-
-            case 2:
-
-                break;
-
-            case 3:
-
-                break;
-        }
-
-
 
         return stage;
     }
@@ -349,3 +296,4 @@ public class GraphicalPlayer {
     }
 
 }
+
