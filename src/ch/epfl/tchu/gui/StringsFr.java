@@ -77,9 +77,7 @@ public final class StringsFr {
     /**
      * Retourne une chaîne marquant le pluriel, ou la chaîne vide.
      * @param value la valeur déterminant la chaîne retournée
-     * @return la chaîne vide si la valeur vaut ±1, la chaîne "s" sinon
+     * @return la chaîne vide si la valeur vaut ±1 ou 0, la chaîne "s" sinon
      */
-    public static String plural(int value) {
-        return Math.abs(value) == 1 ? "" : "s";
-    }
+    public static String plural(int value) { return Math.abs(value) == 1 && value != 0 ? "" : "s"; }
 }

@@ -62,11 +62,9 @@ public class PublicGameState {
 
     /**
      * Asks if player can draw cards
-     * @return true if discard size + deck size is bigger than 5 (i.e total size >10), else returns false
+     * @return true if discard size + deck size is bigger than 5, else returns false
      */
-    public boolean canDrawCards(){
-        return cardState.totalSize() >= 10;
-    }
+    public boolean canDrawCards(){ return cardState.discardsSize()+cardState.deckSize() >= 5; }
 
     /**
      * Current player ID getter

@@ -35,12 +35,6 @@ public class PublicCardState{
     }
 
     /**
-     * Methods that computes total number of cards (face up, deck and discard)
-     * @return the sum of the sizes of the face up cards, the deck size, and the discard pile size
-     */
-    public int totalSize(){ return faceUpCards.size()+deckSize+discardsSize; }
-
-    /**
      * Methods that returns face up card at a certain index
      * @param slot of the desired card
      * @return the card at index slot

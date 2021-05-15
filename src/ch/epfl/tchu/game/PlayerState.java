@@ -96,24 +96,6 @@ public final class PlayerState extends PublicPlayerState {
     }
 
     /**
-     * Adds several cards to a player state
-     * @param additionalCards to be added to the list of cards
-     * @return identical player state, except that the cards that have been given as argument have been added to the
-     * previous list of cards
-     */
-    public PlayerState withAddedCards(SortedBag<Card> additionalCards){
-        List<Card> listWithCard = cards.toList();
-        for (Card card: additionalCards){
-            listWithCard.add(card);
-        }
-        SortedBag.Builder<Card> new_Builder = new SortedBag.Builder<>();
-        for (Card single_card : listWithCard){
-            new_Builder.add(single_card);
-        }
-        return new PlayerState(tickets, new_Builder.build(), routes);
-    }
-
-    /**
      * Method that verifies if a player can claim a given route or not
      * @param route road claimed by the player
      * @return true if the route can be claimed, false if it can't. A route can be claimed if the player has the necessary cars
@@ -152,7 +134,6 @@ public final class PlayerState extends PublicPlayerState {
      * Method that gives the cards a player has to burn when trying to claim a tunnel
      * @param additionalCardsCount the number of cards the player has to add
      * @param initialCards the initial cards used to take the tunnel
-     * @param drawnCards the cards drawn from the stock
      * @return all possible additional cards that the player has to add
      */
     public List<SortedBag<Card>> possibleAdditionalCards(int additionalCardsCount, SortedBag<Card> initialCards, SortedBag<Card> drawnCards){

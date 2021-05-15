@@ -35,6 +35,9 @@ import static javafx.application.Platform.isFxApplicationThread;
  * @author Selim Jerad (327529)
  */
 
+//all public methods assert that they are called within the JavaFX thread, because it is imperative that only
+//this thread controls the graphical interface
+
 public class GraphicalPlayer {
 
     //We need to 3 handlers that are in properties to handle the startTurn method
