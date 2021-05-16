@@ -12,6 +12,8 @@ import static javafx.application.Platform.runLater;
 
 public class GraphicalPlayerAdapter implements Player {
 
+    //attributes needed for the graphical player adapter: several blocking queues (for cards, tickets routes, etc)
+    //and a graphical player
     GraphicalPlayer graphicalPlayer;
     BlockingQueue<SortedBag<Ticket>> ticketsQueue;
     BlockingQueue<TurnKind> turnKindQueue;
@@ -19,6 +21,9 @@ public class GraphicalPlayerAdapter implements Player {
     BlockingQueue<SortedBag<Card>> cardsQueue;
     BlockingQueue<Integer> cardPlacementsQueue;
 
+    /**
+     *Graphical player adapter constructor, which initiates all blocking queues to array blocking queues of size 1
+     */
     public GraphicalPlayerAdapter(){
         ticketsQueue = new ArrayBlockingQueue<>(1);
         turnKindQueue = new ArrayBlockingQueue<>(1);
@@ -110,7 +115,6 @@ public class GraphicalPlayerAdapter implements Player {
 
     @Override
     public SortedBag<Card> chooseAdditionalCards(List<SortedBag<Card>> options) {
-
         ActionHandlers.ChooseCardsHandler chooseCardsHandler = (cards) ->{
             try{cardsQueue.put(cards);}
             catch(InterruptedException e){ throw new Error(); }
@@ -120,6 +124,13 @@ public class GraphicalPlayerAdapter implements Player {
         return cardsQueue.peek();
     }
 
+    /**
+     * Method returning the element in a queue
+     * @param blockingQueue queue in argument
+     * @param <T> type parameter used in the queue
+     * @return only element in the queue, while also removing it from the queue
+     * @throws Error if an InterruptedException is caught
+     */
     private <T> T retrieveFromQueue(BlockingQueue<T> blockingQueue){
         try{
             return blockingQueue.take();
@@ -129,6 +140,13 @@ public class GraphicalPlayerAdapter implements Player {
         }
     }
 
+    /**
+     * Puts element in a blocking queue
+     * @param blockingQueue queue where element will be added
+     * @param element element to be added
+     * @param <T> type parameter of the element
+     * @throws Error if an Interrupted exception is caught
+     */
     private <T> void putInQueue(BlockingQueue<T> blockingQueue, T element){
         try{
             blockingQueue.put(element);

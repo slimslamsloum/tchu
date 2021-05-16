@@ -48,24 +48,6 @@ public class PlayerStateTest {
         assertEquals(5, PS.cards().countOf(Card.BLUE));
     }
 
-
-    @Test
-    void canClaimRouteWorks(){
-        PlayerState PS = PS_generator(7,10);
-        SortedBag.Builder<Card> cards_to_add = new SortedBag.Builder<>();
-        cards_to_add.add(Card.RED);
-        cards_to_add.add(Card.RED);
-        cards_to_add.add(Card.RED);
-        cards_to_add.add(Card.RED);
-        cards_to_add.add(Card.LOCOMOTIVE);
-        cards_to_add.add(Card.LOCOMOTIVE);
-        cards_to_add.add(Card.LOCOMOTIVE);
-        PS=PS.withAddedCards(cards_to_add.build());
-        assert(PS.canClaimRoute(ChMap.routes().get(2)));
-        assert(PS.canClaimRoute(ChMap.routes().get(0)));
-        assertFalse(PS.canClaimRoute(ChMap.routes().get(3)));
-    }
-
     @Test
     void withClaimedRouteWorks(){
         PlayerState PS = PS_generator(7,10);

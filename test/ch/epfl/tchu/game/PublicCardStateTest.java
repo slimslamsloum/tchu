@@ -46,17 +46,6 @@ class PublicCardStateTest {
     }
 
     @Test
-    void totalSizeReturnsTotalSize() {
-        for (int i = 0; i < 10; i++) {
-            for (int j = 0; j < 10; j++) {
-                var cardState = new PublicCardState(FACE_UP_CARDS, i, j);
-                var expectedTotal = i + j + FACE_UP_CARDS.size();
-                assertEquals(expectedTotal, cardState.totalSize());
-            }
-        }
-    }
-
-    @Test
     void faceUpCardsReturnsImmutableListOrCopy() {
         var cardState = new PublicCardState(FACE_UP_CARDS, 0, 0);
         try {
