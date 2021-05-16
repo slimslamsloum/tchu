@@ -10,6 +10,13 @@ import java.util.concurrent.BlockingQueue;
 
 import static javafx.application.Platform.runLater;
 
+/**
+ * Adapter of the class GraphicalPlayer
+ *
+ * @author Alexandre Kambiz Gunter (324268)
+ * @author Selim Jerad (327529)
+ */
+
 public class GraphicalPlayerAdapter implements Player {
 
     //attributes needed for the graphical player adapter: several blocking queues (for cards, tickets routes, etc)
