@@ -148,7 +148,7 @@ public class GraphicalPlayer {
         ListView<Ticket> listView = new ListView<>(FXCollections.observableList(tickets.toList()));
         Button choiceButton = new Button();
         int ticketBagSize = tickets.size();
-        String introText = String.format(StringsFr.CHOOSE_TICKETS, ticketBagSize, StringsFr.plural(ticketBagSize));
+        String introText = String.format(StringsFr.CHOOSE_TICKETS, ticketBagSize-Constants.DISCARDABLE_TICKETS_COUNT, StringsFr.plural(ticketBagSize));
 
         //stage is created with auxiliary method choiceStage
         Stage stage = choiceStage(listView, StringsFr.TICKETS_CHOICE, introText, choiceButton);
@@ -158,7 +158,7 @@ public class GraphicalPlayer {
 
         //choiceButton is disabled while player hasn't selected more or exactly ticketBagSize-2 tickets
         choiceButton.disableProperty()
-                .bind(Bindings.lessThan(ticketBagSize-2, Bindings.size(listView.getSelectionModel().getSelectedItems())));
+                .bind(Bindings.greaterThan(ticketBagSize-2, Bindings.size(listView.getSelectionModel().getSelectedItems())));
 
         //tab can't be closed while picking tickets
         choiceButton.setOnAction(event -> {

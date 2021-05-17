@@ -41,7 +41,9 @@ public class GraphicalPlayerAdapter implements Player {
 
     @Override
     public void initPlayers(PlayerId ownId, Map<PlayerId, String> playerNames) {
-        runLater(() -> graphicalPlayer=new GraphicalPlayer(ownId, playerNames));
+        BlockingQueue<GraphicalPlayer> graphicalPlayerQueue = new ArrayBlockingQueue<>(1);
+        runLater(() -> graphicalPlayerQueue.add(new GraphicalPlayer(ownId, playerNames)));
+        this.graphicalPlayer = retrieveFromQueue(graphicalPlayerQueue);
     }
 
     @Override
@@ -56,7 +58,6 @@ public class GraphicalPlayerAdapter implements Player {
 
     @Override
     public void setInitialTicketChoice(SortedBag<Ticket> tickets) {
-
         ActionHandlers.ChooseTicketsHandler chooseTicketsHandler = (ticketsToChoose) -> {
             putInQueue(ticketsQueue, ticketsToChoose);
         };
@@ -65,7 +66,7 @@ public class GraphicalPlayerAdapter implements Player {
 
     @Override
     public SortedBag<Ticket> chooseInitialTickets() {
-        return ticketsQueue.peek();
+        return retrieveFromQueue(ticketsQueue);
     }
 
     @Override
@@ -92,8 +93,8 @@ public class GraphicalPlayerAdapter implements Player {
 
     @Override
     public int drawSlot() {
-        if (cardPlacementsQueue.peek() != null){
-            return cardPlacementsQueue.peek();
+        if (!cardPlacementsQueue.isEmpty()){
+            return cardPlacementsQueue.remove();
         }
         else{
             ActionHandlers.DrawCardHandler drawCardHandler = (i) -> {
@@ -128,7 +129,7 @@ public class GraphicalPlayerAdapter implements Player {
         };
 
         runLater(() -> graphicalPlayer.chooseAdditionalCards(chooseCardsHandler, options));
-        return cardsQueue.peek();
+        return retrieveFromQueue(cardsQueue);
     }
 
     /**
