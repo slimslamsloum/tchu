@@ -83,6 +83,7 @@ public class GraphicalPlayerAdapter implements Player {
         };
 
         ActionHandlers.DrawCardHandler drawCardHandler = (i) -> {
+            putInQueue(turnKindQueue, TurnKind.DRAW_CARDS);
             putInQueue(cardPlacementsQueue, i);
         };
 

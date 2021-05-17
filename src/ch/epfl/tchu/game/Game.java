@@ -3,6 +3,8 @@ package ch.epfl.tchu.game;
 import ch.epfl.tchu.Preconditions;
 import ch.epfl.tchu.SortedBag;
 import ch.epfl.tchu.gui.Info;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -40,16 +42,20 @@ public final class Game {
         //players get the info of who will play first
         Game.allInfo(new Info(playerNames.get(gameState.currentPlayerId())).willPlayFirst(), players);
 
-
-        //each player chooses between 5 tickets picked from the top of the deck
-        //the deck is then recreated,
-        //then each player receives the info of how many tickets each player has kept
-        for(PlayerId playerId : PlayerId.ALL){
-            players.get(playerId).setInitialTicketChoice(gameState.topTickets(Constants.INITIAL_TICKETS_COUNT));
-            players.get(playerId).updateState(gameState, gameState.playerState(playerId));
-            gameState= gameState.withInitiallyChosenTickets(playerId,players.get(playerId).chooseInitialTickets());
+        //in the following order, for both players: initial tickets are presented, states are updated, players choose
+        //tickets, info are sent
+        for (Map.Entry<PlayerId, Player> playerEntry : players.entrySet()){
+            playerEntry.getValue().setInitialTicketChoice(gameState.topTickets(Constants.INITIAL_TICKETS_COUNT));
             gameState=gameState.withoutTopTickets(Constants.INITIAL_TICKETS_COUNT);
-            Game.allInfo(new Info(playerNames.get(playerId)).keptTickets(gameState.playerState(playerId).ticketCount()), players);
+        }
+        for (Map.Entry<PlayerId, Player> playerEntry : players.entrySet()){
+            playerEntry.getValue().updateState(gameState, gameState.playerState(playerEntry.getKey()));
+        }
+        for (Map.Entry<PlayerId, Player> playerEntry : players.entrySet()){
+            gameState= gameState.withInitiallyChosenTickets(playerEntry.getKey(),players.get(playerEntry.getKey()).chooseInitialTickets());
+        }
+        for (Map.Entry<PlayerId, Player> playerEntry : players.entrySet()){
+            Game.allInfo(new Info(playerNames.get(playerEntry.getKey())).keptTickets(gameState.playerState(playerEntry.getKey()).ticketCount()), players);
         }
 
         //number of turns after a player has less than 2 cars
@@ -71,14 +77,14 @@ public final class Game {
             //Player variable containing the current player playing
             Player currentPlayer = players.get(gameState.currentPlayerId());
 
+            //both players get the info of who is going to play first
+            Game.allInfo(new Info(playerNames.get(gameState.currentPlayerId())).canPlay(),players);
+
             //current player's gamestate is updated
             Game.updateAll(gameState,players);
 
             //current player gets to choose which of the 3 actions he is going to perform
             Player.TurnKind playerChoice = currentPlayer.nextTurn();
-
-            //both players get the info of who is going to play first
-            Game.allInfo(new Info(playerNames.get(gameState.currentPlayerId())).canPlay(),players);
 
 
             //if the current player has chosen to draw tickets and if the player can draw tickets,
@@ -165,7 +171,7 @@ public final class Game {
                                 //SB of the chosen cards of the player is created
                                 SortedBag<Card> chosenCards = currentPlayer.chooseAdditionalCards(possibleAdditionalCards);
                                 //if the chosen cards size is equal to the var cardsToPlay (i.e player has correct cards
-                                //to claim the underground route), the follozing block runs
+                                //to claim the underground route), the following block runs
                                 if (chosenCards.size()== cardsToPlay){
                                     //SB of the total cards played to claim the route is created
                                     SortedBag<Card> cardsPlayedForTunnel = initialClaimCards.union(chosenCards);

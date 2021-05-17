@@ -121,18 +121,18 @@ public class GraphicalPlayer {
 
         //independently of which handler is called, all handlers are then set to null with the method emptyHandlers
         this.claimRouteHandler.set((route,cards) ->{
-            claimRouteHandler.onClaimRoute(route, cards);
             emptyHandlers();
+            claimRouteHandler.onClaimRoute(route, cards);
          });
 
         this.drawTicketsHandler.set(() -> {
-            drawTicketsHandler.onDrawTickets();
             emptyHandlers();
+            drawTicketsHandler.onDrawTickets();
         });
 
         this.drawCardHandler.set( i -> {
-            drawCardHandler.onDrawCard(i);
             emptyHandlers();
+            drawCardHandler.onDrawCard(i);
         } );
     }
 
