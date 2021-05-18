@@ -105,14 +105,14 @@ public final class Game {
             else if (playerChoice == Player.TurnKind.DRAW_CARDS) {
                 //the player gets to pick 2 times a card, explaining the following for loop
                 for (int i = 0; i < 2; i++) {
-                    //when the player picks his first card, the gamestate is updated for the player
-                    if (i == 1) {
-                        Game.updateAll(gameState,players);
-                    }
                     //current player can only pick a card if discard size + deck size is bigger than 5
                     if (gameState.canDrawCards()) {
                         //deck is recreated if needed
                         gameState = gameState.withCardsDeckRecreatedIfNeeded(rng);
+                        //state is update before second draw slot
+                        if (i == 1) {
+                            Game.updateAll(gameState,players);
+                        }
                         //slot = card slot that the player wants to pick
                         int slot = currentPlayer.drawSlot();
                         //if player wants to pick a card from pile
