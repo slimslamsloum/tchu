@@ -148,8 +148,8 @@ public final class GameState extends PublicGameState {
      */
     public GameState withInitiallyChosenTickets(PlayerId playerId, SortedBag<Ticket> chosenTickets) {
         Preconditions.checkArgument(privatePlayerState.get(playerId).ticketCount() == 0);
-        PlayerState withTickets = privatePlayerState.get(currentPlayerId()).withAddedTickets(chosenTickets);
-        Map<PlayerId, PlayerState> MapWithTickets = new EnumMap<>(PlayerId.class);
+        PlayerState withTickets = privatePlayerState.get(playerId).withAddedTickets(chosenTickets);
+        Map<PlayerId, PlayerState> MapWithTickets = new EnumMap<>(privatePlayerState);
         MapWithTickets.put(playerId, withTickets);
         MapWithTickets.put(playerId.next(), privatePlayerState.get(playerId.next()));
         return new GameState(ticketsCount(), ticketDeck, privateCardState, currentPlayerId(), MapWithTickets, lastPlayer());

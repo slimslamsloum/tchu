@@ -170,7 +170,7 @@ class DecksViewCreator {
             //If the player doesn't want to draw cards, the use of the faceUpCard is disabled
             faceUpCardView.disableProperty().bind(drawCardHP.isNull());
 
-            //Calls the action handler in case the players clicks on a card with his mice
+            //Calls the action handler in case the players clicks on a card with his mouse
             faceUpCardView.setOnMouseClicked(event -> drawCardHP.get().onDrawCard(slot));
 
             // Applies the right visual representation of the card according to its color
