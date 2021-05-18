@@ -11,6 +11,9 @@ import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import static ch.epfl.tchu.gui.ActionHandlers.*;
+import static ch.epfl.tchu.gui.GuiConstants.*;
+
+import ch.epfl.tchu.gui.GuiConstants;
 
 /**
  * Creation of the visual and playable interface of the games deck
@@ -20,14 +23,6 @@ import static ch.epfl.tchu.gui.ActionHandlers.*;
  */
 
 class DecksViewCreator {
-    //all needed dimensions for the shapes on the map
-    private static final int OUTSIDE_RECTANGLE_LENGTH = 60;
-    private static final int OUTSIDE_RECTANGLE_HEIGHT = 90;
-    private static final int INSIDE_RECTANGLE_LENGTH = 40;
-    private static final int INSIDE_RECTANGLE_HEIGHT = 70;
-    private static final int GAUGE_RECTANGLE_LENGTH = 50;
-    private static final int GAUGE_RECTANGLE_HEIGHT = 5;
-
     /**
      * private constructor
      */
@@ -73,15 +68,16 @@ class DecksViewCreator {
             else {
                 cardView.getStyleClass().addAll(card.color().name(),"card");
             }
+    
 
             //Creation of all the shapes that make up the card's visual representation
-            Rectangle outsideRectangle = new Rectangle(OUTSIDE_RECTANGLE_LENGTH,OUTSIDE_RECTANGLE_HEIGHT);
+            Rectangle outsideRectangle = new Rectangle(DVC_OUTSIDE_LENGTH,DVC_OUTSIDE_HEIGHT);
             outsideRectangle.getStyleClass().add("outside");
 
-            Rectangle insideRectangle = new Rectangle(INSIDE_RECTANGLE_LENGTH,INSIDE_RECTANGLE_HEIGHT);
+            Rectangle insideRectangle = new Rectangle(DVC_INSIDE_LENGTH,DVC_INSIDE_HEIGHT);
             insideRectangle.getStyleClass().addAll("inside", "filled");
 
-            Rectangle imageRectangle = new Rectangle(INSIDE_RECTANGLE_LENGTH,INSIDE_RECTANGLE_HEIGHT);
+            Rectangle imageRectangle = new Rectangle(DVC_INSIDE_LENGTH,DVC_INSIDE_HEIGHT);
             imageRectangle.getStyleClass().add("train-image");
 
             //Creation of the text that represents the number of cards of a single type
@@ -124,16 +120,16 @@ class DecksViewCreator {
         Group ticketDBGroup = new Group();
 
         //Creation of the shapes that make up the gauge
-        Rectangle ticketGaugeBackground = new Rectangle(GAUGE_RECTANGLE_LENGTH,GAUGE_RECTANGLE_HEIGHT);
+        Rectangle ticketGaugeBackground = new Rectangle(DVC_GAUGE_LENGTH,DVC_GAUGE_HEIGHT);
         ticketGaugeBackground.getStyleClass().add("background");
 
-        Rectangle ticketGaugeForeground = new Rectangle(GAUGE_RECTANGLE_LENGTH,GAUGE_RECTANGLE_HEIGHT);
+        Rectangle ticketGaugeForeground = new Rectangle(DVC_GAUGE_LENGTH,DVC_GAUGE_HEIGHT);
         ticketGaugeForeground.getStyleClass().add("foreground");
 
         // Use of a property to modify the view of the gauge in function of the percentage of tickets remaining
         // In the stock
         ReadOnlyIntegerProperty ticketPctProperty = obsGameState.percentageTickets();
-        ticketGaugeForeground.widthProperty().bind(ticketPctProperty.multiply(GAUGE_RECTANGLE_LENGTH).divide(100));
+        ticketGaugeForeground.widthProperty().bind(ticketPctProperty.multiply(DVC_GAUGE_LENGTH).divide(100));
 
         //The gauge is added as a children of the tickets group, and the group is then added as a part of the button
         //Then the Button is added as a component of the Deck's view
@@ -148,13 +144,13 @@ class DecksViewCreator {
             StackPane faceUpCardView = new StackPane();
 
             //Creation of the shapes that make up the view of the card
-            Rectangle outsideRectangle = new Rectangle(OUTSIDE_RECTANGLE_LENGTH,OUTSIDE_RECTANGLE_HEIGHT);
+            Rectangle outsideRectangle = new Rectangle(DVC_OUTSIDE_LENGTH,DVC_OUTSIDE_HEIGHT);
             outsideRectangle.getStyleClass().add("outside");
 
-            Rectangle insideRectangle = new Rectangle(INSIDE_RECTANGLE_LENGTH,INSIDE_RECTANGLE_HEIGHT);
+            Rectangle insideRectangle = new Rectangle(DVC_INSIDE_LENGTH,DVC_INSIDE_HEIGHT);
             insideRectangle.getStyleClass().addAll("inside", "filled");
 
-            Rectangle imageRectangle = new Rectangle(INSIDE_RECTANGLE_LENGTH,INSIDE_RECTANGLE_HEIGHT);
+            Rectangle imageRectangle = new Rectangle(DVC_INSIDE_LENGTH,DVC_INSIDE_HEIGHT);
             imageRectangle.getStyleClass().add("train-image");
 
             //The shapes are added as children of the card, then the view of the card is added to the deck
@@ -188,10 +184,10 @@ class DecksViewCreator {
         Group cardGauge = new Group();
 
         //Creation of the shapes that make up the gauge
-        Rectangle cardGaugeBackground = new Rectangle(GAUGE_RECTANGLE_LENGTH,GAUGE_RECTANGLE_HEIGHT);
+        Rectangle cardGaugeBackground = new Rectangle(DVC_GAUGE_LENGTH,DVC_GAUGE_HEIGHT);
         cardGaugeBackground.getStyleClass().add("background");
 
-        Rectangle cardGaugeForeground = new Rectangle(GAUGE_RECTANGLE_LENGTH,GAUGE_RECTANGLE_HEIGHT);
+        Rectangle cardGaugeForeground = new Rectangle(DVC_GAUGE_LENGTH,DVC_GAUGE_HEIGHT);
         cardGaugeForeground.getStyleClass().add("foreground");
 
 
@@ -204,7 +200,7 @@ class DecksViewCreator {
         // Use of a property to modify the view of the gauge in function of the percentage of cards remaining
         // In the stock
         ReadOnlyIntegerProperty cardPctProperty = obsGameState.percentageCards();
-        cardGaugeForeground.widthProperty().bind(cardPctProperty.multiply(GAUGE_RECTANGLE_LENGTH).divide(100));
+        cardGaugeForeground.widthProperty().bind(cardPctProperty.multiply(DVC_GAUGE_LENGTH).divide(100));
 
         //Handles the distribution of cards / tickets in case the player does press on one of the button
         cardDeckButton.setOnMouseClicked(event -> drawCardHP.get().onDrawCard(Constants.DECK_SLOT));

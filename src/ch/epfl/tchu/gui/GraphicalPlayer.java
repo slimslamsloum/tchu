@@ -2,6 +2,7 @@ package ch.epfl.tchu.gui;
 
 import ch.epfl.tchu.SortedBag;
 import ch.epfl.tchu.game.*;
+import javafx.*;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -21,12 +22,12 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.StringConverter;
-
+import static javafx.application.Platform.isFxApplicationThread;
+import ch.epfl.tchu.gui.ActionHandlers.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static javafx.application.Platform.isFxApplicationThread;
 
 /**
  * Graphical player
@@ -41,18 +42,18 @@ import static javafx.application.Platform.isFxApplicationThread;
 public class GraphicalPlayer {
 
     //We need to 3 handlers that are in properties to handle the startTurn method
-    private final SimpleObjectProperty<ActionHandlers.DrawTicketsHandler> drawTicketsHandler = new SimpleObjectProperty<>();
-    private final SimpleObjectProperty<ActionHandlers.DrawCardHandler> drawCardHandler = new SimpleObjectProperty<>();
-    private final SimpleObjectProperty<ActionHandlers.ClaimRouteHandler> claimRouteHandler = new SimpleObjectProperty<>();
+    private final SimpleObjectProperty<DrawTicketsHandler> drawTicketsHandler = new SimpleObjectProperty<>();
+    private final SimpleObjectProperty<DrawCardHandler> drawCardHandler = new SimpleObjectProperty<>();
+    private final SimpleObjectProperty<ClaimRouteHandler> claimRouteHandler = new SimpleObjectProperty<>();
 
     //observable list of texts that will be displayed in the InfoView
-    private ObservableList<Text> texts = FXCollections.observableList(new ArrayList<>());
+    private final ObservableList<Text> texts = FXCollections.observableList(new ArrayList<>());
 
     //Observable state of the game in an attribute
-    private ObservableGameState observableGameState;
+    private final ObservableGameState observableGameState;
 
     //main stage of the game
-    private Stage mainStage = new Stage();
+    private final Stage mainStage = new Stage();
 
     /**
      * Graphical player constructor
@@ -103,9 +104,9 @@ public class GraphicalPlayer {
      * @param drawCardHandler handler for drawing cards
      * @param claimRouteHandler handler for claiming a route
      */
-    public void startTurn(ActionHandlers.DrawTicketsHandler drawTicketsHandler,
-                          ActionHandlers.DrawCardHandler drawCardHandler,
-                          ActionHandlers.ClaimRouteHandler claimRouteHandler){
+    public void startTurn(DrawTicketsHandler drawTicketsHandler,
+                          DrawCardHandler drawCardHandler,
+                          ClaimRouteHandler claimRouteHandler){
         assert isFxApplicationThread();
 
         //claimRouteHandler is always filled
@@ -121,18 +122,18 @@ public class GraphicalPlayer {
 
         //independently of which handler is called, all handlers are then set to null with the method emptyHandlers
         this.claimRouteHandler.set((route,cards) ->{
-            emptyHandlers();
             claimRouteHandler.onClaimRoute(route, cards);
-         });
+            emptyHandlers();
+        });
 
         this.drawTicketsHandler.set(() -> {
-            emptyHandlers();
             drawTicketsHandler.onDrawTickets();
+            emptyHandlers();
         });
 
         this.drawCardHandler.set( i -> {
-            emptyHandlers();
             drawCardHandler.onDrawCard(i);
+            emptyHandlers();
         } );
     }
 
@@ -146,7 +147,7 @@ public class GraphicalPlayer {
 
         //listView, button and intro Text are created
         ListView<Ticket> listView = new ListView<>(FXCollections.observableList(tickets.toList()));
-        Button choiceButton = new Button();
+        Button choiceButton = new Button("Choisir");
         int ticketBagSize = tickets.size();
         String introText = String.format(StringsFr.CHOOSE_TICKETS, ticketBagSize-Constants.DISCARDABLE_TICKETS_COUNT, StringsFr.plural(ticketBagSize));
 
@@ -177,7 +178,7 @@ public class GraphicalPlayer {
      * Method that is called when the player is drawing a card for the second time
      * @param handler drawCard handler
      */
-    public void drawCard(ActionHandlers.DrawCardHandler handler){
+    public void drawCard(DrawCardHandler handler){
         assert isFxApplicationThread();
 
         this.drawCardHandler.set(i -> {
@@ -195,7 +196,7 @@ public class GraphicalPlayer {
         assert isFxApplicationThread();
         //listView, choiceButton and stage are created
         ListView<SortedBag<Card>> listView = new ListView<>(FXCollections.observableList(possibleClaimCards));
-        Button choiceButton = new Button();
+        Button choiceButton = new Button("Choisir");
         //stage is created with auxiliary method choiceStage
         Stage stage = choiceStage(listView, StringsFr.CARDS_CHOICE, StringsFr.CHOOSE_CARDS, choiceButton);
 
@@ -221,7 +222,7 @@ public class GraphicalPlayer {
 
         //listView, button and stage are created
         ListView<SortedBag<Card>> listView = new ListView<>(FXCollections.observableList(additionalCards));
-        Button choiceButton = new Button();
+        Button choiceButton = new Button("Choisir");
         //stage is created with choiceStage method
         Stage stage = choiceStage(listView, StringsFr.CARDS_CHOICE, StringsFr.CHOOSE_ADDITIONAL_CARDS, choiceButton);
 
@@ -299,4 +300,3 @@ public class GraphicalPlayer {
     }
 
 }
-

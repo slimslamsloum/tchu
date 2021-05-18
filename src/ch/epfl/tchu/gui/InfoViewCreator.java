@@ -10,6 +10,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.TextFlow;
 import javafx.scene.text.Text;
+import static ch.epfl.tchu.gui.GuiConstants.*;
 
 import java.util.Map;
 
@@ -21,9 +22,6 @@ import java.util.Map;
  */
 
 class InfoViewCreator {
-
-    //constant representing the radius of a circle
-    private final static int CIRCLE_RADIUS = 5;
 
     /**
      * Private class constructor so that class isn't instantiable
@@ -66,7 +64,7 @@ class InfoViewCreator {
             playerN.getStyleClass().add(player.name());
 
             //creation of circle
-            Circle circle = new Circle(CIRCLE_RADIUS);
+            Circle circle = new Circle(IVC_CIRCLE_RADIUS);
             circle.getStyleClass().add("filled");
 
             //creation of Text

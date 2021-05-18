@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import ch.epfl.tchu.gui.ActionHandlers.*;
 
 import static javafx.application.Platform.runLater;
 
@@ -58,7 +59,7 @@ public class GraphicalPlayerAdapter implements Player {
 
     @Override
     public void setInitialTicketChoice(SortedBag<Ticket> tickets) {
-        ActionHandlers.ChooseTicketsHandler chooseTicketsHandler = (ticketsToChoose) -> {
+         ChooseTicketsHandler chooseTicketsHandler = (ticketsToChoose) -> {
             putInQueue(ticketsQueue, ticketsToChoose);
         };
         runLater(() -> graphicalPlayer.chooseTickets(chooseTicketsHandler,tickets));
@@ -72,17 +73,17 @@ public class GraphicalPlayerAdapter implements Player {
     @Override
     public TurnKind nextTurn() {
 
-        ActionHandlers.DrawTicketsHandler drawTicketsHandler = () -> {
+         DrawTicketsHandler drawTicketsHandler = () -> {
             putInQueue(turnKindQueue, TurnKind.DRAW_TICKETS);
         };
 
-        ActionHandlers.ClaimRouteHandler claimRouteHandler = (route,cards) -> {
+         ClaimRouteHandler claimRouteHandler = (route,cards) -> {
             putInQueue(turnKindQueue, TurnKind.CLAIM_ROUTE);
             putInQueue(routesQueue, route);
             putInQueue(cardsQueue, cards);
         };
 
-        ActionHandlers.DrawCardHandler drawCardHandler = (i) -> {
+         DrawCardHandler drawCardHandler = (i) -> {
             putInQueue(turnKindQueue, TurnKind.DRAW_CARDS);
             putInQueue(cardPlacementsQueue, i);
         };
@@ -98,7 +99,7 @@ public class GraphicalPlayerAdapter implements Player {
             return cardPlacementsQueue.remove();
         }
         else{
-            ActionHandlers.DrawCardHandler drawCardHandler = (i) -> {
+             DrawCardHandler drawCardHandler = (i) -> {
                 putInQueue(cardPlacementsQueue, i);
             };
             runLater(() -> graphicalPlayer.drawCard(drawCardHandler));

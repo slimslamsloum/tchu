@@ -10,6 +10,7 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 
 import static ch.epfl.tchu.gui.ActionHandlers.*;
+import static ch.epfl.tchu.gui.GuiConstants.*;
 
 import java.util.*;
 
@@ -21,12 +22,6 @@ import java.util.*;
  */
 
 class MapViewCreator {
-    //all needed dimensions for the cars on the map
-    private static final int RECTANGLE_LENGTH = 36;
-    private static final int RECTANGLE_HEIGHT = 12;
-    private static final int CIRCLE_RADIUS = 3;
-    private static final int CIRCLE_SPACING = 6;
-    private static final int CIRCLE_CENTER = 12;
 
     /**
      * private constructor
@@ -81,15 +76,15 @@ class MapViewCreator {
                 carGroup.getStyleClass().add("car");
 
                 //Creation of the shapes that make up a car or a box
-                Rectangle caseRectangle = new Rectangle(RECTANGLE_LENGTH, RECTANGLE_HEIGHT);
+                Rectangle caseRectangle = new Rectangle(MVC_RECTANGLE_LENGTH, MVC_RECTANGLE_HEIGHT);
                 caseRectangle.getStyleClass().addAll("track", "filled");
                 caseGroup.getChildren().add(caseRectangle);
 
-                Rectangle carRectangle = new Rectangle(RECTANGLE_LENGTH, RECTANGLE_HEIGHT);
+                Rectangle carRectangle = new Rectangle(MVC_RECTANGLE_LENGTH, MVC_RECTANGLE_HEIGHT);
                 carRectangle.getStyleClass().add("filled");
 
-                Circle c1 = new Circle(CIRCLE_CENTER, CIRCLE_SPACING, CIRCLE_RADIUS);
-                Circle c2 = new Circle(CIRCLE_CENTER * 2, CIRCLE_SPACING, CIRCLE_RADIUS);
+                Circle c1 = new Circle(MVC_CIRCLE_CENTER, MVC_CIRCLE_SPACING, MVC_CIRCLE_RADIUS);
+                Circle c2 = new Circle(MVC_CIRCLE_CENTER * 2, MVC_CIRCLE_SPACING, MVC_CIRCLE_RADIUS);
 
                 //the car group is now completed, then added as a children of the case group,
                 // which is finally added to the routeGroup
