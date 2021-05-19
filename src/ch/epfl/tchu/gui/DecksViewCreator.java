@@ -68,7 +68,7 @@ class DecksViewCreator {
             else {
                 cardView.getStyleClass().addAll(card.color().name(),"card");
             }
-    
+
 
             //Creation of all the shapes that make up the card's visual representation
             Rectangle outsideRectangle = new Rectangle(DVC_OUTSIDE_LENGTH,DVC_OUTSIDE_HEIGHT);
@@ -156,15 +156,10 @@ class DecksViewCreator {
             //The shapes are added as children of the card, then the view of the card is added to the deck
             faceUpCardView.getChildren().addAll(outsideRectangle,insideRectangle,imageRectangle);
             deckView.getChildren().add(faceUpCardView);
-
+            faceUpCardView.getStyleClass().addAll("", "card");
             //Adds the new card on the deck if ever a card is drawn by a player
             obsGameState.faceUpCard(slot).addListener((prop,oldVal,newVal) -> {
-                if(newVal.equals(Card.LOCOMOTIVE)){
-                    faceUpCardView.getStyleClass().addAll("NEUTRAL","card");
-                }
-                else {
-                    faceUpCardView.getStyleClass().addAll(newVal.color().name(),"card");
-                }
+                faceUpCardView.getStyleClass().set(0, newVal.equals(Card.LOCOMOTIVE) ? "NEUTRAL" : newVal.color().name() );
             });
 
             //If the player doesn't want to draw cards, the use of the faceUpCard is disabled
