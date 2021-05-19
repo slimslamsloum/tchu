@@ -163,7 +163,7 @@ class DecksViewCreator {
                     faceUpCardView.getStyleClass().addAll("NEUTRAL","card");
                 }
                 else {
-                    faceUpCardView.getStyleClass().addAll(newVal.color().name(), "card");
+                    faceUpCardView.getStyleClass().addAll(newVal.color().name(),"card");
                 }
             });
 

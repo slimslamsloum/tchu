@@ -131,6 +131,7 @@ public final class Game {
                             Game.allInfo(new Info(playerNames.get(gameState.currentPlayerId())).drewVisibleCard(gameState.cardState().faceUpCard(slot)),players);
                             //player draws card at index slot
                             gameState = gameState.withDrawnFaceUpCard(slot);
+
                         }
                     }
                 }

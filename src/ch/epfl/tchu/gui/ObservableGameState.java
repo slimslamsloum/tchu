@@ -131,8 +131,9 @@ public class ObservableGameState {
      */
     private List<Route> doubleRoutes(Route route){
         for (Route route1: ChMap.routes()){
-            if (route.stations().equals(route1.stations())){ return List.of(route, route1); }
-        }return List.of(route);
+            if (route.stations().equals(route1.stations()) && !route.equals(route1)){ return List.of(route, route1);  }
+        }
+        return List.of(route);
     }
 
     /**
