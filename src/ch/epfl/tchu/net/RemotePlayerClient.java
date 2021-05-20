@@ -60,10 +60,10 @@ public class RemotePlayerClient {
                     case INIT_PLAYERS : // calls the method initPlayers of the player
                         PlayerId currentPlayer = Serdes.playerIdSerde.deserialize(separatedMessage[1]);
                         List<String> players = Serdes.listStringSerde.deserialize(separatedMessage[2]);
-                        Map<PlayerId,String> playerId = new TreeMap<>();
-                        playerId.put(PlayerId.PLAYER_1,players.get(0));
-                        playerId.put(PlayerId.PLAYER_2,players.get(1));
-                        player.initPlayers(currentPlayer,playerId);
+                        Map<PlayerId,String> playerIdMap = new TreeMap<>();
+                        playerIdMap.put(currentPlayer,players.get(0));
+                        playerIdMap.put(currentPlayer.next(),players.get(1));
+                        player.initPlayers(currentPlayer,playerIdMap);
                         break;
                     case RECEIVE_INFO: // calls the method receiveInfo of the player for him to receive an information
                         String info = Serdes.stringSerde.deserialize(separatedMessage[1]);

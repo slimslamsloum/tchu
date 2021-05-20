@@ -55,34 +55,37 @@ class InfoViewCreator {
         gameInfo.setId("game-info");
         Bindings.bindContent(gameInfo.getChildren(), observableTexts);
 
-        //iteration through both players
-        for (PlayerId player : PlayerId.ALL){
+        playerInfoView(playerId, observableGameState,playerStats, playerNames);
+        playerInfoView(playerId.next(),observableGameState,playerStats, playerNames);
 
-            //creation of text flow for a player's statistic
-            TextFlow playerN = new TextFlow();
-            playerStats.getChildren().add(playerN);
-            playerN.getStyleClass().add(player.name());
-
-            //creation of circle
-            Circle circle = new Circle(IVC_CIRCLE_RADIUS);
-            circle.getStyleClass().add("filled");
-
-            //creation of Text
-            Text playerStatsText = new Text();
-
-            //string expression is a text that displays the player's statistics (binded to observables gameState's
-            //properties)
-            StringExpression stringExpression = Bindings.format(StringsFr.PLAYER_STATS, playerNames.get(player),
-                    observableGameState.nbTickets(player), observableGameState.nbCards(player),
-                    observableGameState.nbCars(player), observableGameState.nbPoints(player));
-
-            //the string expression will be binded with the text, which is a child of the Text flow for
-            //player statistics
-            playerStatsText.textProperty().bind(stringExpression);
-            playerN.getChildren().addAll(circle, playerStatsText);
-        }
         //playerStats, the separator and gameInfo nodes are now the children of infoPane
         infoPane.getChildren().addAll(playerStats, separator, gameInfo);
         return infoPane;
+    }
+
+    private static void playerInfoView(PlayerId player, ObservableGameState observableGameState, VBox playerStats,
+                                       Map<PlayerId, String> playerNames){
+        //creation of text flow for a player's statistic
+        TextFlow playerN = new TextFlow();
+        playerStats.getChildren().add(playerN);
+        playerN.getStyleClass().add(player.name());
+
+        //creation of circle
+        Circle circle = new Circle(IVC_CIRCLE_RADIUS);
+        circle.getStyleClass().add("filled");
+
+        //creation of Text
+        Text playerStatsText = new Text();
+
+        //string expression is a text that displays the player's statistics (binded to observables gameState's
+        //properties)
+        StringExpression stringExpression = Bindings.format(StringsFr.PLAYER_STATS, playerNames.get(player),
+                observableGameState.nbTickets(player), observableGameState.nbCards(player),
+                observableGameState.nbCars(player), observableGameState.nbPoints(player));
+
+        //the string expression will be binded with the text, which is a child of the Text flow for
+        //player statistics
+        playerStatsText.textProperty().bind(stringExpression);
+        playerN.getChildren().addAll(circle, playerStatsText);
     }
 }

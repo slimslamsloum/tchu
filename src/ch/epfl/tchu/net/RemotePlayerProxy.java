@@ -48,7 +48,7 @@ public class RemotePlayerProxy implements Player {
      */
     @Override
     public void initPlayers(PlayerId ownId, Map<PlayerId, String> playerNames) {
-        List<String> listPlayers = List.of(playerNames.get(PlayerId.PLAYER_1), playerNames.get(PlayerId.PLAYER_2));
+        List<String> listPlayers = List.of(playerNames.get(ownId), playerNames.get(ownId.next()));
         String serializedPlayers = Serde.listOf(Serdes.stringSerde, ",").serialize(listPlayers);
         String serializedPlayerID = Serdes.playerIdSerde.serialize(ownId);
         sendMessage(List.of(serializedPlayerID,serializedPlayers), MessageId.INIT_PLAYERS);
@@ -155,8 +155,8 @@ public class RemotePlayerProxy implements Player {
      */
     @Override
     public SortedBag<Card> chooseAdditionalCards(List<SortedBag<Card>> options) {
-        String serializedSbTickets = Serdes.listSbCardSerde.serialize(options);
-        sendMessage(List.of(serializedSbTickets), MessageId.CHOOSE_ADDITIONAL_CARDS);
+        String serializedSbCards = Serdes.listSbCardSerde.serialize(options);
+        sendMessage(List.of(serializedSbCards), MessageId.CHOOSE_ADDITIONAL_CARDS);
         return Serdes.sbCardSerde.deserialize(receiveMessage());
     }
 

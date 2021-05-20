@@ -229,7 +229,8 @@ public class GraphicalPlayer {
         stage.setOnCloseRequest(Event::consume);
         choiceButton.setOnAction(event -> {
             stage.hide();
-            handler.onChooseCards(listView.getSelectionModel().getSelectedItem());
+            handler.onChooseCards(listView.getSelectionModel().getSelectedItem() == null
+                    ? SortedBag.of() : listView.getSelectionModel().getSelectedItem());
         });
     }
 
