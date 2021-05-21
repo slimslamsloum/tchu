@@ -2,6 +2,8 @@ package ch.epfl.tchu.gui;
 
 public class TchuRules {
 
+    public final static String TITLE_INTRO_TEXT = "Alors comment on joue?";
+
     public final static String INTRO_TEXT = "Une partie de tCHu se joue sur une carte de la Suisse et des pays voisins. Un certain nombre de villes, toutes suisses, sont nommées sur cette carte. Elles sont reliées entre elles par un réseau ferroviaire représenté par des cases rectangulaires colorées placées les unes derrière les autres. Ce réseau s'étend également aux pays voisins — Allemagne, Autriche, Italie et France — mais les villes des pays voisins ne sont pas nommées et sont simplement représentées par un drapeau du pays.\n" +
             "\n" +
             "Le jeu se joue en 1V1 au tour par tour, et le but est a la fin de la partie d’avoir plus de points que son adversaire. \n" +

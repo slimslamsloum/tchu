@@ -306,7 +306,7 @@ public class GraphicalPlayer {
         stage.initModality(Modality.WINDOW_MODAL);
         TextFlow textFlow = new TextFlow();
         stage.setTitle("Règles du jeu");
-
+        textFlow.getChildren().add(new Text(TchuRules.TITLE_INTRO_TEXT));
         textFlow.getChildren().add(new Text(TchuRules.INTRO_TEXT));
         textFlow.getChildren().add(new Text(TchuRules.TITLE_TERMINOLOGY));
         textFlow.getChildren().add(new Text(TchuRules.TERMINOLOGY));
@@ -318,7 +318,6 @@ public class GraphicalPlayer {
         textFlow.getChildren().add(new Text(TchuRules.END_GAME));
         stage.setScene(scene);
         vbox.getChildren().addAll(textFlow);
-
         stage.show();
     }
 
