@@ -85,13 +85,13 @@ public final class Deck <C extends Comparable<C>> {
      */
     public SortedBag<C> topCards(int count){
         Preconditions.checkArgument(count <= this.size() && count >=0);
-        List<C> TopCards_List = new ArrayList<>(this.cardsInDeck);
-        TopCards_List = TopCards_List.subList(0,count);
-        SortedBag.Builder<C> TopCards_SB = new SortedBag.Builder<>();
-        for (C content : TopCards_List){
-            TopCards_SB.add(content);
+        List<C> topCards_List = new ArrayList<>(this.cardsInDeck);
+        topCards_List = topCards_List.subList(0,count);
+        SortedBag.Builder<C> topCards_SB = new SortedBag.Builder<>();
+        for (C content : topCards_List){
+            topCards_SB.add(content);
         }
-        return TopCards_SB.build();
+        return topCards_SB.build();
     }
 
     /**

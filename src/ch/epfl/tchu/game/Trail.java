@@ -152,7 +152,7 @@ public final class Trail {
      */
     @Override
     public String toString(){
-        if (this.station1 ==  null && this.station2 == null && this.routes.size()==0){
+        if (this.station1 ==  null || this.station2 == null || this.routes.size()==0){
             return "empty trail!";
         }
         else {

@@ -225,6 +225,7 @@ public final class GameState extends PublicGameState {
      * @return true if last turn is starting (i.e current player has 2 cars or less), else returns false
      */
     public boolean lastTurnBegins() {
+        if (lastPlayer() != null){ return false; }
         return privatePlayerState.get(currentPlayerId()).carCount() <= 2;
     }
 

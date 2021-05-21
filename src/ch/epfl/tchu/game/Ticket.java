@@ -27,12 +27,13 @@ public final class Ticket implements Comparable<Ticket> {
      */
     public Ticket(List<Trip> trips){
         Preconditions.checkArgument(trips != null && trips.size() != 0);
-        String expectedStation = trips.get(0).from().toString();
-        for(Trip trip : trips){
+
+        String expectedStation = List.copyOf(trips).get(0).from().toString();
+        for(Trip trip : List.copyOf(trips)){
             String station = trip.from().toString();
             Preconditions.checkArgument(station.equals(expectedStation));
         }
-        this.trips = trips;
+        this.trips = List.copyOf(trips);
         text=computeText();
     }
 

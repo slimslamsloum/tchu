@@ -245,8 +245,8 @@ public final class Game {
         else {
             player1points += 10;
             player2points += 10;
-            Game.allInfo(new Info(playerNames.get(PlayerId.PLAYER_1)).getsLongestTrailBonus(longestTrailP2),players);
             Game.allInfo(new Info(playerNames.get(PlayerId.PLAYER_1)).getsLongestTrailBonus(longestTrailP1),players);
+            Game.allInfo(new Info(playerNames.get(PlayerId.PLAYER_2)).getsLongestTrailBonus(longestTrailP2),players);
         }
 
         //both players get the info of who was won or if there a tie
