@@ -299,4 +299,27 @@ public class GraphicalPlayer {
         }
     }
 
+    public static void displayHelpStage(){
+        Stage stage = new Stage(StageStyle.DECORATED);
+        VBox vbox = new VBox();
+        Scene scene = new Scene(vbox);
+        stage.initModality(Modality.WINDOW_MODAL);
+        TextFlow textFlow = new TextFlow();
+        stage.setTitle("Règles du jeu");
+
+        textFlow.getChildren().add(new Text(TchuRules.INTRO_TEXT));
+        textFlow.getChildren().add(new Text(TchuRules.TITLE_TERMINOLOGY));
+        textFlow.getChildren().add(new Text(TchuRules.TERMINOLOGY));
+        textFlow.getChildren().add(new Text(TchuRules.TITLE_BEGINNING_GAME));
+        textFlow.getChildren().add(new Text(TchuRules.BEGINNING_GAME));
+        textFlow.getChildren().add(new Text(TchuRules.TITLE_TURN_KIND));
+        textFlow.getChildren().add(new Text(TchuRules.TURN_KIND));
+        textFlow.getChildren().add(new Text(TchuRules.TITLE_END_GAME));
+        textFlow.getChildren().add(new Text(TchuRules.END_GAME));
+        stage.setScene(scene);
+        vbox.getChildren().addAll(textFlow);
+
+        stage.show();
+    }
+
 }

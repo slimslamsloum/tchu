@@ -12,6 +12,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import static ch.epfl.tchu.gui.ActionHandlers.*;
 import static ch.epfl.tchu.gui.GuiConstants.*;
+import ch.epfl.tchu.gui.GraphicalPlayer;
 
 import ch.epfl.tchu.gui.GuiConstants;
 
@@ -116,6 +117,9 @@ class DecksViewCreator {
         Button ticketDeckButton = new Button("Billets");
         ticketDeckButton.getStyleClass().add("gauged");
 
+        Button helpButton = new Button("Aide");
+        helpButton.getStyleClass().add("help");
+
         //Creation of the group that contains the gauge which indicates the number of tickets remaining in the stock
         Group ticketDBGroup = new Group();
 
@@ -191,6 +195,7 @@ class DecksViewCreator {
         cardGauge.getChildren().addAll(cardGaugeBackground, cardGaugeForeground);
         cardDeckButton.setGraphic(cardGauge);
         deckView.getChildren().add(cardDeckButton);
+        deckView.getChildren().add(helpButton);
 
         // Use of a property to modify the view of the gauge in function of the percentage of cards remaining
         // In the stock
@@ -200,6 +205,8 @@ class DecksViewCreator {
         //Handles the distribution of cards / tickets in case the player does press on one of the button
         cardDeckButton.setOnMouseClicked(event -> drawCardHP.get().onDrawCard(Constants.DECK_SLOT));
         ticketDeckButton.setOnMouseClicked(event -> drawTicketsHP.get().onDrawTickets());
+
+        helpButton.setOnMouseClicked(event -> GraphicalPlayer.displayHelpStage());
 
         //In case the player doesn't want to draw a card or a ticket, the use of the buttons is disabled
         cardDeckButton.disableProperty().bind(drawCardHP.isNull());
