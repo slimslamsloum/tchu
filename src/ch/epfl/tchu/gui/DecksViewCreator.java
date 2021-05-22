@@ -6,6 +6,7 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
@@ -125,7 +126,6 @@ class DecksViewCreator {
 
         //Creation of help button
         Button helpButton = new Button("Aide");
-        helpButton.getStyleClass().add("help");
 
         //Creation of Dark Mode button
         ToggleButton darkModeButton = new ToggleButton("Dark Mode");
@@ -228,23 +228,57 @@ class DecksViewCreator {
 
     private static void displayHelpStage(){
         Stage stage = new Stage(StageStyle.DECORATED);
+        ScrollPane scrollPane = new ScrollPane();
         VBox vbox = new VBox();
-        Scene scene = new Scene(vbox);
+        Scene scene = new Scene(scrollPane);
+        vbox.getStylesheets().add("rules.css");
         stage.initModality(Modality.WINDOW_MODAL);
         TextFlow textFlow = new TextFlow();
         stage.setTitle("Règles du jeu");
-        textFlow.getChildren().add(new Text(TchuRules.TITLE_INTRO_TEXT));
-        textFlow.getChildren().add(new Text(TchuRules.INTRO_TEXT));
-        textFlow.getChildren().add(new Text(TchuRules.TITLE_TERMINOLOGY));
-        textFlow.getChildren().add(new Text(TchuRules.TERMINOLOGY));
-        textFlow.getChildren().add(new Text(TchuRules.TITLE_BEGINNING_GAME));
-        textFlow.getChildren().add(new Text(TchuRules.BEGINNING_GAME));
-        textFlow.getChildren().add(new Text(TchuRules.TITLE_TURN_KIND));
-        textFlow.getChildren().add(new Text(TchuRules.TURN_KIND));
-        textFlow.getChildren().add(new Text(TchuRules.TITLE_END_GAME));
-        textFlow.getChildren().add(new Text(TchuRules.END_GAME));
+
+        Text titleIntroText= new Text(TchuRules.TITLE_INTRO_TEXT);
+        titleIntroText.setId("mainTitle");
+        textFlow.getChildren().add(titleIntroText);
+
+        Text introText= new Text(TchuRules.INTRO_TEXT);
+        introText.setId("text");
+        textFlow.getChildren().add(introText);
+
+        Text titleTerminology= new Text(TchuRules.TITLE_TERMINOLOGY);
+        titleTerminology.setId("title");
+        textFlow.getChildren().add(titleTerminology);
+
+        Text terminology= new Text(TchuRules.TERMINOLOGY);
+        terminology.setId("text");
+        textFlow.getChildren().add(terminology);
+
+        Text titleBeginning= new Text(TchuRules.TITLE_BEGINNING_GAME);
+        titleBeginning.setId("title");
+        textFlow.getChildren().add(titleBeginning);
+
+        Text beginning= new Text(TchuRules.BEGINNING_GAME);
+        beginning.setId("text");
+        textFlow.getChildren().add(beginning);
+
+        Text titleTurn= new Text(TchuRules.TITLE_TURN_KIND);
+        titleTurn.setId("title");
+        textFlow.getChildren().add(titleTurn);
+
+        Text turnKind= new Text(TchuRules.TURN_KIND);
+        turnKind.setId("text");
+        textFlow.getChildren().add(turnKind);
+
+        Text titleEnd= new Text(TchuRules.TITLE_END_GAME);
+        titleEnd.setId("title");
+        textFlow.getChildren().add(titleEnd);
+
+        Text end= new Text(TchuRules.END_GAME);
+        end.setId("text");
+        textFlow.getChildren().add(end);
+
         stage.setScene(scene);
         vbox.getChildren().addAll(textFlow);
+        scrollPane.contentProperty().set(vbox);
         stage.show();
     }
 }
