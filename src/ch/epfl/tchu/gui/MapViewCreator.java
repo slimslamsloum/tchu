@@ -48,47 +48,13 @@ class MapViewCreator {
         for (Route route : ChMap.routes()) {
 
             // creation of a group proper to each route
-            Group routeGroup = new Group();
-            routeGroup.setId(route.id());
-            routeGroup.getStyleClass().add("route");
-
-            //modification of the routes visual appearance according to its level and color
-            if (route.level().equals(Route.Level.UNDERGROUND)){
-                routeGroup.getStyleClass().add("UNDERGROUND");
-            }
-
-            if(route.color() == null){
-                routeGroup.getStyleClass().add("NEUTRAL");
-            }
-            else {
-                routeGroup.getStyleClass().addAll( route.color().toString());
-            }
-
+            Group routeGroup = groupForRoute(route);
             // iteration on the length of the route to produce each box that makes up the route
-            for (int i = 0; i < route.length(); ++i) {
+            for (int index = 0; index < route.length(); ++index) {
 
                 //Creation of the visual representation of a routes box
-                Group caseGroup = new Group();
-                caseGroup.setId(route.id() + "_" + (i + 1));
-
-                //Creation of the visual representation of a taken routes box, called cars
-                Group carGroup = new Group();
-                carGroup.getStyleClass().add("car");
-
-                //Creation of the shapes that make up a car or a box
-                Rectangle caseRectangle = new Rectangle(MVC_RECTANGLE_LENGTH, MVC_RECTANGLE_HEIGHT);
-                caseRectangle.getStyleClass().addAll("track", "filled");
-                caseGroup.getChildren().add(caseRectangle);
-
-                Rectangle carRectangle = new Rectangle(MVC_RECTANGLE_LENGTH, MVC_RECTANGLE_HEIGHT);
-                carRectangle.getStyleClass().add("filled");
-
-                Circle c1 = new Circle(MVC_CIRCLE_CENTER, MVC_CIRCLE_SPACING, MVC_CIRCLE_RADIUS);
-                Circle c2 = new Circle(MVC_CIRCLE_CENTER * 2, MVC_CIRCLE_SPACING, MVC_CIRCLE_RADIUS);
-
-                //the car group is now completed, then added as a children of the case group,
-                // which is finally added to the routeGroup
-                carGroup.getChildren().addAll(carRectangle, c1, c2);
+                Group caseGroup = groupForCase(index, route);
+                Group carGroup = groupForCar();
                 caseGroup.getChildren().add(carGroup);
                 routeGroup.getChildren().add(caseGroup);
             }
@@ -134,5 +100,63 @@ class MapViewCreator {
          * @param handler the action handler to choose cards
          */
         void chooseCards(List<SortedBag<Card>> options, ChooseCardsHandler handler);
+    }
+
+    /**
+     * Method that creates the visual group representing a whole tCHu route
+     * @param route the route we want to represent
+     * @return a new group representing the route
+     */
+    private static Group groupForRoute(Route route){
+        Group routeGroup = new Group();
+        routeGroup.setId(route.id());
+        routeGroup.getStyleClass().add("route");
+
+        //modification of the routes visual appearance according to its level and color
+        if (route.level().equals(Route.Level.UNDERGROUND)){
+            routeGroup.getStyleClass().add("UNDERGROUND");
+        }
+        String color = route.color() == null ? "NEUTRAL" : route.color().toString();
+        routeGroup.getStyleClass().add(color);
+        return routeGroup;
+    }
+
+
+    /**
+     * Method that creates the box for one part of the route
+     * @param index the box index,
+     * @param route the route we want to represent
+     * @return a new group representing the route
+     */
+    private static Group groupForCase(int index, Route route){
+        Group caseGroup = new Group();
+        caseGroup.setId(route.id() + "_" + (index + 1));
+
+        //Creation of the shapes that make up a box
+        Rectangle caseRectangle = new Rectangle(MVC_RECTANGLE_LENGTH, MVC_RECTANGLE_HEIGHT);
+        caseRectangle.getStyleClass().addAll("track", "filled");
+        caseGroup.getChildren().add(caseRectangle);
+        return caseGroup;
+    }
+
+
+    /**
+     * Method that creates the visual representation of a routes box, called cars
+     * @return a new group representing the car
+     */
+    private static Group groupForCar() {
+        Group carGroup = new Group();
+        carGroup.getStyleClass().add("car");
+
+        Rectangle carRectangle = new Rectangle(MVC_RECTANGLE_LENGTH, MVC_RECTANGLE_HEIGHT);
+        carRectangle.getStyleClass().add("filled");
+
+        Circle c1 = new Circle(MVC_CIRCLE_CENTER, MVC_CIRCLE_SPACING, MVC_CIRCLE_RADIUS);
+        Circle c2 = new Circle(MVC_CIRCLE_CENTER * 2, MVC_CIRCLE_SPACING, MVC_CIRCLE_RADIUS);
+
+        //the car group is now completed, then added as a children of the case group,
+        // which is finally added to the routeGroup
+        carGroup.getChildren().addAll(carRectangle, c1, c2);
+        return carGroup;
     }
 }

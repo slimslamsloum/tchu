@@ -14,11 +14,25 @@ import java.util.Random;
 
 import static ch.epfl.tchu.game.PlayerId.PLAYER_1;
 import static ch.epfl.tchu.game.PlayerId.PLAYER_2;
+/**
+ * Server hosting the game
+ *
+ * @author Alexandre Kambiz Gunter (324268)
+ * @author Selim Jerad (327529)
+ */
 
 public class ServerMain extends Application {
 
+    /**
+     * Main method of the server
+     * @param args the arguments of the client
+     */
     public static void main(String[] args) { launch(args); }
 
+    /**
+     * Method that starts the game for the server
+     * @param primaryStage obligatory argument - not used in this overridden definition
+     */
     public void start(Stage primaryStage) throws Exception {
         String name1 = getParameters().getRaw().isEmpty() ?
                 "Ada" : getParameters().getRaw().get(0);
