@@ -3,8 +3,10 @@ import ch.epfl.tchu.game.*;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.scene.Group;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -15,6 +17,10 @@ import static ch.epfl.tchu.gui.GuiConstants.*;
 import ch.epfl.tchu.gui.GraphicalPlayer;
 
 import ch.epfl.tchu.gui.GuiConstants;
+import javafx.scene.text.TextFlow;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 /**
  * Creation of the visual and playable interface of the games deck
@@ -108,7 +114,7 @@ class DecksViewCreator {
      */
     public static VBox createCardsView(ObservableGameState obsGameState, ObjectProperty<DrawTicketsHandler> drawTicketsHP,
                                        ObjectProperty<DrawCardHandler> drawCardHP){
-        // Creation of the global view of the deck
+        //Creation of the global view of the deck
         VBox deckView = new VBox();
         deckView.getStylesheets().addAll("decks.css", "colors.css");
         deckView.setId("card-pane");
@@ -117,8 +123,12 @@ class DecksViewCreator {
         Button ticketDeckButton = new Button("Billets");
         ticketDeckButton.getStyleClass().add("gauged");
 
+        //Creation of help button
         Button helpButton = new Button("Aide");
         helpButton.getStyleClass().add("help");
+
+        //Creation of Dark Mode button
+        ToggleButton darkModeButton = new ToggleButton("Dark Mode");
 
         //Creation of the group that contains the gauge which indicates the number of tickets remaining in the stock
         Group ticketDBGroup = new Group();
@@ -139,6 +149,7 @@ class DecksViewCreator {
         //Then the Button is added as a component of the Deck's view
         ticketDBGroup.getChildren().addAll(ticketGaugeBackground,ticketGaugeForeground);
         ticketDeckButton.setGraphic(ticketDBGroup);
+        deckView.getChildren().add(darkModeButton);
         deckView.getChildren().add(ticketDeckButton);
 
         //iteration on all the slots from which cards facing up can be drawn
@@ -206,12 +217,34 @@ class DecksViewCreator {
         cardDeckButton.setOnMouseClicked(event -> drawCardHP.get().onDrawCard(Constants.DECK_SLOT));
         ticketDeckButton.setOnMouseClicked(event -> drawTicketsHP.get().onDrawTickets());
 
-        helpButton.setOnMouseClicked(event -> GraphicalPlayer.displayHelpStage());
+        helpButton.setOnMouseClicked(event -> displayHelpStage());
 
         //In case the player doesn't want to draw a card or a ticket, the use of the buttons is disabled
         cardDeckButton.disableProperty().bind(drawCardHP.isNull());
         ticketDeckButton.disableProperty().bind(drawTicketsHP.isNull());
 
         return deckView;
+    }
+
+    private static void displayHelpStage(){
+        Stage stage = new Stage(StageStyle.DECORATED);
+        VBox vbox = new VBox();
+        Scene scene = new Scene(vbox);
+        stage.initModality(Modality.WINDOW_MODAL);
+        TextFlow textFlow = new TextFlow();
+        stage.setTitle("Règles du jeu");
+        textFlow.getChildren().add(new Text(TchuRules.TITLE_INTRO_TEXT));
+        textFlow.getChildren().add(new Text(TchuRules.INTRO_TEXT));
+        textFlow.getChildren().add(new Text(TchuRules.TITLE_TERMINOLOGY));
+        textFlow.getChildren().add(new Text(TchuRules.TERMINOLOGY));
+        textFlow.getChildren().add(new Text(TchuRules.TITLE_BEGINNING_GAME));
+        textFlow.getChildren().add(new Text(TchuRules.BEGINNING_GAME));
+        textFlow.getChildren().add(new Text(TchuRules.TITLE_TURN_KIND));
+        textFlow.getChildren().add(new Text(TchuRules.TURN_KIND));
+        textFlow.getChildren().add(new Text(TchuRules.TITLE_END_GAME));
+        textFlow.getChildren().add(new Text(TchuRules.END_GAME));
+        stage.setScene(scene);
+        vbox.getChildren().addAll(textFlow);
+        stage.show();
     }
 }
