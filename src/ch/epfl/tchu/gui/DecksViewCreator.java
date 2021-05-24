@@ -9,6 +9,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
@@ -36,6 +37,9 @@ class DecksViewCreator {
      */
     private DecksViewCreator() {
     }
+
+    //Dark mode button
+    public static ToggleButton darkModeButton;
 
     /**
      * Method that creates the player's hand view
@@ -77,7 +81,6 @@ class DecksViewCreator {
                 cardView.getStyleClass().addAll(card.color().name(),"card");
             }
 
-
             //Creation of all the shapes that make up the card's visual representation
             Rectangle outsideRectangle = new Rectangle(DVC_OUTSIDE_LENGTH,DVC_OUTSIDE_HEIGHT);
             outsideRectangle.getStyleClass().add("outside");
@@ -103,6 +106,9 @@ class DecksViewCreator {
         }
         //the view of the player's cards is now added as a children of the player's global hand view
         handView.getChildren().add(cardsHBox);
+
+        DarkModeButton.changeToDarkMode("darkDecks.css", handView);
+
         return handView;
     }
 
@@ -128,7 +134,7 @@ class DecksViewCreator {
         Button helpButton = new Button("Aide");
 
         //Creation of Dark Mode button
-        ToggleButton darkModeButton = new ToggleButton("Dark Mode");
+        darkModeButton = new ToggleButton("Dark Mode");
 
         //Creation of the group that contains the gauge which indicates the number of tickets remaining in the stock
         Group ticketDBGroup = new Group();
@@ -222,6 +228,8 @@ class DecksViewCreator {
         //In case the player doesn't want to draw a card or a ticket, the use of the buttons is disabled
         cardDeckButton.disableProperty().bind(drawCardHP.isNull());
         ticketDeckButton.disableProperty().bind(drawTicketsHP.isNull());
+
+        DarkModeButton.changeToDarkMode("darkDecks.css", deckView);
 
         return deckView;
     }

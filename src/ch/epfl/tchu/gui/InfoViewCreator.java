@@ -60,6 +60,9 @@ class InfoViewCreator {
 
         //playerStats, the separator and gameInfo nodes are now the children of infoPane
         infoPane.getChildren().addAll(playerStats, separator, gameInfo);
+
+        //DarkModeButton.changeToDarkMode("darkInfo.css", infoPane);
+
         return infoPane;
     }
 
