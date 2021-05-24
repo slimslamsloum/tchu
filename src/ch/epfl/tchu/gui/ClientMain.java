@@ -8,7 +8,7 @@ import javafx.stage.Stage;
 
 import java.util.List;
 /**
- * The client
+ * The main client
  *
  * @author Alexandre Kambiz Gunter (324268)
  * @author Selim Jerad (327529)
