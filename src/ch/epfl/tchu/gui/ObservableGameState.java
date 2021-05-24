@@ -130,6 +130,8 @@ public class ObservableGameState {
      * @return neighboring route if there is one, else returns null
      */
     private List<Route> doubleRoutes(Route route){
+        //for all routes, if a double route is found, return list with route in argument and double route.
+        //else, return list with only route in argument (double route wasn't found)
         for (Route route1: ChMap.routes()){
             if (route.stations().equals(route1.stations()) && !route.equals(route1)){ return List.of(route, route1);  }
         }
@@ -144,7 +146,10 @@ public class ObservableGameState {
      */
     private boolean notClaimed(Route route){
         if (!publicGameState.claimedRoutes().contains(route)){
+            //doubleRoute(route),size is 2 iff route in argument has a double route
             if (doubleRoutes(route).size() == 2){
+                //return true if double route (which is always at index 1 in list) hasn't been captured,
+                //else return false
                 return !publicGameState.claimedRoutes().contains(doubleRoutes(route).get(1));
             } else return true;
         } else return false;
