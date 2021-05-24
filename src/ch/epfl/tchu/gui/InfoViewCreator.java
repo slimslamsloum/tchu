@@ -68,6 +68,13 @@ class InfoViewCreator {
         return infoPane;
     }
 
+    /**
+     * Creator of statistics for a given player
+     * @param player player for which we're going to write statistics
+     * @param observableGameState observable state of the game
+     * @param playerStats vbox containing player statistics
+     * @param playerNames map of player names
+     */
     private static void playerInfoView(PlayerId player, ObservableGameState observableGameState, VBox playerStats,
                                        Map<PlayerId, String> playerNames){
         //creation of text flow for a player's statistic

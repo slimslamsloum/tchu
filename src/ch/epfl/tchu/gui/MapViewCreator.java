@@ -123,6 +123,9 @@ class MapViewCreator {
                     }
             );
         }
+
+        DarkModeButton.changeToDarkMode("darkMap.css", mapView);
+
         return mapView;
     }
     // functional interface to choose cards

@@ -229,6 +229,8 @@ class DecksViewCreator {
         cardDeckButton.disableProperty().bind(drawCardHP.isNull());
         ticketDeckButton.disableProperty().bind(drawTicketsHP.isNull());
 
+        DarkModeButton.changeToDarkMode("darkDecks.css", deckView);
+
         return deckView;
     }
 

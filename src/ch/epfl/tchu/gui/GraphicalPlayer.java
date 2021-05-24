@@ -65,9 +65,9 @@ public class GraphicalPlayer {
         observableGameState=new ObservableGameState(playerId);
 
         //creation of the view of the map, info, cards and hand
-        Node mapView = MapViewCreator.createMapView(observableGameState, claimRouteHandler, (cards,handler)->chooseClaimCards(handler,cards));
         Node cardsView = DecksViewCreator.createCardsView(observableGameState, drawTicketsHandler, drawCardHandler);
         Node handView = DecksViewCreator.createHandView(observableGameState);
+        Node mapView = MapViewCreator.createMapView(observableGameState, claimRouteHandler, (cards,handler)->chooseClaimCards(handler,cards));
         Node infoView = InfoViewCreator.createInfoView(playerId, playerNames, observableGameState, texts);
 
         //creation of the borderpane, which will be associated with mainStage

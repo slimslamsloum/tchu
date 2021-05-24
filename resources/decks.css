@@ -51,10 +51,6 @@ Button.gauged .foreground {
     -fx-fill: darkgray;
 }
 
-Button.help{
-    -fx-fill: white;
-}
-
 /* Hand pane (tickets and cards held) */
 
 #tickets {
@@ -67,3 +63,4 @@ Button.help{
     -fx-padding: 5 50 5 50;
     -fx-spacing: 10;
 }
+
