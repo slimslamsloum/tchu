@@ -65,13 +65,15 @@ public class GraphicalPlayer {
         observableGameState=new ObservableGameState(playerId);
 
         //creation of the view of the map, info, cards and hand
-        Node infoView = InfoViewCreator.createInfoView(playerId, playerNames, observableGameState, texts);
         Node mapView = MapViewCreator.createMapView(observableGameState, claimRouteHandler, (cards,handler)->chooseClaimCards(handler,cards));
         Node cardsView = DecksViewCreator.createCardsView(observableGameState, drawTicketsHandler, drawCardHandler);
         Node handView = DecksViewCreator.createHandView(observableGameState);
+        Node infoView = InfoViewCreator.createInfoView(playerId, playerNames, observableGameState, texts);
 
         //creation of the borderpane, which will be associated with mainStage
         BorderPane mainPane = new BorderPane(mapView, null, cardsView, handView, infoView);
+        DarkModeButton.changeToDarkMode("darkMainPane.css",mainPane);
+        mainPane.setId("mainPane");
         mainStage.setScene(new Scene(mainPane));
         mainStage.setTitle("tChu \u2014"+playerNames.get(playerId));
         mainStage.show();
@@ -94,7 +96,9 @@ public class GraphicalPlayer {
     public void receiveInfo(String message){
         assert isFxApplicationThread();
         if (texts.size() == GuiConstants.MAX_MESSAGE_DISPLAYED){ texts.remove(0); }
-        texts.add(new Text(message));
+        Text text = new Text(message);
+        text.setId("text");
+        texts.add(text);
     }
 
     /**

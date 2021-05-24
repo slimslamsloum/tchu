@@ -23,7 +23,7 @@ public class ClientMain extends Application {
             client = new RemotePlayerClient(player,host,port);
         }
         else {
-            client = new RemotePlayerClient(player,"localhost",5108);
+            client = new RemotePlayerClient(player,"128.179.187.248",5108);
         }
         new Thread(client::run).start();
     }

@@ -3,7 +3,7 @@
 .card .outside {
     -fx-arc-width: 10;
     -fx-arc-height: 10;
-    -fx-fill: white;
+    -fx-fill: #a2a1a1;
     -fx-stroke: dimgrey;
 }
 
@@ -39,7 +39,6 @@
     -fx-spacing: 10;
     -fx-alignment: center;
     -fx-padding: 5;
-    -fx-background-color: black;
 }
 
 Button.gauged {
@@ -67,5 +66,4 @@ Button.help{
     -fx-alignment: center;
     -fx-padding: 5 50 5 50;
     -fx-spacing: 10;
-    -fx-background-color: black;
 }

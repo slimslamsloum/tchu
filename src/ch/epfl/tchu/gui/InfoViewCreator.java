@@ -4,6 +4,7 @@ import ch.epfl.tchu.game.PlayerId;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringExpression;
 import javafx.collections.ObservableList;
+import javafx.scene.Node;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -53,6 +54,7 @@ class InfoViewCreator {
         //creation of text flow for information related to the game
         TextFlow gameInfo = new TextFlow();
         gameInfo.setId("game-info");
+
         Bindings.bindContent(gameInfo.getChildren(), observableTexts);
 
         playerInfoView(playerId, observableGameState,playerStats, playerNames);
@@ -61,7 +63,7 @@ class InfoViewCreator {
         //playerStats, the separator and gameInfo nodes are now the children of infoPane
         infoPane.getChildren().addAll(playerStats, separator, gameInfo);
 
-        //DarkModeButton.changeToDarkMode("darkInfo.css", infoPane);
+        DarkModeButton.changeToDarkMode("darkInfo.css", infoPane);
 
         return infoPane;
     }
@@ -89,6 +91,7 @@ class InfoViewCreator {
         //the string expression will be binded with the text, which is a child of the Text flow for
         //player statistics
         playerStatsText.textProperty().bind(stringExpression);
+        playerStatsText.setId("text");
         playerN.getChildren().addAll(circle, playerStatsText);
     }
 }

@@ -3,7 +3,6 @@
 #player-stats {
     -fx-spacing: 10;
     -fx-padding: 10;
-    -fx-background-color: black;
 }
 
 #player-stats Circle {
@@ -15,5 +14,8 @@
     -fx-padding: 10;
     -fx-pref-width: 220;
     -fx-line-spacing: 3;
-    -fx-background-color: black;
+}
+
+#text {
+    -fx-fill: white;
 }
