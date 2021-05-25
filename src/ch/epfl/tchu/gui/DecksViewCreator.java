@@ -48,7 +48,6 @@ class DecksViewCreator {
 
         //iteration on all the cards of the game
         for (Card card : Card.ALL) {
-
             //Creates the view corresponding to the card and adds it to the player's hand
             cardsHBox.getChildren().add(handCardView(card,obsGameState));
         }

@@ -40,7 +40,7 @@ import java.util.Map;
 
 public class GraphicalPlayer {
 
-    //We need to 3 handlers that are in properties to handle the startTurn method
+    //We need 3 handlers that are in properties to handle the startTurn method
     private final SimpleObjectProperty<DrawTicketsHandler> drawTicketsHandler = new SimpleObjectProperty<>();
     private final SimpleObjectProperty<DrawCardHandler> drawCardHandler = new SimpleObjectProperty<>();
     private final SimpleObjectProperty<ClaimRouteHandler> claimRouteHandler = new SimpleObjectProperty<>();
