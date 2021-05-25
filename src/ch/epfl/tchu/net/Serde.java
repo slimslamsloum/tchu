@@ -43,8 +43,7 @@ public interface Serde <T>{
     static <T> Serde<T> of(Function<T, String> serialize, Function<String, T> deserialize){
         return new Serde<>() {
             @Override
-            public String serialize(T t) {
-                return serialize.apply(t); }
+            public String serialize(T t) { return serialize.apply(t); }
 
             @Override
             public T deserialize(String s) {
@@ -55,7 +54,7 @@ public interface Serde <T>{
 
     /**
      * Creates serde capable of serializing a certain tChu object (a turnkind, a player id, a route...)
-     * also called an enumerated value
+     * also called an enumerated value.
      * @param ValEnum list of values of the tChu enumerated value
      * @param <T> type of the enumerated value
      * @return the serde capable of de/serializing an enumerated value
@@ -89,10 +88,12 @@ public interface Serde <T>{
             public String serialize(List<T> list) {
                 if(list.isEmpty()){ return ""; }
                 else {
+                    //create list of string with each serialized element in argument "list"
                     List<String> l = new ArrayList<>();
                     for (T t : list) {
                         l.add(serde.serialize(t));
                     }
+                    //return string, with each serialized string separated with separator argument
                     return String.join(separator, l);
                 }
             }
@@ -101,8 +102,10 @@ public interface Serde <T>{
             public List<T> deserialize(String string) {
                 if (string.equals("")){return List.of();}
                 else {
+                    //creation of list of serialized strings, knowing message was used using separator in argument
                     String[] noSeparator = string.split(Pattern.quote(separator), -1);
                     List<T> tList = new ArrayList<>();
+                    //each string is deserialized
                     for (String toDeserialize : noSeparator) {
                         tList.add(serde.deserialize(toDeserialize));
                     }
@@ -126,10 +129,12 @@ public interface Serde <T>{
             public String serialize(SortedBag<T> SB) {
                 if (SB.isEmpty()){ return ""; }
                 else {
+                    //add to list of string, each serialized element in SB
                     List<String> l = new ArrayList<>();
                     for (T t : SB) {
                         l.add(serde.serialize(t));
                     }
+                    //return String with each serialized element separated with separator given in argument
                     return String.join(separator, l);
                 }
             }
@@ -138,8 +143,10 @@ public interface Serde <T>{
             public SortedBag<T> deserialize(String string) {
                 if (string.equals("")){return SortedBag.of();}
                 else{
+                    //creation of list of serialized elements
                     String[] noSeparator = string.split(Pattern.quote(separator), -1);
                     SortedBag.Builder<T> builder = new SortedBag.Builder<>();
+                    //each serialized element is deserialized
                     for (String toDeserialize : noSeparator) {
                         builder.add(serde.deserialize(toDeserialize));
                     }
