@@ -20,7 +20,7 @@ public final class StationPartition implements StationConnectivity{
      * @param station_partition partition of stations
      */
     private StationPartition(int[] station_partition){
-        this.partition = station_partition;
+        this.partition = station_partition.clone();
     }
 
     /**

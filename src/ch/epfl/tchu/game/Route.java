@@ -5,6 +5,7 @@ import ch.epfl.tchu.SortedBag;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Route
@@ -40,9 +41,9 @@ public final class Route {
     public Route(String id, Station station1, Station station2, int length, Level level, Color color){
         Preconditions.checkArgument(!station1.equals(station2));
         Preconditions.checkArgument(!(length > Constants.MAX_ROUTE_LENGTH || length < Constants.MIN_ROUTE_LENGTH));
-        if (id == null || station2 == null || level == null){
-            throw new NullPointerException("level, a station or route id is null");
-        }
+        Objects.requireNonNull(id);
+        Objects.requireNonNull(level);
+        Objects.requireNonNull(station2);
         this.id=id;
         this.color=color;
         this.length=length;

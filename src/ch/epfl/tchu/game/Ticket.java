@@ -26,7 +26,7 @@ public final class Ticket implements Comparable<Ticket> {
      * throws exception if trips is null or starting stations don't match
      */
     public Ticket(List<Trip> trips){
-        Preconditions.checkArgument(trips != null && trips.size() != 0);
+        Preconditions.checkArgument(trips != null && !trips.isEmpty());
 
         String expectedStation = List.copyOf(trips).get(0).from().toString();
         for(Trip trip : List.copyOf(trips)){

@@ -4,7 +4,6 @@ import ch.epfl.tchu.Preconditions;
 import ch.epfl.tchu.SortedBag;
 import ch.epfl.tchu.gui.Info;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -28,7 +27,7 @@ public final class Game {
      * @throws IllegalArgumentException if there are not 2 players and 2 player names in each map
      */
     public static void play(Map<PlayerId, Player> players, Map<PlayerId, String> playerNames, SortedBag<Ticket> tickets, Random rng) {
-        Preconditions.checkArgument(players.size()==2 && playerNames.size()==2);
+        Preconditions.checkArgument(players.size()==PlayerId.COUNT && playerNames.size()==PlayerId.COUNT);
 
         //here, method initPlayers is used to create the 2 players that will play the game and also
         //to give each one a name
@@ -126,7 +125,7 @@ public final class Game {
                             Game.allInfo(new Info(playerNames.get(gameState.currentPlayerId())).drewBlindCard(),players);
                         }
                         //if current player wants to draw a face up card
-                        if (slot >= Constants.FACE_UP_CARD_SLOTS.get(0) && slot <= Constants.FACE_UP_CARD_SLOTS.get(4)) {
+                        if (Constants.FACE_UP_CARD_SLOTS.contains(slot)) {
                             //players receive info that current player will draw the face up card at index slot
                             Game.allInfo(new Info(playerNames.get(gameState.currentPlayerId())).drewVisibleCard(gameState.cardState().faceUpCard(slot)),players);
                             //player draws card at index slot

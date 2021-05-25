@@ -40,7 +40,7 @@ public class ObservableGameState {
     //properties that concern private information about the player watching the game state
     private final ObservableList<Ticket> playerTickets;
     private final Map<Card, SimpleIntegerProperty> numberPerCard;
-    private final Map<Route, SimpleBooleanProperty> booleanForEachRoute;
+    private final Map<Route, SimpleBooleanProperty> canClaimRoute;
 
     /**
      * Observable Game state constructor
@@ -67,7 +67,7 @@ public class ObservableGameState {
         //initialization of properties concerning information about the player with id "ownPlayerId"
         playerTickets=FXCollections.observableArrayList();
         numberPerCard=numberCardPropertyMap();
-        booleanForEachRoute=booleanPropertyMap();
+        canClaimRoute =booleanPropertyMap();
     }
 
     public void setState(PublicGameState newGameState, PlayerState newPlayerState){
@@ -78,6 +78,9 @@ public class ObservableGameState {
         //setting new values for the first set of properties
         percentageTickets.set((newGameState.ticketsCount()*100)/Constants.TOTAL_TICKET_COUNT);
         percentageCards.set((newGameState.cardState().deckSize()*100)/Constants.TOTAL_CARDS_COUNT);
+
+        Constants.FACE_UP_CARD_SLOTS.forEach(slot -> faceUpCards.get(slot).set(newGameState.cardState().faceUpCard(slot)) );
+
         for (int slot : Constants.FACE_UP_CARD_SLOTS) {
             Card newCard = newGameState.cardState().faceUpCard(slot);
             faceUpCards.get(slot).set(newCard);
@@ -106,22 +109,10 @@ public class ObservableGameState {
             numberPerCard.get(card).set(newPlayerState.cards().countOf(card));
         }
         for(Route route : ChMap.routes()){
-            boolean bool = (notClaimed(route) &&
+            boolean bool = (!routeIsClaimed(route) &&
                     newGameState.currentPlayerId().equals(ownPlayerId) && newPlayerState.canClaimRoute(route));
-            booleanForEachRoute.get(route).set(bool);
+            canClaimRoute.get(route).set(bool);
         }
-    }
-
-    /**
-     * Face Up Cards Creator
-     * @return List of 5 Object Properties of Cards (one for each face up card)
-     */
-    private List<ObjectProperty<Card>> createFaceUpCards(){
-        List<ObjectProperty<Card>> l = new ArrayList<>();
-        for (int i =0; i<Constants.FACE_UP_CARDS_COUNT; i++){
-            l.add(new SimpleObjectProperty<>());
-        }
-        return l;
     }
 
     /**
@@ -129,30 +120,26 @@ public class ObservableGameState {
      * @param route for which we want to find the neighboring route
      * @return neighboring route if there is one, else returns null
      */
-    private List<Route> doubleRoutes(Route route){
-        //for all routes, if a double route is found, return list with route in argument and double route.
-        //else, return list with only route in argument (double route wasn't found)
+    private Route doubleRoute(Route route){
+        //for all routes, if a double route is found, return the corresponding double route.
         for (Route route1: ChMap.routes()){
-            if (route.stations().equals(route1.stations()) && !route.equals(route1)){ return List.of(route, route1);  }
+            if (route.stations().equals(route1.stations()) && !route.equals(route1)){ return route1;  }
         }
-        return List.of(route);
+        return null;
     }
 
     /**
      * Checks, if a certain route has already been claimed or not
      * @param route route to be checked
-     * @return true, if route is single and hasn't been claimed OR if route is double and the two routes haven't
-     * been claimed, returns false in all other scenarios
+     * @return true, if route is single and has been claimed OR if route is double and at least one of the two routes
+     * have been claimed, returns false in all other scenarios
      */
-    private boolean notClaimed(Route route){
-        if (!publicGameState.claimedRoutes().contains(route)){
-            //doubleRoute(route),size is 2 iff route in argument has a double route
-            if (doubleRoutes(route).size() == 2){
-                //return true if double route (which is always at index 1 in list) hasn't been captured,
-                //else return false
-                return !publicGameState.claimedRoutes().contains(doubleRoutes(route).get(1));
-            } else return true;
-        } else return false;
+    private boolean routeIsClaimed(Route route){
+        Route doubleRoute = doubleRoute(route);
+        boolean isClaimed = doubleRoute==null ? publicGameState.claimedRoutes().contains(route)
+                : (publicGameState.claimedRoutes().contains(route)
+                || publicGameState.claimedRoutes().contains(doubleRoute));
+        return isClaimed;
     }
 
     /**
@@ -227,7 +214,7 @@ public class ObservableGameState {
      * @param route route to be checked
      * @return read only property of the boolean value associated to the route
      */
-    public ReadOnlyBooleanProperty booleanForEachRoute(Route route){ return booleanForEachRoute.get(route);}
+    public ReadOnlyBooleanProperty canClaimRoute(Route route){ return canClaimRoute.get(route);}
 
     /**
      * canDrawTickets
@@ -243,6 +230,27 @@ public class ObservableGameState {
      */
     public boolean canDrawCards(){
         return publicGameState.canDrawCards();
+    }
+
+    /**
+     * Returns possible claim cards given a certain route, using player state
+     * @param route route to be checked
+     * @return possible claim cards to claim the route
+     */
+    public List<SortedBag<Card>> playerState(Route route){
+        return playerState.possibleClaimCards(route);
+    }
+
+    /**
+     * Face Up Cards Creator
+     * @return List of 5 Object Properties of Cards (one for each face up card)
+     */
+    private List<ObjectProperty<Card>> createFaceUpCards(){
+        List<ObjectProperty<Card>> l = new ArrayList<>();
+        for (int i =0; i<Constants.FACE_UP_CARDS_COUNT; i++){
+            l.add(new SimpleObjectProperty<>());
+        }
+        return l;
     }
 
     /**
@@ -279,15 +287,6 @@ public class ObservableGameState {
             map.put(card, new SimpleIntegerProperty());
         }
         return map;
-    }
-
-    /**
-     * Returns possible claim cards given a certain route, using player state
-     * @param route route to be checked
-     * @return possible claim cards to claim the route
-     */
-    public List<SortedBag<Card>> playerstate (Route route){
-        return playerState.possibleClaimCards(route);
     }
 
     /**

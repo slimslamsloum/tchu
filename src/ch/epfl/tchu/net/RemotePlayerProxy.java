@@ -170,12 +170,10 @@ public class RemotePlayerProxy implements Player {
         try {
             w.write(messageId.name());
             w.write(" ");
-            int i = 0;
             if (!list.isEmpty()){
                 for (String string : list){
                     w.write(string);
-                    if (i != list.size()){w.write(" ");}
-                    i++;
+                    if (list.indexOf(string) != list.size() -1){w.write(" ");}
                 }
             }
             w.write('\n');

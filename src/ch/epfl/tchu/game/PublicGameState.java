@@ -28,7 +28,7 @@ public class PublicGameState {
      * @throws NullPointerException if cardState or current player id is null
      */
     public PublicGameState(int ticketsCount, PublicCardState cardState, PlayerId currentPlayerId, Map<PlayerId, PublicPlayerState> playerState, PlayerId lastPlayer){
-        Preconditions.checkArgument(ticketsCount >= 0 && playerState.size() == 2);
+        Preconditions.checkArgument(ticketsCount >= 0 && playerState.size() == PlayerId.COUNT);
         Objects.requireNonNull(cardState);
         Objects.requireNonNull(currentPlayerId);
         this.ticketCount =ticketsCount;

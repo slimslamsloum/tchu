@@ -65,7 +65,7 @@ class MapViewCreator {
             //or if he cannot take the route
             routeGroup.disableProperty()
                     .bind(claimRouteHandlerProperty.isNull().
-                            or(observableGameState.booleanForEachRoute(route).not()));
+                            or(observableGameState.canClaimRoute(route).not()));
 
             //Allows the route to change visually if the route is taken by a new owner
             observableGameState.routePlayerId(route).addListener((property, oldVal, newVal)
@@ -75,7 +75,7 @@ class MapViewCreator {
             //Allow the players to take the route with their mouse
             routeGroup.setOnMouseClicked(
                     e -> {
-                        List<SortedBag<Card>> possibleClaimCards = observableGameState.playerstate(route);
+                        List<SortedBag<Card>> possibleClaimCards = observableGameState.playerState(route);
                         ClaimRouteHandler claimRouteH = claimRouteHandlerProperty.get();
                         //If the player has only one choice, the route is automatically taken with these cards
                         if (possibleClaimCards.size() == 1) {
