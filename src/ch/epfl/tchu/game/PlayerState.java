@@ -4,6 +4,8 @@ import ch.epfl.tchu.Preconditions;
 import ch.epfl.tchu.SortedBag;
 
 import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * Private state of a player
@@ -136,26 +138,19 @@ public final class PlayerState extends PublicPlayerState {
      * @param initialCards the initial cards used to take the tunnel
      * @return all possible additional cards that the player has to add
      */
-    public List<SortedBag<Card>> possibleAdditionalCards(int additionalCardsCount, SortedBag<Card> initialCards, SortedBag<Card> drawnCards){
+    public List<SortedBag<Card>> possibleAdditionalCards(int additionalCardsCount, SortedBag<Card> initialCards){
         Preconditions.checkArgument(
                 additionalCardsCount>=1 && additionalCardsCount<=Constants.ADDITIONAL_TUNNEL_CARDS
-                        && drawnCards.size()==Constants.ADDITIONAL_TUNNEL_CARDS
                         && initialCards != null && initialCards.size() != 0 && initialCards.toSet().size()<=2);
 
-        SortedBag<Card> newCards = cards.difference(initialCards);
+        SortedBag<Card> playableCards = cards.difference(initialCards);
+        Set <Card> initialCardsSet = initialCards.toSet();
 
-        for(Card card : drawnCards){
-            for(Card initial_card : initialCards){
-                SortedBag.Builder<Card> dC = new SortedBag.Builder<>();
-                if (card.equals(initial_card) || card.equals(Card.LOCOMOTIVE)){
-                    break;
-                }
-                dC.add(card);
-                SortedBag<Card> uselessCard = dC.build();
-                drawnCards = drawnCards.difference(uselessCard);
-            }
-        }
-        SortedBag<Card> allUsableCards = allUsableCards(newCards,drawnCards);
+        SortedBag<Card> allUsableCards = SortedBag.of(playableCards.stream()
+                .filter( predicate ->
+                        initialCardsSet.contains(predicate) || predicate.equals(Card.LOCOMOTIVE))
+                .collect(Collectors.toList()));
+
         if(allUsableCards.size() >= additionalCardsCount){
             List<SortedBag<Card>> possibleAdditionalCards = new ArrayList<>(allUsableCards.subsetsOfSize(additionalCardsCount));
             possibleAdditionalCards.sort(
@@ -163,28 +158,8 @@ public final class PlayerState extends PublicPlayerState {
             return possibleAdditionalCards;
         }
         else {
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
-    }
-
-
-    /**
-     *
-     * @param deck the cards in possession of the payer
-     * @param drawnCards the cards randomly drawn from the stock
-     * @return all the cards that can be used by the player from his own deck of cards
-     */
-    private static SortedBag<Card> allUsableCards(SortedBag<Card> deck,SortedBag<Card> drawnCards){
-        SortedBag.Builder<Card> temp = new SortedBag.Builder<>();
-        for (Card my_card : deck) {
-            for (Card additional_card : drawnCards){
-                if(my_card.equals(additional_card) || my_card.equals(Card.LOCOMOTIVE)){
-                    temp.add(my_card);
-                    break;
-                }
-            }
-        }
-        return temp.build();
     }
 
     /**

@@ -164,8 +164,7 @@ public final class Game {
                         //list of possible additional cards the player needs to add is computed
                         if (cardsToPlay!=0){
                             List<SortedBag<Card>> possibleAdditionalCards =
-                                    gameState.currentPlayerState().possibleAdditionalCards(cardsToPlay, initialClaimCards,
-                                            drawnCardsSB.build());
+                                    gameState.currentPlayerState().possibleAdditionalCards(cardsToPlay, initialClaimCards);
 
                             //if possibleAdditionalCards's size isn't null (i.e player has different options to take the tunnel)
                             if (possibleAdditionalCards.size() != 0) {
