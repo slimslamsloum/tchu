@@ -147,7 +147,7 @@ public class GraphicalPlayer {
         ListView<Ticket> listView = new ListView<>(FXCollections.observableList(tickets.toList()));
         Button choiceButton = new Button(CHOOSE);
         int ticketBagSize = tickets.size();
-        String introText = String.format(CHOOSE_TICKETS, ticketBagSize-Constants.MAX_DISCARDABLE_TICKETS_COUNT,
+        String introText = String.format(CHOOSE_TICKETS, ticketBagSize-Constants.DISCARDABLE_TICKETS_COUNT,
                 plural(ticketBagSize));
 
         //stage is created with auxiliary method choiceStage
@@ -159,7 +159,7 @@ public class GraphicalPlayer {
         //choiceButton is disabled while player hasn't selected more or exactly ticketBagSize-2 tickets,
         //where 2 is the maximum of tickets a player can discard
         choiceButton.disableProperty()
-                .bind(Bindings.greaterThan(ticketBagSize-Constants.MAX_DISCARDABLE_TICKETS_COUNT,
+                .bind(Bindings.greaterThan(ticketBagSize-Constants.DISCARDABLE_TICKETS_COUNT,
                         Bindings.size(listView.getSelectionModel().getSelectedItems())));
 
         //tab can't be closed while picking tickets
@@ -199,6 +199,10 @@ public class GraphicalPlayer {
         //stage is created with auxiliary method choiceStage
         Stage stage = choiceStage(listView, CARDS_CHOICE, CHOOSE_CARDS, choiceButton);
 
+        //textual representation of elements in listView are converted with CardBagStringConverter class
+        listView.setCellFactory(v ->
+                new TextFieldListCell<>(new CardBagStringConverter()));
+
         //button is disabled while player hasn't chosen a combination of cards
         choiceButton.disableProperty()
                 .bind(Bindings.equal(0, Bindings.size(listView.getSelectionModel().getSelectedItems())));
@@ -224,6 +228,10 @@ public class GraphicalPlayer {
         Button choiceButton = new Button(CHOOSE);
         //stage is created with choiceStage method
         Stage stage = choiceStage(listView, CARDS_CHOICE, CHOOSE_ADDITIONAL_CARDS, choiceButton);
+
+        //textual representation of elements in listView are converted with CardBagStringConverter class
+        listView.setCellFactory(v ->
+                new TextFieldListCell<>(new CardBagStringConverter()));
 
         //tab can't be closed while picking cards
         stage.setOnCloseRequest(Event::consume);
@@ -257,13 +265,6 @@ public class GraphicalPlayer {
         //stage is given new title
         stage.setTitle(title);
 
-        //textual representation of elements in listView are converted with CardBagStringConverter class only
-        //if player isn't drawing tickets
-        if (!title.equals(TICKETS_CHOICE)){
-            listView.setCellFactory(v ->
-                    new TextFieldListCell<>(new CardBagStringConverter()));
-
-        }
         //vbox children are created, stage is then shown
         stage.setScene(scene);
         vbox.getChildren().addAll(textFlow, listView, choiceButton);
