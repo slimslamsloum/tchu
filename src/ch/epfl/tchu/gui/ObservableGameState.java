@@ -75,17 +75,15 @@ public class ObservableGameState {
         publicGameState=newGameState;
         playerState=newPlayerState;
 
-        //setting new values for the first set of properties
+        //setting new values for the first set of properties -- the percentages of tickets / cards both player have,
+        //the faceUpCards and the routes
         percentageTickets.set((newGameState.ticketsCount()*100)/Constants.TOTAL_TICKET_COUNT);
         percentageCards.set((newGameState.cardState().deckSize()*100)/Constants.TOTAL_CARDS_COUNT);
 
+        //sets the new cards placed among the faceUpCards
         Constants.FACE_UP_CARD_SLOTS.forEach(slot -> faceUpCards.get(slot).set(newGameState.cardState().faceUpCard(slot)) );
 
-        for (int slot : Constants.FACE_UP_CARD_SLOTS) {
-            Card newCard = newGameState.cardState().faceUpCard(slot);
-            faceUpCards.get(slot).set(newCard);
-        }
-
+        //sets the routes that have been taken to the player that claimed it
         for (Route route: ChMap.routes()) {
             for (PlayerId player : PlayerId.ALL){
                 if (newGameState.playerState(player).routes().contains(route)){
@@ -94,7 +92,7 @@ public class ObservableGameState {
             }
         }
 
-        //setting new values for the second set of properties
+        //setting new values for the second set of properties -- the number of tickets, cards, cars and points they have
         for (PlayerId playerId: PlayerId.ALL){
             nbTickets.get(playerId).set(newGameState.playerState(playerId).ticketCount());
             nbCards.get(playerId).set(newGameState.playerState(playerId).cardCount());
@@ -102,12 +100,14 @@ public class ObservableGameState {
             nbPoints.get(playerId).set(newGameState.playerState(playerId).claimPoints());
         }
 
-        //setting new values for the third set of properties
+        //setting new values for the third set of properties -- for the player watching the game
+        //setting the new tickets of the player watching the game
         playerTickets.setAll(newPlayerState.tickets().toList());
 
-        for (Card card : Card.ALL){
-            numberPerCard.get(card).set(newPlayerState.cards().countOf(card));
-        }
+        //setting the number of cards per type of cards of the player
+        Card.ALL.forEach(card -> numberPerCard.get(card).set(newPlayerState.cards().countOf(card)) );
+
+        //setting the routes the player can still claim (or not claim anymore)
         for(Route route : ChMap.routes()){
             boolean bool = (!routeIsClaimed(route) &&
                     newGameState.currentPlayerId().equals(ownPlayerId) && newPlayerState.canClaimRoute(route));

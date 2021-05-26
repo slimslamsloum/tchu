@@ -22,6 +22,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.StringConverter;
 import static javafx.application.Platform.isFxApplicationThread;
+import static ch.epfl.tchu.gui.StringsFr.*;
 import ch.epfl.tchu.gui.ActionHandlers.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -112,12 +113,10 @@ public class GraphicalPlayer {
         this.claimRouteHandler.set(claimRouteHandler);
 
         //drawCardHandler is filled only if player can draw cards
-        if(observableGameState.canDrawCards()){ this.drawCardHandler.set(drawCardHandler); }
-        else{ this.drawCardHandler.set(null); }
+        this.drawCardHandler.set(observableGameState.canDrawCards() ? drawCardHandler : null);
 
         //drawTicketsHandler is filled only if player can draw tickets
-        if(observableGameState.canDrawTickets()){ this.drawTicketsHandler.set(drawTicketsHandler);}
-        else{ this.drawTicketsHandler.set(null); }
+        this.drawTicketsHandler.set(observableGameState.canDrawTickets() ? drawTicketsHandler : null);
 
         //independently of which handler is called, all handlers are then set to null with the method emptyHandlers
         this.claimRouteHandler.set((route,cards) ->{
@@ -141,33 +140,34 @@ public class GraphicalPlayer {
      * @param handler ticket handler
      * @param tickets all the tickets from which the player can choose from
      */
-    public void chooseTickets(ActionHandlers.ChooseTicketsHandler handler, SortedBag<Ticket> tickets){
+    public void chooseTickets(ChooseTicketsHandler handler, SortedBag<Ticket> tickets){
         assert isFxApplicationThread();
 
         //listView, button and intro Text are created
         ListView<Ticket> listView = new ListView<>(FXCollections.observableList(tickets.toList()));
-        Button choiceButton = new Button("Choisir");
+        Button choiceButton = new Button(CHOOSE);
         int ticketBagSize = tickets.size();
-        String introText = String.format(StringsFr.CHOOSE_TICKETS, ticketBagSize-Constants.DISCARDABLE_TICKETS_COUNT, StringsFr.plural(ticketBagSize));
+        String introText = String.format(CHOOSE_TICKETS, ticketBagSize-Constants.MAX_DISCARDABLE_TICKETS_COUNT,
+                plural(ticketBagSize));
 
         //stage is created with auxiliary method choiceStage
-        Stage stage = choiceStage(listView, StringsFr.TICKETS_CHOICE, introText, choiceButton);
+        Stage stage = choiceStage(listView, TICKETS_CHOICE, introText, choiceButton);
 
         //selection mode becomes MULTIPLE
         listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-        //choiceButton is disabled while player hasn't selected more or exactly ticketBagSize-2 tickets
+        //choiceButton is disabled while player hasn't selected more or exactly ticketBagSize-2 tickets,
+        //where 2 is the maximum of tickets a player can discard
         choiceButton.disableProperty()
-                .bind(Bindings.greaterThan(ticketBagSize-2, Bindings.size(listView.getSelectionModel().getSelectedItems())));
+                .bind(Bindings.greaterThan(ticketBagSize-Constants.MAX_DISCARDABLE_TICKETS_COUNT,
+                        Bindings.size(listView.getSelectionModel().getSelectedItems())));
 
         //tab can't be closed while picking tickets
         choiceButton.setOnAction(event -> {
             stage.hide();
             List<Ticket> ticketList = listView.getSelectionModel().getSelectedItems();
             SortedBag.Builder<Ticket> ticketBuilder = new SortedBag.Builder<>();
-            for (Ticket ticket : ticketList) {
-                ticketBuilder.add(ticket);
-            }
+            ticketList.forEach(ticketBuilder::add);
             handler.onChooseTickets(ticketBuilder.build());
         });
         stage.setOnCloseRequest(Event::consume);
@@ -191,13 +191,13 @@ public class GraphicalPlayer {
      * @param handler chooseCardsHandler
      * @param possibleClaimCards list of possible SortedBags of cards from which the player can choose from
      */
-    public void chooseClaimCards(ActionHandlers.ChooseCardsHandler handler, List<SortedBag<Card>> possibleClaimCards){
+    public void chooseClaimCards(ChooseCardsHandler handler, List<SortedBag<Card>> possibleClaimCards){
         assert isFxApplicationThread();
         //listView, choiceButton and stage are created
         ListView<SortedBag<Card>> listView = new ListView<>(FXCollections.observableList(possibleClaimCards));
-        Button choiceButton = new Button("Choisir");
+        Button choiceButton = new Button(CHOOSE);
         //stage is created with auxiliary method choiceStage
-        Stage stage = choiceStage(listView, StringsFr.CARDS_CHOICE, StringsFr.CHOOSE_CARDS, choiceButton);
+        Stage stage = choiceStage(listView, CARDS_CHOICE, CHOOSE_CARDS, choiceButton);
 
         //button is disabled while player hasn't chosen a combination of cards
         choiceButton.disableProperty()
@@ -216,14 +216,14 @@ public class GraphicalPlayer {
      * @param handler chooseCardsHandler
      * @param additionalCards list of possible SortedBags of additional cards from which the player can choose from
      */
-    public void chooseAdditionalCards(ActionHandlers.ChooseCardsHandler handler, List<SortedBag<Card>> additionalCards){
+    public void chooseAdditionalCards(ChooseCardsHandler handler, List<SortedBag<Card>> additionalCards){
         assert isFxApplicationThread();
 
         //listView, button and stage are created
         ListView<SortedBag<Card>> listView = new ListView<>(FXCollections.observableList(additionalCards));
-        Button choiceButton = new Button("Choisir");
+        Button choiceButton = new Button(CHOOSE);
         //stage is created with choiceStage method
-        Stage stage = choiceStage(listView, StringsFr.CARDS_CHOICE, StringsFr.CHOOSE_ADDITIONAL_CARDS, choiceButton);
+        Stage stage = choiceStage(listView, CARDS_CHOICE, CHOOSE_ADDITIONAL_CARDS, choiceButton);
 
         //tab can't be closed while picking cards
         stage.setOnCloseRequest(Event::consume);
@@ -251,22 +251,19 @@ public class GraphicalPlayer {
         scene.getStylesheets().add("chooser.css");
         stage.initOwner(mainStage);
         stage.initModality(Modality.WINDOW_MODAL);
-        TextFlow textFlow = new TextFlow();
+        //intro text is added with the TextFlow
+        TextFlow textFlow = new TextFlow(new Text(intro));
 
         //stage is given new title
         stage.setTitle(title);
 
         //textual representation of elements in listView are converted with CardBagStringConverter class only
         //if player isn't drawing tickets
-        if (!title.equals(StringsFr.TICKETS_CHOICE)){
+        if (!title.equals(TICKETS_CHOICE)){
             listView.setCellFactory(v ->
                     new TextFieldListCell<>(new CardBagStringConverter()));
 
         }
-
-        //intro text is added
-        textFlow.getChildren().add(new Text(intro));
-
         //vbox children are created, stage is then shown
         stage.setScene(scene);
         vbox.getChildren().addAll(textFlow, listView, choiceButton);

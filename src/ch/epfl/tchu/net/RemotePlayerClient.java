@@ -2,6 +2,7 @@ package ch.epfl.tchu.net;
 
 import ch.epfl.tchu.SortedBag;
 import ch.epfl.tchu.game.*;
+import ch.epfl.tchu.gui.StringsFr;
 
 import java.io.*;
 import java.net.Socket;
@@ -52,7 +53,7 @@ public class RemotePlayerClient {
 
             String str;
             while((str = r.readLine()) != null){
-                String[] separatedMessage = str.split(Pattern.quote(" "), -1);
+                String[] separatedMessage = str.split(Pattern.quote(StringsFr.SPACE_SEPARATOR), -1);
                 String messageId = separatedMessage[0]; // gives the type of action to be done
                 // According to the content of the messageId, which is a value of the enum type MessageId,
                 // It does a specific action

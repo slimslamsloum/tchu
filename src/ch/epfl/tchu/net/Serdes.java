@@ -3,7 +3,7 @@ package ch.epfl.tchu.net;
 
 import ch.epfl.tchu.SortedBag;
 import ch.epfl.tchu.game.*;
-
+import static ch.epfl.tchu.gui.StringsFr.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -31,7 +31,7 @@ public class Serdes {
      */
     public final static Serde<String> stringSerde=Serde.of(
             i -> Base64.getEncoder().encodeToString(i.getBytes(StandardCharsets.UTF_8)),
-            str -> new String(Base64.getDecoder().decode(str.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8));
+            i -> new String(Base64.getDecoder().decode(i.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8));
 
     /**
      * Serde that de/serializes a playerId
@@ -61,40 +61,40 @@ public class Serdes {
     /**
      * Serde that de/serializes a list of cards
      */
-    public final static Serde<List<Card>> listCardSerde = Serde.listOf(cardSerde, ",");
+    public final static Serde<List<Card>> listCardSerde = Serde.listOf(cardSerde, SEMICOLON_SEPARATOR);
 
     /**
      * Serde that de/serializes a list of routes
      */
-    public final static Serde<List<Route>> listRouteSerde = Serde.listOf(routeSerde, ",");
+    public final static Serde<List<Route>> listRouteSerde = Serde.listOf(routeSerde, COMMA_SEPARATOR);
 
     /**
      * Serde that de/serializes a list of string
      */
-    public final static Serde<List<String>> listStringSerde = Serde.listOf(stringSerde, ",");
+    public final static Serde<List<String>> listStringSerde = Serde.listOf(stringSerde, COMMA_SEPARATOR);
 
     /**
      * Serde that de/serializes a SortedBag of Cards
      */
-    public final static Serde<SortedBag<Card>> sbCardSerde = Serde.bagOf(cardSerde, ",");
+    public final static Serde<SortedBag<Card>> sbCardSerde = Serde.bagOf(cardSerde, COMMA_SEPARATOR);
 
     /**
      * Serde that de/serializes a SortedBag of tickets
      */
-    public final static Serde<SortedBag<Ticket>> sbTicketSerde = Serde.bagOf(ticketSerde, ",");
+    public final static Serde<SortedBag<Ticket>> sbTicketSerde = Serde.bagOf(ticketSerde, COMMA_SEPARATOR);
 
     /**
      * Serde that de/serializes a list of SortedBags of tickets
      */
-    public final static Serde<List<SortedBag<Card>>> listSbCardSerde = Serde.listOf(sbCardSerde, ";");
+    public final static Serde<List<SortedBag<Card>>> listSbCardSerde = Serde.listOf(sbCardSerde, COMMA_SEPARATOR);
 
     /**
      * Serde that de/serializes a Public Card State
      */
     public final static Serde<PublicCardState> publicCardStateSerde = Serde.of(
-            i -> String.join(";", listCardSerde.serialize(i.faceUpCards()), intSerde.serialize(i.deckSize()), intSerde.serialize(i.discardsSize())),
+            i -> String.join(SEMICOLON_SEPARATOR, listCardSerde.serialize(i.faceUpCards()), intSerde.serialize(i.deckSize()), intSerde.serialize(i.discardsSize())),
             str -> {
-                String[] noSeparator = str.split(Pattern.quote(";"), -1);
+                String[] noSeparator = str.split(Pattern.quote(SEMICOLON_SEPARATOR), -1);
                 return new PublicCardState(listCardSerde.deserialize(noSeparator[0]), intSerde.deserialize(noSeparator[1]), intSerde.deserialize(noSeparator[2]));
             }
     );
@@ -103,9 +103,9 @@ public class Serdes {
      * Serde that de/serializes a Public Player State
      */
     public final static Serde<PublicPlayerState> publicPlayerStateSerde = Serde.of(
-            i -> String.join(";", intSerde.serialize(i.ticketCount()), intSerde.serialize(i.cardCount()), listRouteSerde.serialize(i.routes())),
+            i -> String.join(SEMICOLON_SEPARATOR, intSerde.serialize(i.ticketCount()), intSerde.serialize(i.cardCount()), listRouteSerde.serialize(i.routes())),
             str ->{
-                String[] noSeparator = str.split(Pattern.quote(";"), -1);
+                String[] noSeparator = str.split(Pattern.quote(SEMICOLON_SEPARATOR), -1);
                 return new PublicPlayerState(intSerde.deserialize(noSeparator[0]), intSerde.deserialize(noSeparator[1]), listRouteSerde.deserialize(noSeparator[2]));
             }
     );
@@ -114,9 +114,9 @@ public class Serdes {
      * Serde that de/serializes a list of Player State
      */
     public final static Serde<PlayerState> playerStateSerde =Serde.of(
-            i -> String.join(";", sbTicketSerde.serialize(i.tickets()), sbCardSerde.serialize(i.cards()), listRouteSerde.serialize(i.routes())),
+            i -> String.join(SEMICOLON_SEPARATOR, sbTicketSerde.serialize(i.tickets()), sbCardSerde.serialize(i.cards()), listRouteSerde.serialize(i.routes())),
             str -> {
-                String[] noSeparator = str.split(Pattern.quote(";"), -1);
+                String[] noSeparator = str.split(Pattern.quote(SEMICOLON_SEPARATOR), -1);
                 return new PlayerState(sbTicketSerde.deserialize(noSeparator[0]), sbCardSerde.deserialize(noSeparator[1]), listRouteSerde.deserialize(noSeparator[2]));
             }
     );
@@ -125,10 +125,10 @@ public class Serdes {
      * Serde that de/serializes a Public Game State
      */
     public final static Serde<PublicGameState> publicGameStateSerde = Serde.of(
-            i -> String.join(":", intSerde.serialize(i.ticketsCount()), publicCardStateSerde.serialize(i.cardState()), playerIdSerde.serialize(i.currentPlayerId()) ,
+            i -> String.join(COLON_SEPARATOR, intSerde.serialize(i.ticketsCount()), publicCardStateSerde.serialize(i.cardState()), playerIdSerde.serialize(i.currentPlayerId()) ,
                     publicPlayerStateSerde.serialize(i.playerState(PlayerId.PLAYER_1)), publicPlayerStateSerde.serialize(i.playerState(PlayerId.PLAYER_2)), playerIdSerde.serialize(i.lastPlayer())),
             str-> {
-                String[] noSeparator = str.split(Pattern.quote(":"), -1);
+                String[] noSeparator = str.split(Pattern.quote(COLON_SEPARATOR), -1);
                 Map<PlayerId, PublicPlayerState> playerIdPlayerStateMap = new HashMap<>();
                 playerIdPlayerStateMap.put(PlayerId.PLAYER_1, publicPlayerStateSerde.deserialize(noSeparator[3]));
                 playerIdPlayerStateMap.put(PlayerId.PLAYER_2, publicPlayerStateSerde.deserialize(noSeparator[4]));

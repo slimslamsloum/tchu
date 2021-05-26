@@ -30,7 +30,7 @@ public final class StringsFr {
             "Choisissez les cartes à utiliser pour vous emparer de cette route :";
     public static final String CHOOSE_ADDITIONAL_CARDS =
             "Choisissez les cartes supplémentaires à utiliser pour vous" +
-            " emparer de ce tunnel (ou aucune pour annuler et passer votre tour) :";
+                    " emparer de ce tunnel (ou aucune pour annuler et passer votre tour) :";
 
     // Informations concernant le déroulement de la partie
     public static final String WILL_PLAY_FIRST =
@@ -73,11 +73,18 @@ public final class StringsFr {
     // Séparateurs textuels
     public static final String AND_SEPARATOR = " et ";
     public static final String EN_DASH_SEPARATOR = " – ";
+    public static final String SPACE_SEPARATOR = " ";
+    public static final String SEMICOLON_SEPARATOR = ";";
+    public static final String COLON_SEPARATOR = ":";
+    public static final String COMMA_SEPARATOR = ",";
+
+    // Neutral color for Style Classes
+    public static final String NEUTRAL= "NEUTRAL";
 
     /**
      * Retourne une chaîne marquant le pluriel, ou la chaîne vide.
      * @param value la valeur déterminant la chaîne retournée
-     * @return la chaîne vide si la valeur vaut ±1 ou 0, la chaîne "s" sinon
+     * @return la chaîne vide si la valeur vaut ±1 ou 0, le pluriel "s" sinon
      */
-    public static String plural(int value) { return Math.abs(value) == 1 && value != 0 ? "" : "s"; }
+    public static String plural(int value) { return Math.abs(value) <=1 ? "" : "s"; }
 }

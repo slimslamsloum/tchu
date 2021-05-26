@@ -80,7 +80,7 @@ public final class Constants {
     /**
      * Nombre maximum de billets qu'un joueur peut défausser lors d'un tirage.
      */
-    public static final int DISCARDABLE_TICKETS_COUNT = 2;
+    public static final int MAX_DISCARDABLE_TICKETS_COUNT = 2;
 
     /**
      * Nombre de cartes à tirer lors de la construction d'un tunnel.

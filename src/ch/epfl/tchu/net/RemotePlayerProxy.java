@@ -2,6 +2,7 @@ package ch.epfl.tchu.net;
 
 import ch.epfl.tchu.SortedBag;
 import ch.epfl.tchu.game.*;
+import ch.epfl.tchu.gui.StringsFr;
 
 import java.io.*;
 import java.net.Socket;
@@ -169,11 +170,11 @@ public class RemotePlayerProxy implements Player {
     private void sendMessage(List<String> list, MessageId messageId){
         try {
             w.write(messageId.name());
-            w.write(" ");
+            w.write(StringsFr.SPACE_SEPARATOR);
             if (!list.isEmpty()){
                 for (String string : list){
                     w.write(string);
-                    if (list.indexOf(string) != list.size() -1){w.write(" ");}
+                    if (list.indexOf(string) != list.size() -1){w.write(StringsFr.SPACE_SEPARATOR);}
                 }
             }
             w.write('\n');

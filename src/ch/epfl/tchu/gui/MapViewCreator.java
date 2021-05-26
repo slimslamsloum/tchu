@@ -114,9 +114,9 @@ class MapViewCreator {
 
         //modification of the routes visual appearance according to its level and color
         if (route.level().equals(Route.Level.UNDERGROUND)){
-            routeGroup.getStyleClass().add("UNDERGROUND");
+            routeGroup.getStyleClass().add(Route.Level.UNDERGROUND.name());
         }
-        String color = route.color() == null ? "NEUTRAL" : route.color().toString();
+        String color = route.color() == null ? StringsFr.NEUTRAL : route.color().toString();
         routeGroup.getStyleClass().add(color);
         return routeGroup;
     }
