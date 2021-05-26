@@ -61,7 +61,7 @@ public class Serdes {
     /**
      * Serde that de/serializes a list of cards
      */
-    public final static Serde<List<Card>> listCardSerde = Serde.listOf(cardSerde, SEMICOLON_SEPARATOR);
+    public final static Serde<List<Card>> listCardSerde = Serde.listOf(cardSerde, COMMA_SEPARATOR);
 
     /**
      * Serde that de/serializes a list of routes
@@ -86,7 +86,7 @@ public class Serdes {
     /**
      * Serde that de/serializes a list of SortedBags of tickets
      */
-    public final static Serde<List<SortedBag<Card>>> listSbCardSerde = Serde.listOf(sbCardSerde, COMMA_SEPARATOR);
+    public final static Serde<List<SortedBag<Card>>> listSbCardSerde = Serde.listOf(sbCardSerde, SEMICOLON_SEPARATOR);
 
     /**
      * Serde that de/serializes a Public Card State

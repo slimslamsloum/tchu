@@ -8,6 +8,7 @@ import javafx.stage.Stage;
 
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -43,8 +44,8 @@ public class ServerMain extends Application {
         Player player1 = new GraphicalPlayerAdapter();
         Player player2 = new RemotePlayerProxy(socket);
         SortedBag<Ticket> tickets = SortedBag.of(ChMap.tickets());
-        Map<PlayerId, String> names =
-                Map.of(PLAYER_1, name1, PLAYER_2, name2);
+        Map<PlayerId, String> names = Map.of(PLAYER_1, name1, PLAYER_2, name2);
+
         Map<PlayerId, Player> players =
                 Map.of(PLAYER_1, player1,
                         PLAYER_2, player2);

@@ -49,7 +49,7 @@ public class RemotePlayerProxy implements Player {
      */
     @Override
     public void initPlayers(PlayerId ownId, Map<PlayerId, String> playerNames) {
-        List<String> listPlayers = List.of(playerNames.get(ownId), playerNames.get(ownId.next()));
+        List<String> listPlayers = List.of(playerNames.get(PlayerId.PLAYER_1), playerNames.get(PlayerId.PLAYER_2));
         String serializedPlayers = Serde.listOf(Serdes.stringSerde, ",").serialize(listPlayers);
         String serializedPlayerID = Serdes.playerIdSerde.serialize(ownId);
         sendMessage(List.of(serializedPlayerID,serializedPlayers), MessageId.INIT_PLAYERS);
@@ -76,6 +76,7 @@ public class RemotePlayerProxy implements Player {
         List<String> list = List.of(serializedPGS,serializedPS);
         sendMessage(list, MessageId.UPDATE_STATE);
     }
+
 
     /**
      * Serializes tickets and sends them in a message of type SET_INITIAL_TICKETS to the socket

@@ -71,7 +71,7 @@ class DecksViewCreator {
         deckView.setId("card-pane");
 
         //Creation of the button to draw tickets from the card's stock
-        Button ticketDeckButton = buttonView("Billets",obsGameState.percentageTickets());
+        Button ticketDeckButton = buttonView(StringsFr.TICKETS,obsGameState.percentageTickets());
 
         //The Button is then added as a component of the Deck's view
         deckView.getChildren().add(ticketDeckButton);
@@ -84,7 +84,7 @@ class DecksViewCreator {
         }
 
         //Creation of the button to draw cards from the card's stock
-        Button cardDeckButton = buttonView("Cartes",obsGameState.percentageCards());
+        Button cardDeckButton = buttonView(StringsFr.CARDS,obsGameState.percentageCards());
 
         //Then the Button is added as a component of the Deck's view
         deckView.getChildren().add(cardDeckButton);
