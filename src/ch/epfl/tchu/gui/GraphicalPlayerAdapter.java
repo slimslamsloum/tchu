@@ -28,6 +28,8 @@ public class GraphicalPlayerAdapter implements Player {
     BlockingQueue<Route> routesQueue;
     BlockingQueue<SortedBag<Card>> cardsQueue;
     BlockingQueue<Integer> cardPlacementsQueue;
+    BlockingQueue<GraphicalPlayer> graphicalPlayerQueue;
+
 
     /**
      *Graphical player adapter constructor, which initiates all blocking queues to array blocking queues of size 1
@@ -38,11 +40,11 @@ public class GraphicalPlayerAdapter implements Player {
         routesQueue = new ArrayBlockingQueue<>(1);
         cardsQueue = new ArrayBlockingQueue<>(1);
         cardPlacementsQueue = new ArrayBlockingQueue<>(1);
+        graphicalPlayerQueue = new ArrayBlockingQueue<>(1);
     }
 
     @Override
     public void initPlayers(PlayerId ownId, Map<PlayerId, String> playerNames) {
-        BlockingQueue<GraphicalPlayer> graphicalPlayerQueue = new ArrayBlockingQueue<>(1);
         runLater(() -> graphicalPlayerQueue.add(new GraphicalPlayer(ownId, playerNames)));
         this.graphicalPlayer = retrieveFromQueue(graphicalPlayerQueue);
     }
@@ -126,9 +128,7 @@ public class GraphicalPlayerAdapter implements Player {
     @Override
     public SortedBag<Card> chooseAdditionalCards(List<SortedBag<Card>> options) {
         ActionHandlers.ChooseCardsHandler chooseCardsHandler = (cards) ->{
-            try{cardsQueue.put(cards);}
-            catch(InterruptedException e){ throw new Error(); }
-        };
+            putInQueue(cardsQueue, cards); };
 
         runLater(() -> graphicalPlayer.chooseAdditionalCards(chooseCardsHandler, options));
         return retrieveFromQueue(cardsQueue);
