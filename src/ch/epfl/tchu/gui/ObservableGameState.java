@@ -40,7 +40,7 @@ public class ObservableGameState {
     //properties that concern private information about the player watching the game state
     private final ObservableList<Ticket> playerTickets;
     private final Map<Card, SimpleIntegerProperty> numberPerCard;
-    private final Map<Route, SimpleBooleanProperty> canClaimRoute;
+    private final Map<Route, SimpleBooleanProperty> canClaim;
 
     /**
      * Observable Game state constructor
@@ -67,7 +67,7 @@ public class ObservableGameState {
         //initialization of properties concerning information about the player with id "ownPlayerId"
         playerTickets=FXCollections.observableArrayList();
         numberPerCard=numberCardPropertyMap();
-        canClaimRoute =booleanPropertyMap();
+        canClaim =booleanPropertyMap();
     }
 
     public void setState(PublicGameState newGameState, PlayerState newPlayerState){
@@ -111,7 +111,7 @@ public class ObservableGameState {
         for(Route route : ChMap.routes()){
             boolean bool = (!routeIsClaimed(route) &&
                     newGameState.currentPlayerId().equals(ownPlayerId) && newPlayerState.canClaimRoute(route));
-            canClaimRoute.get(route).set(bool);
+            canClaim.get(route).set(bool);
         }
     }
 
@@ -214,7 +214,7 @@ public class ObservableGameState {
      * @param route route to be checked
      * @return read only property of the boolean value associated to the route
      */
-    public ReadOnlyBooleanProperty canClaimRoute(Route route){ return canClaimRoute.get(route);}
+    public ReadOnlyBooleanProperty canClaim(Route route){ return canClaim.get(route);}
 
     /**
      * canDrawTickets

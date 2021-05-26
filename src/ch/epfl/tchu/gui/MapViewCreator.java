@@ -65,7 +65,7 @@ class MapViewCreator {
             //or if he cannot take the route
             routeGroup.disableProperty()
                     .bind(claimRouteHandlerProperty.isNull().
-                            or(observableGameState.canClaimRoute(route).not()));
+                            or(observableGameState.canClaim(route).not()));
 
             //Allows the route to change visually if the route is taken by a new owner
             observableGameState.routePlayerId(route).addListener((property, oldVal, newVal)
