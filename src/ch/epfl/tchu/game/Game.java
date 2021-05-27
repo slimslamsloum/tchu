@@ -104,8 +104,6 @@ public final class Game {
             else if (playerChoice == Player.TurnKind.DRAW_CARDS) {
                 //the player gets to pick 2 times a card, explaining the following for loop
                 for (int i = 0; i < 2; i++) {
-                    //current player can only pick a card if discard size + deck size is bigger than 5
-                    if (gameState.canDrawCards()) {
                         //deck is recreated if needed
                         gameState = gameState.withCardsDeckRecreatedIfNeeded(rng);
                         //state is update before second draw slot
@@ -131,7 +129,6 @@ public final class Game {
                             gameState = gameState.withDrawnFaceUpCard(slot);
 
                         }
-                    }
                 }
             }
             //if the current player wants to claim a route, the following
@@ -142,8 +139,6 @@ public final class Game {
                 SortedBag.Builder<Card> drawnCardsSB = new SortedBag.Builder<>();
                 boolean canClaimRoute = gameState.currentPlayerState().canClaimRoute(route);
 
-                //if the player can claim the route with the cards he has, the following block of code runs
-                if (canClaimRoute) {
                     //if the player tries to claim and underground route, the following block of code runs
                     if (route.level() == Route.Level.UNDERGROUND) {
                         //both players receive the info the the current player is attempting to claim
@@ -210,7 +205,6 @@ public final class Game {
                         //both players get the info that this route was claimed by the current player
                         Game.allInfo(new Info(playerNames.get(gameState.currentPlayerId())).claimedRoute(route,initialClaimCards),players);
                     }
-                }
                 else {
                     //if the player can't claim the route, both players are made aware of it
                     Game.allInfo(new Info(playerNames.get(gameState.currentPlayerId())).didNotClaimRoute(route),players);
@@ -218,6 +212,7 @@ public final class Game {
             }
             //the current player becomes the next player
             gameState = gameState.forNextTurn();
+            System.out.println("Deck size:" + gameState.cardState().deckSize());
         }
 
         //both player have their gamestates updated at the end of the game
