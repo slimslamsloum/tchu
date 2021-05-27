@@ -49,7 +49,6 @@ public final class Game {
         }
         for (Map.Entry<PlayerId, Player> playerEntry : players.entrySet()){
             playerEntry.getValue().updateState(gameState, gameState.playerState(playerEntry.getKey()));
-
         }
         for (Map.Entry<PlayerId, Player> playerEntry : players.entrySet()){
             gameState= gameState.withInitiallyChosenTickets(playerEntry.getKey(),players.get(playerEntry.getKey()).chooseInitialTickets());

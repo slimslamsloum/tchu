@@ -109,30 +109,25 @@ public class GraphicalPlayer {
                           ClaimRouteHandler claimRouteHandler){
         assert isFxApplicationThread();
 
-        //claimRouteHandler is always filled
-        this.claimRouteHandler.set(claimRouteHandler);
+        if(observableGameState.canDrawTickets()){
+            this.drawTicketsHandler.set(() -> {
+                drawTicketsHandler.onDrawTickets();
+                emptyHandlers();
+            });
+        }
 
-        //drawCardHandler is filled only if player can draw cards
-        this.drawCardHandler.set(observableGameState.canDrawCards() ? drawCardHandler : null);
-
-        //drawTicketsHandler is filled only if player can draw tickets
-        this.drawTicketsHandler.set(observableGameState.canDrawTickets() ? drawTicketsHandler : null);
+        if (observableGameState.canDrawCards()){
+            this.drawCardHandler.set( i -> {
+                drawCardHandler.onDrawCard(i);
+                emptyHandlers();
+            } );
+        }
 
         //independently of which handler is called, all handlers are then set to null with the method emptyHandlers
         this.claimRouteHandler.set((route,cards) ->{
             claimRouteHandler.onClaimRoute(route, cards);
             emptyHandlers();
         });
-
-        this.drawTicketsHandler.set(() -> {
-            drawTicketsHandler.onDrawTickets();
-            emptyHandlers();
-        });
-
-        this.drawCardHandler.set( i -> {
-            drawCardHandler.onDrawCard(i);
-            emptyHandlers();
-        } );
     }
 
     /**
