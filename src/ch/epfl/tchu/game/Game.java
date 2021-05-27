@@ -47,9 +47,10 @@ public final class Game {
             playerEntry.getValue().setInitialTicketChoice(gameState.topTickets(Constants.INITIAL_TICKETS_COUNT));
             gameState=gameState.withoutTopTickets(Constants.INITIAL_TICKETS_COUNT);
         }
+        for (Map.Entry<PlayerId, Player> playerEntry : players.entrySet()){
+            playerEntry.getValue().updateState(gameState, gameState.playerState(playerEntry.getKey()));
 
-        Game.updateAll(gameState,players);
-
+        }
         for (Map.Entry<PlayerId, Player> playerEntry : players.entrySet()){
             gameState= gameState.withInitiallyChosenTickets(playerEntry.getKey(),players.get(playerEntry.getKey()).chooseInitialTickets());
         }
@@ -58,20 +59,14 @@ public final class Game {
         }
 
         //number of turns after a player has less than 2 cars
-        int lastTurns = 1;
+        int lastTurns = PlayerId.COUNT;
+        boolean lastTurnHasBegun = false;
 
         //loop that defines what happens in a round. A player has 3 choices, and in the next
         //loop the next player will play.
         //The loop continues until a player has less than 2 cars (lastTurnBegins is true), in which
         //case each player plays once and then the game ends.
-        while (!gameState.lastTurnBegins() || lastTurns != 0) {
-            //once we know a player has less than 2 cars, both players get that information.
-            //lastTurns then decrements by 1, and when it is equal to 0 (both players will have played
-            //once more) the loop will end
-            if (gameState.lastTurnBegins()){
-                allInfo(new Info(playerNames.get(gameState.currentPlayerId())).lastTurnBegins(gameState.currentPlayerState().carCount()),players);
-                lastTurns -= 1;
-            }
+        while (!lastTurnHasBegun || lastTurns >= 0) {
 
             //Player variable containing the current player playing
             Player currentPlayer = players.get(gameState.currentPlayerId());
@@ -108,7 +103,7 @@ public final class Game {
                     gameState = gameState.withCardsDeckRecreatedIfNeeded(rng);
                     //state is update before second draw slot
                     if (i == 1) {
-                        Game.updateAll(gameState, players);
+                        Game.updateAll(gameState,players);
                     }
                     //slot = card slot that the player wants to pick
                     int slot = currentPlayer.drawSlot();
@@ -119,12 +114,12 @@ public final class Game {
                         //player blindly draws a card from deck
                         gameState = gameState.withBlindlyDrawnCard();
                         //players get info that current player has blindly drawn a card
-                        Game.allInfo(new Info(playerNames.get(gameState.currentPlayerId())).drewBlindCard(), players);
+                        Game.allInfo(new Info(playerNames.get(gameState.currentPlayerId())).drewBlindCard(),players);
                     }
                     //if current player wants to draw a face up card
                     if (Constants.FACE_UP_CARD_SLOTS.contains(slot)) {
                         //players receive info that current player will draw the face up card at index slot
-                        Game.allInfo(new Info(playerNames.get(gameState.currentPlayerId())).drewVisibleCard(gameState.cardState().faceUpCard(slot)), players);
+                        Game.allInfo(new Info(playerNames.get(gameState.currentPlayerId())).drewVisibleCard(gameState.cardState().faceUpCard(slot)),players);
                         //player draws card at index slot
                         gameState = gameState.withDrawnFaceUpCard(slot);
                     }
@@ -138,6 +133,8 @@ public final class Game {
                 SortedBag.Builder<Card> drawnCardsSB = new SortedBag.Builder<>();
                 boolean canClaimRoute = gameState.currentPlayerState().canClaimRoute(route);
 
+                //if the player can claim the route with the cards he has, the following block of code runs
+                if (canClaimRoute) {
                     //if the player tries to claim and underground route, the following block of code runs
                     if (route.level() == Route.Level.UNDERGROUND) {
                         //both players receive the info the the current player is attempting to claim
@@ -204,10 +201,21 @@ public final class Game {
                         //both players get the info that this route was claimed by the current player
                         Game.allInfo(new Info(playerNames.get(gameState.currentPlayerId())).claimedRoute(route,initialClaimCards),players);
                     }
+                }
                 else {
                     //if the player can't claim the route, both players are made aware of it
                     Game.allInfo(new Info(playerNames.get(gameState.currentPlayerId())).didNotClaimRoute(route),players);
                 }
+            }
+            //once we know a player has less than 2 cars, both players get that information.
+            //lastTurns then decrements by 1, and when it is equal to 0 (both players will have played
+            //once more) the loop will end
+            if (gameState.lastTurnBegins() || lastTurnHasBegun){
+                lastTurnHasBegun = true;
+                lastTurns -= 1;
+            }
+            if (gameState.lastTurnBegins()){
+                allInfo(new Info(playerNames.get(gameState.currentPlayerId())).lastTurnBegins(gameState.currentPlayerState().carCount()),players);
             }
             //the current player becomes the next player
             gameState = gameState.forNextTurn();
@@ -221,7 +229,7 @@ public final class Game {
 
         //longest trail is computed
         Trail longestTrailP1 = Trail.longest(gameState.playerState(PlayerId.PLAYER_1).routes());
-        Trail longestTrailP2 = Trail.longest(gameState.playerState(PlayerId.PLAYER_1).routes());
+        Trail longestTrailP2 = Trail.longest(gameState.playerState(PlayerId.PLAYER_2).routes());
 
         //10 extra points is given to the player that has claimed the longest route
         if (longestTrailP1.length() > longestTrailP2.length()){
@@ -230,7 +238,7 @@ public final class Game {
         }
         else if (longestTrailP1.length() < longestTrailP2.length()){
             player2points += 10;
-            Game.allInfo(new Info(playerNames.get(PlayerId.PLAYER_1)).getsLongestTrailBonus(longestTrailP2),players);
+            Game.allInfo(new Info(playerNames.get(PlayerId.PLAYER_2)).getsLongestTrailBonus(longestTrailP2),players);
         }
         else {
             player1points += 10;
