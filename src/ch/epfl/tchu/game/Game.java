@@ -47,9 +47,9 @@ public final class Game {
             playerEntry.getValue().setInitialTicketChoice(gameState.topTickets(Constants.INITIAL_TICKETS_COUNT));
             gameState=gameState.withoutTopTickets(Constants.INITIAL_TICKETS_COUNT);
         }
-        for (Map.Entry<PlayerId, Player> playerEntry : players.entrySet()){
-            playerEntry.getValue().updateState(gameState, gameState.playerState(playerEntry.getKey()));
-        }
+
+        Game.updateAll(gameState,players);
+
         for (Map.Entry<PlayerId, Player> playerEntry : players.entrySet()){
             gameState= gameState.withInitiallyChosenTickets(playerEntry.getKey(),players.get(playerEntry.getKey()).chooseInitialTickets());
         }
@@ -104,31 +104,30 @@ public final class Game {
             else if (playerChoice == Player.TurnKind.DRAW_CARDS) {
                 //the player gets to pick 2 times a card, explaining the following for loop
                 for (int i = 0; i < 2; i++) {
-                        //deck is recreated if needed
+                    //deck is recreated if needed
+                    gameState = gameState.withCardsDeckRecreatedIfNeeded(rng);
+                    //state is update before second draw slot
+                    if (i == 1) {
+                        Game.updateAll(gameState, players);
+                    }
+                    //slot = card slot that the player wants to pick
+                    int slot = currentPlayer.drawSlot();
+                    //if player wants to pick a card from pile
+                    if (slot == Constants.DECK_SLOT) {
+                        //deck is recreated from discard pile if needed
                         gameState = gameState.withCardsDeckRecreatedIfNeeded(rng);
-                        //state is update before second draw slot
-                        if (i == 1) {
-                            Game.updateAll(gameState,players);
-                        }
-                        //slot = card slot that the player wants to pick
-                        int slot = currentPlayer.drawSlot();
-                        //if player wants to pick a card from pile
-                        if (slot == Constants.DECK_SLOT) {
-                            //deck is recreated from discard pile if needed
-                            gameState = gameState.withCardsDeckRecreatedIfNeeded(rng);
-                            //player blindly draws a card from deck
-                            gameState = gameState.withBlindlyDrawnCard();
-                            //players get info that current player has blindly drawn a card
-                            Game.allInfo(new Info(playerNames.get(gameState.currentPlayerId())).drewBlindCard(),players);
-                        }
-                        //if current player wants to draw a face up card
-                        if (Constants.FACE_UP_CARD_SLOTS.contains(slot)) {
-                            //players receive info that current player will draw the face up card at index slot
-                            Game.allInfo(new Info(playerNames.get(gameState.currentPlayerId())).drewVisibleCard(gameState.cardState().faceUpCard(slot)),players);
-                            //player draws card at index slot
-                            gameState = gameState.withDrawnFaceUpCard(slot);
-
-                        }
+                        //player blindly draws a card from deck
+                        gameState = gameState.withBlindlyDrawnCard();
+                        //players get info that current player has blindly drawn a card
+                        Game.allInfo(new Info(playerNames.get(gameState.currentPlayerId())).drewBlindCard(), players);
+                    }
+                    //if current player wants to draw a face up card
+                    if (Constants.FACE_UP_CARD_SLOTS.contains(slot)) {
+                        //players receive info that current player will draw the face up card at index slot
+                        Game.allInfo(new Info(playerNames.get(gameState.currentPlayerId())).drewVisibleCard(gameState.cardState().faceUpCard(slot)), players);
+                        //player draws card at index slot
+                        gameState = gameState.withDrawnFaceUpCard(slot);
+                    }
                 }
             }
             //if the current player wants to claim a route, the following
@@ -212,7 +211,6 @@ public final class Game {
             }
             //the current player becomes the next player
             gameState = gameState.forNextTurn();
-            System.out.println("Deck size:" + gameState.cardState().deckSize());
         }
 
         //both player have their gamestates updated at the end of the game
