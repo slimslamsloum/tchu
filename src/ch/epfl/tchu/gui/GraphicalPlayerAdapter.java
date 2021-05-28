@@ -43,49 +43,75 @@ public class GraphicalPlayerAdapter implements Player {
         graphicalPlayerQueue = new ArrayBlockingQueue<>(1);
     }
 
+    /**
+     * Method to instantiate the visual interface of the player
+     * @param ownId id of player on which method is called
+     * @param playerNames map of Player Ids linked to player names
+     */
     @Override
     public void initPlayers(PlayerId ownId, Map<PlayerId, String> playerNames) {
         runLater(() -> graphicalPlayerQueue.add(new GraphicalPlayer(ownId, playerNames)));
         this.graphicalPlayer = retrieveFromQueue(graphicalPlayerQueue);
     }
 
+    /**
+     * Method that allows the information to be seen by the player
+     * @param info info communicated to the player
+     */
     @Override
     public void receiveInfo(String info) {
         runLater(() -> graphicalPlayer.receiveInfo(info));
     }
 
+    /**
+     * Method that updates the state of the player
+     * @param newState a new gamestate
+     * @param ownState player's player state
+     */
     @Override
     public void updateState(PublicGameState newState, PlayerState ownState) {
         runLater(()-> graphicalPlayer.setState(newState, ownState));
     }
 
+    /**
+     * Method that sets the initial possible choice of ticket of the player
+     * @param tickets 5 tickets distributed at the beginning of the game to a player
+     */
     @Override
     public void setInitialTicketChoice(SortedBag<Ticket> tickets) {
-         ChooseTicketsHandler chooseTicketsHandler = (ticketsToChoose) -> {
+        ChooseTicketsHandler chooseTicketsHandler = (ticketsToChoose) -> {
             putInQueue(ticketsQueue, ticketsToChoose);
         };
         runLater(() -> graphicalPlayer.chooseTickets(chooseTicketsHandler,tickets));
     }
 
+    /**
+     * Method that returns the initial choice of Tickets of the player
+     * @return the initial choice of Tickets of the player
+     */
     @Override
     public SortedBag<Ticket> chooseInitialTickets() {
         return retrieveFromQueue(ticketsQueue);
     }
 
+    /**
+     * Method that allows the next turn of the player to start and to play one of the options he has
+     * @return the action he decided to play, which is removed from the queue
+     */
     @Override
     public TurnKind nextTurn() {
 
-         DrawTicketsHandler drawTicketsHandler = () -> {
+        DrawTicketsHandler drawTicketsHandler = () -> {
             putInQueue(turnKindQueue, TurnKind.DRAW_TICKETS);
         };
 
-         ClaimRouteHandler claimRouteHandler = (route,cards) -> {
+        ClaimRouteHandler claimRouteHandler = (route,cards) -> {
             putInQueue(turnKindQueue, TurnKind.CLAIM_ROUTE);
             putInQueue(routesQueue, route);
             putInQueue(cardsQueue, cards);
         };
 
-         DrawCardHandler drawCardHandler = (i) -> {
+        DrawCardHandler drawCardHandler = (i) -> {
             putInQueue(turnKindQueue, TurnKind.DRAW_CARDS);
             putInQueue(cardPlacementsQueue, i);
         };
@@ -95,13 +121,17 @@ public class GraphicalPlayerAdapter implements Player {
         return retrieveFromQueue(turnKindQueue);
     }
 
+    /**
+     * Method that allows a player to draw cards from a specific slot
+     * @return the card that was drown and removed to be placed in the player's hand
+     */
     @Override
     public int drawSlot() {
         if (!cardPlacementsQueue.isEmpty()){
             return cardPlacementsQueue.remove();
         }
         else{
-             DrawCardHandler drawCardHandler = (i) -> {
+            DrawCardHandler drawCardHandler = (i) -> {
                 putInQueue(cardPlacementsQueue, i);
             };
             runLater(() -> graphicalPlayer.drawCard(drawCardHandler));
@@ -109,22 +139,40 @@ public class GraphicalPlayerAdapter implements Player {
         }
     }
 
+    /**
+     * Method that removes a claimed route from the possible routes that can be claimed
+     * @return the route that has been claimed, which is removed from the queue
+     */
     @Override
     public Route claimedRoute() {
         return retrieveFromQueue(routesQueue);
     }
 
+    /**
+     * Method that allows the player to choose amongst 3 tickets
+     * @param options tickets the player has drawn from the ticket pile
+     * @return the choice of the player, which is removed from the queue
+     */
     @Override
     public SortedBag<Ticket> chooseTickets(SortedBag<Ticket> options) {
         setInitialTicketChoice(options);
         return chooseInitialTickets();
     }
 
+    /**
+     * Method that removes from the queue the cards initially used by the player to claim a route
+     * @return the card used to claim the route initially, which are removed from the queue
+     */
     @Override
     public SortedBag<Card> initialClaimCards() {
         return retrieveFromQueue(cardsQueue);
     }
 
+    /**
+     * Method that allows a player to choose the cards he wants to use additionally to obtain a tunnel
+     * @param options possible SortedBags that can be used to claim the tunnel
+     * @return the additional cards used to claim the tunnel, which are removed from the queue
+     */
     @Override
     public SortedBag<Card> chooseAdditionalCards(List<SortedBag<Card>> options) {
         ActionHandlers.ChooseCardsHandler chooseCardsHandler = (cards) ->{
