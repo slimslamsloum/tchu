@@ -10,6 +10,7 @@ import javafx.event.Event;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.cell.TextFieldListCell;
@@ -20,6 +21,7 @@ import javafx.scene.text.TextFlow;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.util.Callback;
 import javafx.util.StringConverter;
 import static javafx.application.Platform.isFxApplicationThread;
 import static ch.epfl.tchu.gui.StringsFr.*;
@@ -249,7 +251,7 @@ public class GraphicalPlayer {
      * @param choiceButton button of the tab
      * @return stage of the new tab
      */
-    private Stage choiceStage(ListView listView, String title, String intro, Button choiceButton){
+    private <T> Stage choiceStage(ListView<T> listView, String title, String intro, Button choiceButton){
 
         //creation of stage, vbox. scene, textflow
         Stage stage = new Stage(StageStyle.UTILITY);
@@ -259,7 +261,48 @@ public class GraphicalPlayer {
         stage.initOwner(mainStage);
         stage.initModality(Modality.WINDOW_MODAL);
         //intro text is added with the TextFlow
-        TextFlow textFlow = new TextFlow(new Text(intro));
+        Text text = new Text(intro);
+        text.setId("text");
+        TextFlow textFlow = new TextFlow(text);
+
+        /*
+
+        listView.setCellFactory(new Callback<ListView<T>, ListCell<T>>() {
+            @Override
+            public ListCell<T> call(ListView<T> param) {
+                return new ListCell<T>(){
+                    protected void updateItem(T item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (item == null || empty) {
+                            setText(null);
+                            setStyle("-fx-control-inner-background: " + "derive(-fx-base,80%)" + ";");
+                        }
+                        else{
+                            setStyle("-fx-control-inner-background: " + "derive(-fx-base,80%)" + ";");
+                            setText(item.toString());
+                        }
+                        DecksViewCreator.darkModeButton.selectedProperty().addListener((obs, wasSelected, isSelected)->{
+                            if (item == null || empty) {
+                                setText(null);
+                                setStyle("-fx-control-inner-background: " + "derive(-fx-base,80%)" + ";");
+                            }
+                            else if (isSelected){
+                                setStyle("-fx-control-inner-background: " + "dimgrey" + ";");
+                                setText(item.toString());
+                            }
+                            else{
+                                setStyle("-fx-control-inner-background: " + "derive(-fx-base,80%)" + ";");
+                                setText(item.toString());
+                            }
+                        });
+                    }
+                };
+            };
+        });
+
+        DarkModeButton.changeToDarkMode("darkChooser.css", vbox);
+
+         */
 
         //stage is given new title
         stage.setTitle(title);

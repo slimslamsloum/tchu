@@ -4,11 +4,9 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ListView;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.ToggleButton;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
@@ -17,6 +15,7 @@ import javafx.scene.text.TextFlow;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.util.Callback;
 
 import static ch.epfl.tchu.gui.ActionHandlers.*;
 import static ch.epfl.tchu.gui.GuiConstants.*;
@@ -52,6 +51,44 @@ class DecksViewCreator {
         ListView<Ticket> ticketListView = new ListView<>(obsGameState.playerTickets());
         ticketListView.setId("tickets");
         handView.getChildren().add(ticketListView);
+
+        ticketListView.setCellFactory(new Callback<ListView<Ticket>, ListCell<Ticket>>() {
+            @Override
+            public ListCell<Ticket> call(ListView<Ticket> param) {
+                return new ListCell<Ticket>(){
+                    protected void updateItem(Ticket item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (item == null || empty) {
+                            setText(null);
+                            setStyle("-fx-control-inner-background: " + "derive(-fx-base,80%)" + ";");
+                        }
+                        else if (darkModeButton.isSelected()){
+                            setStyle("-fx-control-inner-background: " + "black" + ";");
+                            setText(item.toString());
+                        }
+                        else{
+                            setStyle("-fx-control-inner-background: " + "derive(-fx-base,80%)" + ";");
+                            setText(item.toString());
+                        }
+                        darkModeButton.selectedProperty().addListener((obs, wasSelected, isSelected)->{
+                            if (item == null || empty) {
+                                setText(null);
+                            }
+                            else if (isSelected){
+                                setStyle("-fx-control-inner-background: " + "black" + ";");
+                                setText(item.toString());
+                            }
+                            else{
+                                setStyle("-fx-control-inner-background: " + "derive(-fx-base,80%)" + ";");
+                                setText(item.toString());
+                            }
+                        });
+                    }
+                };
+            };
+        });
+
+
 
         //Creation of the view of all player's cards
         HBox cardsHBox = new HBox();
@@ -117,7 +154,10 @@ class DecksViewCreator {
         cardDeckButton.setOnMouseClicked(event -> drawCardHP.get().onDrawCard(Constants.DECK_SLOT));
         ticketDeckButton.setOnMouseClicked(event -> drawTicketsHP.get().onDrawTickets());
 
-        helpButton.setOnMouseClicked(event -> displayHelpStage());
+        VBox vboxHelp = new VBox();
+        helpButton.setOnMouseClicked(event -> displayHelpStage(vboxHelp));
+        DarkModeButton.changeToDarkMode("darkRules.css", vboxHelp);
+        vboxHelp.setId("background");
 
         //In case the player doesn't want to draw a card or a ticket, the use of the buttons is disabled
         cardDeckButton.disableProperty().bind(drawCardHP.isNull());
@@ -180,6 +220,7 @@ class DecksViewCreator {
 
         //Calls the action handler in case the players clicks on a card with his mouse
         faceUpCardView.setOnMouseClicked(event -> drawCardHP.get().onDrawCard(slot));
+
         return faceUpCardView;
     }
 
@@ -236,10 +277,9 @@ class DecksViewCreator {
         return buttonView;
     }
 
-    private static void displayHelpStage(){
+    private static void displayHelpStage(VBox vbox){
         Stage stage = new Stage(StageStyle.DECORATED);
         ScrollPane scrollPane = new ScrollPane();
-        VBox vbox = new VBox();
         Scene scene = new Scene(scrollPane);
         vbox.getStylesheets().add("rules.css");
         stage.initModality(Modality.WINDOW_MODAL);
@@ -289,6 +329,7 @@ class DecksViewCreator {
         stage.setScene(scene);
         vbox.getChildren().addAll(textFlow);
         scrollPane.contentProperty().set(vbox);
+
         stage.show();
     }
 
