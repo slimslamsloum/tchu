@@ -60,6 +60,9 @@ class InfoViewCreator {
 
         //playerStats, the separator and gameInfo nodes are now the children of infoPane
         infoPane.getChildren().addAll(playerStats, separator, gameInfo);
+
+        DarkModeButton.changeToDarkMode("darkInfo.css", infoPane);
+
         return infoPane;
     }
 
@@ -86,6 +89,7 @@ class InfoViewCreator {
         //the string expression will be binded with the text, which is a child of the Text flow for
         //player statistics
         playerStatsText.textProperty().bind(stringExpression);
+        playerStatsText.setId("text");
         playerN.getChildren().addAll(circle, playerStatsText);
     }
 }

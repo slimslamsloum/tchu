@@ -3,13 +3,21 @@ import ch.epfl.tchu.game.*;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.scene.Group;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+
 import static ch.epfl.tchu.gui.ActionHandlers.*;
 import static ch.epfl.tchu.gui.GuiConstants.*;
 
@@ -26,6 +34,9 @@ class DecksViewCreator {
      */
     private DecksViewCreator() {
     }
+
+    //Dark mode button
+    public static ToggleButton darkModeButton;
 
     /**
      * Method that creates the player's hand view
@@ -53,6 +64,9 @@ class DecksViewCreator {
         }
         //the view of the player's cards is now added as a children of the player's global hand view
         handView.getChildren().add(cardsHBox);
+
+        DarkModeButton.changeToDarkMode("darkDecks.css", handView);
+
         return handView;
     }
 
@@ -73,6 +87,14 @@ class DecksViewCreator {
         //Creation of the button to draw tickets from the card's stock
         Button ticketDeckButton = buttonView(StringsFr.TICKETS,obsGameState.percentageTickets());
 
+        //Creation of help button
+        Button helpButton = new Button("Aide");
+
+        //Creation of Dark Mode button
+        darkModeButton = new ToggleButton("Dark Mode");
+
+        deckView.getChildren().add(darkModeButton);
+
         //The Button is then added as a component of the Deck's view
         deckView.getChildren().add(ticketDeckButton);
 
@@ -89,13 +111,19 @@ class DecksViewCreator {
         //Then the Button is added as a component of the Deck's view
         deckView.getChildren().add(cardDeckButton);
 
+        deckView.getChildren().add(helpButton);
+
         //Handles the distribution of cards / tickets in case the player does press on one of the button
         cardDeckButton.setOnMouseClicked(event -> drawCardHP.get().onDrawCard(Constants.DECK_SLOT));
         ticketDeckButton.setOnMouseClicked(event -> drawTicketsHP.get().onDrawTickets());
 
+        helpButton.setOnMouseClicked(event -> displayHelpStage());
+
         //In case the player doesn't want to draw a card or a ticket, the use of the buttons is disabled
         cardDeckButton.disableProperty().bind(drawCardHP.isNull());
         ticketDeckButton.disableProperty().bind(drawTicketsHP.isNull());
+
+        DarkModeButton.changeToDarkMode("darkDecks.css", deckView);
 
         return deckView;
     }
@@ -207,4 +235,61 @@ class DecksViewCreator {
         buttonView.setGraphic(buttonGroup);
         return buttonView;
     }
+
+    private static void displayHelpStage(){
+        Stage stage = new Stage(StageStyle.DECORATED);
+        ScrollPane scrollPane = new ScrollPane();
+        VBox vbox = new VBox();
+        Scene scene = new Scene(scrollPane);
+        vbox.getStylesheets().add("rules.css");
+        stage.initModality(Modality.WINDOW_MODAL);
+        TextFlow textFlow = new TextFlow();
+        stage.setTitle("Règles du jeu");
+
+        Text titleIntroText= new Text(TchuRules.TITLE_INTRO_TEXT);
+        titleIntroText.setId("mainTitle");
+        textFlow.getChildren().add(titleIntroText);
+
+        Text introText= new Text(TchuRules.INTRO_TEXT);
+        introText.setId("text");
+        textFlow.getChildren().add(introText);
+
+        Text titleTerminology= new Text(TchuRules.TITLE_TERMINOLOGY);
+        titleTerminology.setId("title");
+        textFlow.getChildren().add(titleTerminology);
+
+        Text terminology= new Text(TchuRules.TERMINOLOGY);
+        terminology.setId("text");
+        textFlow.getChildren().add(terminology);
+
+        Text titleBeginning= new Text(TchuRules.TITLE_BEGINNING_GAME);
+        titleBeginning.setId("title");
+        textFlow.getChildren().add(titleBeginning);
+
+        Text beginning= new Text(TchuRules.BEGINNING_GAME);
+        beginning.setId("text");
+        textFlow.getChildren().add(beginning);
+
+        Text titleTurn= new Text(TchuRules.TITLE_TURN_KIND);
+        titleTurn.setId("title");
+        textFlow.getChildren().add(titleTurn);
+
+        Text turnKind= new Text(TchuRules.TURN_KIND);
+        turnKind.setId("text");
+        textFlow.getChildren().add(turnKind);
+
+        Text titleEnd= new Text(TchuRules.TITLE_END_GAME);
+        titleEnd.setId("title");
+        textFlow.getChildren().add(titleEnd);
+
+        Text end= new Text(TchuRules.END_GAME);
+        end.setId("text");
+        textFlow.getChildren().add(end);
+
+        stage.setScene(scene);
+        vbox.getChildren().addAll(textFlow);
+        scrollPane.contentProperty().set(vbox);
+        stage.show();
+    }
+
 }
