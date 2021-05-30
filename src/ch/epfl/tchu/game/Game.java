@@ -111,10 +111,20 @@ public final class Game {
                     if (slot == Constants.DECK_SLOT) {
                         //deck is recreated from discard pile if needed
                         gameState = gameState.withCardsDeckRecreatedIfNeeded(rng);
+                        // the current player get the info on the card he has drawn from the deck
+                        players.get(gameState.currentPlayerId())
+                                .receiveInfo(
+                                        new Info(playerNames
+                                                .get(gameState.currentPlayerId()))
+                                                .drewDeckCard(gameState.topCard()));
+                        //the next player get info that current player has blindly drawn a card
+                        players.get(gameState.currentPlayerId().next())
+                                .receiveInfo(
+                                        new Info(playerNames
+                                                .get(gameState.currentPlayerId()))
+                                                .drewBlindCard());
                         //player blindly draws a card from deck
                         gameState = gameState.withBlindlyDrawnCard();
-                        //players get info that current player has blindly drawn a card
-                        Game.allInfo(new Info(playerNames.get(gameState.currentPlayerId())).drewBlindCard(),players);
                     }
                     //if current player wants to draw a face up card
                     if (Constants.FACE_UP_CARD_SLOTS.contains(slot)) {

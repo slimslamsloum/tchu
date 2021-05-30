@@ -119,9 +119,17 @@ public final class Info {
             StringsFr.plural(count));}
 
     /**
-     * @return a message announcing that the player drew a card blindfolded from the stock
+     * @return a message announcing that the adverse player drew a card blindfolded from the stock
      */
     public String drewBlindCard(){return String.format(StringsFr.DREW_BLIND_CARD,playerName);}
+
+    /**
+     * @param card the cards type
+     * @return a message announcing that the player drew one a card from the deck, and which one it is
+     */
+    public String drewDeckCard(Card card){
+        return String.format(StringsFr.DREW_DECK_CARD,playerName,cardName(card,1));
+    }
 
     /**
      * @param card the cards type

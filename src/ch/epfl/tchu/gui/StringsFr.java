@@ -43,6 +43,8 @@ public final class StringsFr {
             "%s a tiré %s billet%s...\n";
     public static final String DREW_BLIND_CARD =
             "%s a tiré une carte de la pioche.\n";
+    public static final String DREW_DECK_CARD =
+            "%s a tiré une carte %s de la pioche.\n";
     public static final String DREW_VISIBLE_CARD =
             "%s a tiré une carte %s visible.\n";
     public static final String CLAIMED_ROUTE =
