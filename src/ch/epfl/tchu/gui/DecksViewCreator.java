@@ -62,33 +62,45 @@ class DecksViewCreator {
                             setText(null);
                             setStyle("-fx-control-inner-background: " + "derive(-fx-base,80%)" + ";");
                         }
+                        else if (obsGameState.ticketPoints(item).greaterThan(0).get()){
+                            setStyle("-fx-control-inner-background: " + "green" + ";");
+                            setText(item.toString());
+                        }
                         else if (darkModeButton.isSelected()){
                             setStyle("-fx-control-inner-background: " + "black" + ";");
                             setText(item.toString());
                         }
-                        else{
+                        else {
                             setStyle("-fx-control-inner-background: " + "derive(-fx-base,80%)" + ";");
                             setText(item.toString());
+                            darkModeButton.selectedProperty().addListener((obs1, wasSelected, isSelected)->{
+                                if (item == null || empty) {
+                                    setText(null);
+                                }
+                                else if (isSelected && !obsGameState.ticketPoints(item).greaterThan(0).get()){
+                                    setStyle("-fx-control-inner-background: " + "black" + ";");
+                                    setText(item.toString());
+                                }
+                                else if(!isSelected && !obsGameState.ticketPoints(item).greaterThan(0).get()){
+                                    setStyle("-fx-control-inner-background: " + "derive(-fx-base,80%)" + ";");
+                                    setText(item.toString());
+                                }
+                            });
+
+                            obsGameState.ticketPoints(item).addListener((obs2, oldVal, newVal)-> {
+                                if (newVal.intValue() > 0) {
+                                    setStyle("-fx-control-inner-background: " + "green" + ";");
+                                    setText(item.toString());
+                                } else if (!darkModeButton.isSelected()) {
+                                    setStyle("-fx-control-inner-background: " + "derive(-fx-base,80%)" + ";");
+                                    setText(item.toString());
+                                }
+                            });
                         }
-                        darkModeButton.selectedProperty().addListener((obs, wasSelected, isSelected)->{
-                            if (item == null || empty) {
-                                setText(null);
-                            }
-                            else if (isSelected){
-                                setStyle("-fx-control-inner-background: " + "black" + ";");
-                                setText(item.toString());
-                            }
-                            else{
-                                setStyle("-fx-control-inner-background: " + "derive(-fx-base,80%)" + ";");
-                                setText(item.toString());
-                            }
-                        });
                     }
                 };
             };
         });
-
-
 
         //Creation of the view of all player's cards
         HBox cardsHBox = new HBox();
@@ -155,9 +167,10 @@ class DecksViewCreator {
         ticketDeckButton.setOnMouseClicked(event -> drawTicketsHP.get().onDrawTickets());
 
         VBox vboxHelp = new VBox();
-        helpButton.setOnMouseClicked(event -> displayHelpStage(vboxHelp));
         DarkModeButton.changeToDarkMode("darkRules.css", vboxHelp);
         vboxHelp.setId("background");
+        helpButton.setOnMouseClicked(event -> displayHelpStage(vboxHelp));
+
 
         //In case the player doesn't want to draw a card or a ticket, the use of the buttons is disabled
         cardDeckButton.disableProperty().bind(drawCardHP.isNull());
@@ -278,6 +291,11 @@ class DecksViewCreator {
     }
 
     private static void displayHelpStage(VBox vbox){
+        vbox=new VBox();
+        vbox.setId("background");
+        if(darkModeButton.isSelected()){
+            vbox.getStylesheets().add("darkRules.css");
+        }
         Stage stage = new Stage(StageStyle.DECORATED);
         ScrollPane scrollPane = new ScrollPane();
         Scene scene = new Scene(scrollPane);
@@ -329,6 +347,8 @@ class DecksViewCreator {
         stage.setScene(scene);
         vbox.getChildren().addAll(textFlow);
         scrollPane.contentProperty().set(vbox);
+
+        DarkModeButton.changeToDarkMode("darkRules.css", vbox);
 
         stage.show();
     }

@@ -39,7 +39,7 @@ public class ServerMain extends Application {
                 "Ada" : getParameters().getRaw().get(0);
         String name2 = getParameters().getRaw().isEmpty() ?
                 "Charles" : getParameters().getRaw().get(1);
-        ServerSocket serverSocket = new ServerSocket(5108);
+        ServerSocket serverSocket = new ServerSocket(5109);
         Socket socket = serverSocket.accept();
         Player player1 = new GraphicalPlayerAdapter();
         Player player2 = new RemotePlayerProxy(socket);

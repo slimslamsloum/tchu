@@ -4,7 +4,7 @@
     -fx-arc-width: 10;
     -fx-arc-height: 10;
     -fx-fill: #a2a1a1;
-    -fx-stroke: dimgrey;
+    -fx-stroke: #a2a1a1;
 }
 
 .card .inside {
@@ -28,8 +28,8 @@
 
 .card .count {
     -fx-font-size: 24;
-    -fx-fill: white;
-    -fx-stroke: white;
+    -fx-fill: #a2a1a1;
+    -fx-stroke: #a2a1a1;
     -fx-effect: dropshadow(gaussian, black, 5, 0, 1, 1);
 }
 
@@ -47,8 +47,9 @@ Button.gauged {
 Button.gauged .background {
     -fx-fill: white;
 }
+
 Button.gauged .foreground {
-    -fx-fill: red;
+    -fx-fill: black;
 }
 
 /* Hand pane (tickets and cards held) */

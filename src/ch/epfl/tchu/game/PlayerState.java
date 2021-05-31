@@ -180,6 +180,14 @@ public final class PlayerState extends PublicPlayerState {
      * @return the number of total points won / lost with the players tickets
      */
     public int ticketPoints(){
+        int totalPoints = 0;
+        for (Ticket ticket : tickets) {
+            totalPoints+=singleTicketPoints(ticket);
+        }
+        return totalPoints;
+    }
+
+    public int singleTicketPoints(Ticket ticket){
         int stationCount=0;
         for(Route route : routes){
             int station1Id = route.station1().id();
@@ -193,7 +201,6 @@ public final class PlayerState extends PublicPlayerState {
         }
 
         StationPartition.Builder partition = new StationPartition.Builder(stationCount+1);
-
         for (Route route : routes) {
             Station departure = route.station1();
             Station arrival = route.station2();
@@ -201,10 +208,7 @@ public final class PlayerState extends PublicPlayerState {
         }
         StationConnectivity connectivity = partition.build();
         int totalPoints=0;
-        for (Ticket ticket : tickets) {
-            totalPoints+=ticket.points(connectivity);
-        }
-        return totalPoints;
+        return ticket.points(connectivity);
     }
 
     /**

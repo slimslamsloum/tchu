@@ -42,6 +42,8 @@ public class ObservableGameState {
     private final Map<Card, SimpleIntegerProperty> numberPerCard;
     private final Map<Route, SimpleBooleanProperty> canClaim;
 
+    private final Map<Ticket, SimpleIntegerProperty> ticketPoints;
+
     /**
      * Observable Game state constructor
      * @param playerId playerId of the player watching the game state
@@ -68,6 +70,8 @@ public class ObservableGameState {
         playerTickets=FXCollections.observableArrayList();
         numberPerCard=numberCardPropertyMap();
         canClaim =booleanPropertyMap();
+
+        ticketPoints = ticketIntegerPropertyMap();
     }
 
     public void setState(PublicGameState newGameState, PlayerState newPlayerState){
@@ -113,6 +117,12 @@ public class ObservableGameState {
                     newGameState.currentPlayerId().equals(ownPlayerId) && newPlayerState.canClaimRoute(route));
             canClaim.get(route).set(bool);
         }
+
+        for(Ticket ticket: playerState.tickets()){
+            ticketPoints.get(ticket).set(playerState.singleTicketPoints(ticket));
+            System.out.println(playerState.singleTicketPoints(ticket));
+        }
+
     }
 
     /**
@@ -216,6 +226,8 @@ public class ObservableGameState {
      */
     public ReadOnlyBooleanProperty canClaim(Route route){ return canClaim.get(route);}
 
+    public ReadOnlyIntegerProperty ticketPoints(Ticket ticket) {return ticketPoints.get(ticket);}
+
     /**
      * canDrawTickets
      * @return the method canDrawTickets applied to the current public game state
@@ -231,6 +243,7 @@ public class ObservableGameState {
     public boolean canDrawCards(){
         return publicGameState.canDrawCards();
     }
+
 
     /**
      * Returns possible claim cards given a certain route, using player state
@@ -297,6 +310,14 @@ public class ObservableGameState {
         Map<Route, SimpleBooleanProperty> map = new HashMap<>();
         for (Route route : ChMap.routes()){
             map.put(route, new SimpleBooleanProperty(false));
+        }
+        return map;
+    }
+
+    private Map<Ticket, SimpleIntegerProperty> ticketIntegerPropertyMap(){
+        Map<Ticket, SimpleIntegerProperty> map = new HashMap<>();
+        for (Ticket ticket : ChMap.tickets()){
+            map.put(ticket, new SimpleIntegerProperty());
         }
         return map;
     }

@@ -31,7 +31,7 @@ public class ClientMain extends Application {
         List<String> params= getParameters().getRaw();
         Player player = new GraphicalPlayerAdapter();
         String host = params.isEmpty() ? "localhost" : params.get(0);
-        int port = params.isEmpty() ? 5108 : Integer.parseInt(params.get(1));
+        int port = params.isEmpty() ? 5109 : Integer.parseInt(params.get(1));
         RemotePlayerClient client = new RemotePlayerClient(player,host,port);
         new Thread(client::run).start();
     }
