@@ -9,7 +9,6 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
@@ -20,9 +19,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Callback;
 import javafx.util.Duration;
-
-import java.util.List;
-
+import javafx.util.Pair;
 import static ch.epfl.tchu.gui.ActionHandlers.*;
 import static ch.epfl.tchu.gui.GuiConstants.*;
 
@@ -43,7 +40,12 @@ class DecksViewCreator {
     //Dark mode button
     public static ToggleButton darkModeButton;
 
-    public final static int ANIMATION_DURATION = 500;
+    //all necessary constants for the animation
+    public final static int ANIMATION_DURATION = 300;
+    public final static double MAX_SIZE = 1.1;
+    public final static double MIN_SIZE = 1;
+    public final static float CAR_OPACITY = 0.3f;
+    public final static float LOCOMOTIVE_OPACITY = 0.7f;
     public final static float MAX_OPACITY = 3.0f;
 
     /**
@@ -61,10 +63,10 @@ class DecksViewCreator {
         ticketListView.setId("tickets");
         handView.getChildren().add(ticketListView);
 
-        ticketListView.setCellFactory(new Callback<ListView<Ticket>, ListCell<Ticket>>() {
+        ticketListView.setCellFactory(new Callback<>() {
             @Override
             public ListCell<Ticket> call(ListView<Ticket> param) {
-                return new ListCell<Ticket>(){
+                return new ListCell<>(){
                     protected void updateItem(Ticket item, boolean empty) {
                         super.updateItem(item, empty);
                         if (item == null || empty) {
@@ -108,7 +110,7 @@ class DecksViewCreator {
                         }
                     }
                 };
-            };
+            }
         });
 
         //Creation of the view of all player's cards
@@ -180,7 +182,7 @@ class DecksViewCreator {
         VBox vboxHelp = new VBox();
         DarkModeButton.changeToDarkMode("darkRules.css", vboxHelp);
         vboxHelp.setId("background");
-        helpButton.setOnMouseClicked(event -> displayHelpStage(vboxHelp));
+        helpButton.setOnMouseClicked(event -> displayHelpStage());
 
 
         //In case the player doesn't want to draw a card or a ticket, the use of the buttons is disabled
@@ -200,10 +202,10 @@ class DecksViewCreator {
      */
     private static StackPane handCardView(Card card, ObservableGameState observableGameState){
 
-        List<Float> opacity = List.of(card.equals(Card.LOCOMOTIVE) ? 0.7f : 0.3f);
+        float opacity = card.equals(Card.LOCOMOTIVE) ? 0.7f : 0.3f;
 
         //creates a new basic view of a card
-        StackPane handCardView = cardView(opacity);
+        StackPane handCardView = createHandCardView(opacity);
 
         //Creates the property of a player containing the number of cards of a single type
         //he has in his possession
@@ -227,38 +229,45 @@ class DecksViewCreator {
         //the shapes and the text are defined as children of the view of the card
         handCardView.getChildren().add(countText);
 
+        //creates an animation for a hand's card
+        //addCardAnimation(handCardView);
+
         return handCardView;
     }
-
+    /**
+     * Method that creates the view of a faceUpCard
+     * @param slot the slot in which the card is placed
+     * @param observableGameState the observable GameState, contains the number of cards of the player
+     * @param drawCardHP the property to draw cards
+     * @return The view of the card
+     */
     private static StackPane faceUpCardView(int slot, ObservableGameState observableGameState,
                                             ObjectProperty<DrawCardHandler> drawCardHP){
-
-        List<Float> opacity = List.of(0.3f);
-        //Creates a new basic view of a card
-        StackPane faceUpCardView = cardView(opacity);
-
-        faceUpCardView.getStyleClass().addAll("", "card");
+        //Creates a new basic view of a card, with animation
+        StackPane faceUpCardView = createDeckCardView(observableGameState.faceUpCard(slot));
         //Adds the new card on the deck if ever a card is drawn by a player
         //And applies the right visual representation of the card according to its color
         observableGameState.faceUpCard(slot).addListener((prop,oldVal,newVal) ->
-                faceUpCardView.getStyleClass().set(0, newVal.equals(Card.LOCOMOTIVE) ? "NEUTRAL" : newVal.color().name() ));
-
+                faceUpCardView.getStyleClass().set(0, newVal.equals(Card.LOCOMOTIVE) ? "NEUTRAL" : newVal.color().name()));
         //If the player doesn't want to draw cards, the use of the faceUpCard is disabled
         faceUpCardView.disableProperty().bind(drawCardHP.isNull());
 
         //Calls the action handler in case the players clicks on a card with his mouse
         faceUpCardView.setOnMouseClicked(event -> drawCardHP.get().onDrawCard(slot));
 
+
         return faceUpCardView;
     }
 
     /**
-     * Method that creates the shape of a card
-     * @return The visual shape of the card
+     * Method that creates a new view of a card in the player's hand, which comes with an animation
+     * @param opacity the opacity of the card
+     * @return a basic view of a card in the player's hand, with an animation
      */
-    private static StackPane cardView(List<Float> opacity){
+    private static StackPane createHandCardView(float opacity){
 
         StackPane cardShape = new StackPane();
+        cardShape.getStyleClass().addAll("", "card");
 
         //Creation of all the shapes that make up the card's visual representation
         Rectangle outsideRectangle = new Rectangle(DVC_OUTSIDE_LENGTH,DVC_OUTSIDE_HEIGHT);
@@ -271,7 +280,34 @@ class DecksViewCreator {
         imageRectangle.getStyleClass().add("train-image");
 
         //The card animations are created thanks to a private static method
-        addCardAnimation(opacity.get(0), cardShape, imageRectangle);
+        addHandCardAnimation(opacity, cardShape, imageRectangle);
+
+        cardShape.getChildren().addAll(outsideRectangle,insideRectangle,imageRectangle);
+        return cardShape;
+    }
+
+    /**
+     * Method that creates the shape of a card from the deck
+     * @param readOnlyObjectProperty the card's property, later used to obtain the card's type
+     * @return The visual shape of the card, that can be animated
+     */
+    private static StackPane createDeckCardView(ReadOnlyObjectProperty<Card> readOnlyObjectProperty){
+
+        StackPane cardShape = new StackPane();
+        cardShape.getStyleClass().addAll("", "card");
+
+        //Creation of all the shapes that make up the card's visual representation
+        Rectangle outsideRectangle = new Rectangle(DVC_OUTSIDE_LENGTH,DVC_OUTSIDE_HEIGHT);
+        outsideRectangle.getStyleClass().add("outside");
+
+        Rectangle insideRectangle = new Rectangle(DVC_INSIDE_LENGTH,DVC_INSIDE_HEIGHT);
+        insideRectangle.getStyleClass().addAll("inside", "filled");
+
+        Rectangle imageRectangle = new Rectangle(DVC_INSIDE_LENGTH,DVC_INSIDE_HEIGHT);
+        imageRectangle.getStyleClass().add("train-image");
+
+        //The card animations are created thanks to a private static method
+        addDeckCardAnimation(readOnlyObjectProperty, cardShape, imageRectangle);
 
         cardShape.getChildren().addAll(outsideRectangle,insideRectangle,imageRectangle);
         return cardShape;
@@ -310,63 +346,148 @@ class DecksViewCreator {
 
     /**
      * Method that allows the creation of an animation for the card when the mouse is over the card
-     * @param opacity the opacity of the image in the card
+     * @param readOnlyObjectProperty allows us to obtain the opacity of the image in the card
      * @param card the view of the card
      * @param imageRectangle the image in the card (on which we modify the opacity)
      */
-    private static void addCardAnimation(float opacity, StackPane card, Rectangle imageRectangle){
+    private static void addDeckCardAnimation(ReadOnlyObjectProperty<Card> readOnlyObjectProperty,
+                                             StackPane card, Rectangle imageRectangle){
 
         //Fade animation that allows a fade from a light to a dark color when the mouse enters the image
-        FadeTransition inFadeTransition =
+        FadeTransition cardInFadeTransition =
                 new FadeTransition(Duration.millis(ANIMATION_DURATION), imageRectangle);
-        inFadeTransition.setFromValue(0.3f);
-        inFadeTransition.setToValue(MAX_OPACITY);
+        cardInFadeTransition.setFromValue(CAR_OPACITY);
+        cardInFadeTransition.setToValue(MAX_OPACITY);
 
         //Fade animation that allows a fade from a dark to a light color when the mouse exited the image
-        FadeTransition outFadeTransition =
+        FadeTransition cardOutFadeTransition =
                 new FadeTransition(Duration.millis(ANIMATION_DURATION), imageRectangle);
-        outFadeTransition.setFromValue(MAX_OPACITY);
-        outFadeTransition.setToValue(0.3f);
+        cardOutFadeTransition.setFromValue(MAX_OPACITY);
+        cardOutFadeTransition.setToValue(CAR_OPACITY);
 
-        //Scalar animation that allows the image to grow when the mouse entered the image
-        ScaleTransition inScaleTransition =
-                new ScaleTransition(Duration.millis(ANIMATION_DURATION), card);
-        inScaleTransition.setFromX(1);
-        inScaleTransition.setFromY(1);
-        inScaleTransition.setToX(1.1);
-        inScaleTransition.setToY(1.1);
+        //Fade animation that allows a fade from a light to a dark color when the mouse enters the image
+        FadeTransition locomotiveInFadeTransition =
+                new FadeTransition(Duration.millis(ANIMATION_DURATION), imageRectangle);
+        locomotiveInFadeTransition.setFromValue(LOCOMOTIVE_OPACITY);
+        locomotiveInFadeTransition.setToValue(MAX_OPACITY);
 
-        //Scalar animation that allows the image to shrink when the mouse entered the image
-        ScaleTransition outScaleTransition =
-                new ScaleTransition(Duration.millis(ANIMATION_DURATION), card);
-        outScaleTransition.setFromX(1.1);
-        outScaleTransition.setFromY(1.1);
-        outScaleTransition.setToX(1);
-        outScaleTransition.setToY(1);
+        //Fade animation that allows a fade from a dark to a light color when the mouse exited the image
+        FadeTransition locomotiveOutFadeTransition =
+                new FadeTransition(Duration.millis(ANIMATION_DURATION), imageRectangle);
+        locomotiveOutFadeTransition.setFromValue(MAX_OPACITY);
+        locomotiveOutFadeTransition.setToValue(LOCOMOTIVE_OPACITY);
+
+        //Creation of the scalar animation that allows the image to grow/shrink
+        Pair<ScaleTransition,ScaleTransition> scaleTransition = createScaleTransition(card);
 
         //allows the fade and scalar transitions to take place simultaneously
         ParallelTransition inParallelTransition = new ParallelTransition();
         inParallelTransition.getChildren().addAll(
-                inFadeTransition,
-                inScaleTransition
+                cardInFadeTransition,
+                scaleTransition.getKey()
         );
 
         ParallelTransition outParallelTransition = new ParallelTransition();
         outParallelTransition.getChildren().addAll(
-                outFadeTransition,
-                outScaleTransition
+                cardOutFadeTransition,
+                scaleTransition.getValue()
+        );
+        //changes the opacity of the animation in function of the card's original opacity
+        readOnlyObjectProperty.addListener((p,o,n) -> {
+            if(n.equals(Card.LOCOMOTIVE)) {
+                inParallelTransition.getChildren().set(0,locomotiveInFadeTransition);
+                outParallelTransition.getChildren().set(0,locomotiveOutFadeTransition);
+            }
+            else {
+                inParallelTransition.getChildren().set(0, cardInFadeTransition);
+                outParallelTransition.getChildren().set(0, cardOutFadeTransition);
+            }
+            card.setOnMouseEntered(event -> {
+                inParallelTransition.play();
+                outParallelTransition.stop();
+            });
+            card.setOnMouseExited(event -> {
+                outParallelTransition.play();
+                inParallelTransition.stop();
+            });
+        });
+    }
+
+
+    /**
+     * Method that allows the creation of an animation for the card when the mouse is over the card
+     * @param opacity the opacity of the image in the card
+     * @param card the view of the card
+     * @param imageRectangle the image in the card (on which we modify the opacity)
+     */
+    private static void addHandCardAnimation(float opacity,
+                                             StackPane card, Rectangle imageRectangle){
+
+        //Fade animation that allows a fade from a light to a dark color when the mouse enters the image
+        FadeTransition cardInFadeTransition =
+                new FadeTransition(Duration.millis(ANIMATION_DURATION), imageRectangle);
+        cardInFadeTransition.setFromValue(opacity);
+        cardInFadeTransition.setToValue(MAX_OPACITY);
+
+        //Fade animation that allows a fade from a dark to a light color when the mouse exited the image
+        FadeTransition cardOutFadeTransition =
+                new FadeTransition(Duration.millis(ANIMATION_DURATION), imageRectangle);
+        cardOutFadeTransition.setFromValue(MAX_OPACITY);
+        cardOutFadeTransition.setToValue(opacity);
+
+
+        //Creation of the scalar animation that allows the image to grow/shrink
+        Pair<ScaleTransition,ScaleTransition> scaleTransition = createScaleTransition(card);
+
+        //allows the fade and scalar transitions to take place simultaneously
+        ParallelTransition inParallelTransition = new ParallelTransition();
+        inParallelTransition.getChildren().addAll(
+                cardInFadeTransition,
+                scaleTransition.getKey()
         );
 
-        //sets the right animations when the mouse enters the card's perimeter
+        ParallelTransition outParallelTransition = new ParallelTransition();
+        outParallelTransition.getChildren().addAll(
+                cardOutFadeTransition,
+                scaleTransition.getValue()
+        );
+        ///sets the right animations when the mouse enters the card's perimeter
         card.setOnMouseEntered(event -> {inParallelTransition.play();
             outParallelTransition.stop();});
+
         //sets the right animations when the mouse exists the card's perimeter
         card.setOnMouseExited(event -> {outParallelTransition.play();
             inParallelTransition.stop();});
+
     }
 
-    private static void displayHelpStage(VBox vbox){
-        vbox=new VBox();
+    /**
+     * Method that allows to create the scalar animation of a card
+     * @param card the type of the card
+     * @return the pair of in and out animations
+     */
+    private static Pair<ScaleTransition,ScaleTransition> createScaleTransition(StackPane card){
+        //Scalar animation that allows the image to grow when the mouse entered the image
+        ScaleTransition inScaleTransition =
+                new ScaleTransition(Duration.millis(ANIMATION_DURATION), card);
+        inScaleTransition.setFromX(MIN_SIZE);
+        inScaleTransition.setFromY(MIN_SIZE);
+        inScaleTransition.setToX(MAX_SIZE);
+        inScaleTransition.setToY(MAX_SIZE);
+
+
+        //Scalar animation that allows the image to shrink when the mouse entered the image
+        ScaleTransition outScaleTransition =
+                new ScaleTransition(Duration.millis(ANIMATION_DURATION), card);
+        outScaleTransition.setFromX(MAX_SIZE);
+        outScaleTransition.setFromY(MAX_SIZE);
+        outScaleTransition.setToX(MIN_SIZE);
+        outScaleTransition.setToY(MIN_SIZE);
+        return new Pair<>(inScaleTransition,outScaleTransition);
+    }
+
+    private static void displayHelpStage(){
+        VBox vbox = new VBox();
         vbox.setId("background");
         if(darkModeButton.isSelected()){
             vbox.getStylesheets().add("darkRules.css");

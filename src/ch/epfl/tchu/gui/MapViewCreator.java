@@ -2,12 +2,15 @@ package ch.epfl.tchu.gui;
 
 import ch.epfl.tchu.SortedBag;
 import ch.epfl.tchu.game.*;
+import javafx.animation.Animation;
+import javafx.animation.RotateTransition;
 import javafx.beans.property.*;
 import javafx.scene.Group;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
+import javafx.util.Duration;
 
 import static ch.epfl.tchu.gui.ActionHandlers.*;
 import static ch.epfl.tchu.gui.GuiConstants.*;
@@ -49,6 +52,10 @@ class MapViewCreator {
 
             // creation of a group proper to each route
             Group routeGroup = groupForRoute(route);
+
+            //creation of a list with animations for each cars
+            List<RotateTransition> carAnimation = new ArrayList<>();
+
             // iteration on the length of the route to produce each box that makes up the route
             for (int index = 0; index < route.length(); ++index) {
 
@@ -56,6 +63,7 @@ class MapViewCreator {
                 Group caseGroup = groupForCase(index, route);
                 Group carGroup = groupForCar();
                 caseGroup.getChildren().add(carGroup);
+                carAnimation.add(addCarAnimation(carGroup));
                 routeGroup.getChildren().add(caseGroup);
             }
             //The route group is added as a children of the map
@@ -69,7 +77,8 @@ class MapViewCreator {
 
             //Allows the route to change visually if the route is taken by a new owner
             observableGameState.routePlayerId(route).addListener((property, oldVal, newVal)
-                    -> routeGroup.getStyleClass().add(newVal.name())
+                    -> {routeGroup.getStyleClass().add(newVal.name());
+                carAnimation.forEach(Animation::play);}
             );
 
             //Allow the players to take the route with their mouse
@@ -160,5 +169,16 @@ class MapViewCreator {
         // which is finally added to the routeGroup
         carGroup.getChildren().addAll(carRectangle, c1, c2);
         return carGroup;
+    }
+    /**
+     * Method creates an animation for each car Group
+     * @param carGroup the car Group that will be animated
+     * @return a new RotationTransition for the car group
+     */
+    private static RotateTransition addCarAnimation(Group carGroup){
+        RotateTransition rotateTransition =
+                new RotateTransition(Duration.millis(500), carGroup);
+        rotateTransition.setByAngle(360f);
+        return rotateTransition;
     }
 }
