@@ -1,0 +1,22 @@
+#mainTitle {
+    -fx-fill: red;
+    -fx-text-alignment: center;
+    -fx-font-weight: bold;
+    -fx-font-size: 30px;
+}
+
+#title {
+    -fx-fill: red;
+    -fx-text-alignment: center;
+    -fx-font-weight: bold;
+    -fx-font-size: 20px;
+}
+
+#text {
+    -fx-font-size: 15;
+    -fx-fill: white;
+}
+
+#background {
+    -fx-background-color: #312d38;
+}
