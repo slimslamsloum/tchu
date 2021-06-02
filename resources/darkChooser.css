@@ -3,14 +3,23 @@ VBox {
     -fx-alignment: center;
     -fx-padding: 20;
     -fx-max-width: 450;
-    -fx-background-color: dimgrey;
+    -fx-background-color: #312d38;
+    -fx-fill: #312d38;
 }
 
 ListView {
     -fx-pref-width: 400;
     -fx-pref-height: 150;
+
 }
 
 #text {
     -fx-fill: white;
 }
+
+Button {
+    -fx-content-display: bottom;
+    -fx-background-color: #a2a1a1;
+}
+
+

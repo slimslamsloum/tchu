@@ -200,10 +200,6 @@ public class GraphicalPlayer {
         //stage is created with auxiliary method choiceStage
         Stage stage = choiceStage(listView, CARDS_CHOICE, CHOOSE_CARDS, choiceButton);
 
-        //textual representation of elements in listView are converted with CardBagStringConverter class
-        listView.setCellFactory(v ->
-                new TextFieldListCell<>(new CardBagStringConverter()));
-
         //button is disabled while player hasn't chosen a combination of cards
         choiceButton.disableProperty()
                 .bind(Bindings.equal(0, Bindings.size(listView.getSelectionModel().getSelectedItems())));
@@ -229,10 +225,6 @@ public class GraphicalPlayer {
         Button choiceButton = new Button(CHOOSE);
         //stage is created with choiceStage method
         Stage stage = choiceStage(listView, CARDS_CHOICE, CHOOSE_ADDITIONAL_CARDS, choiceButton);
-
-        //textual representation of elements in listView are converted with CardBagStringConverter class
-        listView.setCellFactory(v ->
-                new TextFieldListCell<>(new CardBagStringConverter()));
 
         //tab can't be closed while picking cards
         stage.setOnCloseRequest(Event::consume);
@@ -264,8 +256,9 @@ public class GraphicalPlayer {
         Text text = new Text(intro);
         text.setId("text");
         TextFlow textFlow = new TextFlow(text);
-
-        /*
+        if(DecksViewCreator.darkModeButton.isSelected()){
+            scene.getStylesheets().add("darkChooser.css");
+        }
 
         listView.setCellFactory(new Callback<ListView<T>, ListCell<T>>() {
             @Override
@@ -281,28 +274,20 @@ public class GraphicalPlayer {
                             setStyle("-fx-control-inner-background: " + "derive(-fx-base,80%)" + ";");
                             setText(item.toString());
                         }
-                        DecksViewCreator.darkModeButton.selectedProperty().addListener((obs, wasSelected, isSelected)->{
+                        if (DecksViewCreator.darkModeButton.isSelected()){
                             if (item == null || empty) {
                                 setText(null);
-                                setStyle("-fx-control-inner-background: " + "derive(-fx-base,80%)" + ";");
-                            }
-                            else if (isSelected){
-                                setStyle("-fx-control-inner-background: " + "dimgrey" + ";");
-                                setText(item.toString());
+                                setStyle("-fx-control-inner-background: " + "#312d38" + ";");
                             }
                             else{
-                                setStyle("-fx-control-inner-background: " + "derive(-fx-base,80%)" + ";");
+                                setStyle("-fx-control-inner-background: " + "#312d38" + ";");
                                 setText(item.toString());
                             }
-                        });
+                        }
                     }
                 };
             };
         });
-
-        DarkModeButton.changeToDarkMode("darkChooser.css", vbox);
-
-         */
 
         //stage is given new title
         stage.setTitle(title);

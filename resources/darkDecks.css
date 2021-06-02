@@ -42,7 +42,7 @@
 }
 
 Button.gauged {
-     -fx-content-display: bottom;
+    -fx-content-display: bottom;
     -fx-background-color: #a2a1a1;
 
 }

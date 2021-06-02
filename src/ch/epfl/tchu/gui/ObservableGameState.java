@@ -120,7 +120,6 @@ public class ObservableGameState {
 
         for(Ticket ticket: playerState.tickets()){
             ticketPoints.get(ticket).set(playerState.singleTicketPoints(ticket));
-            System.out.println(playerState.singleTicketPoints(ticket));
         }
 
     }
